@@ -115,14 +115,6 @@ class PlayerClient(Player):
         except (MPDError, IOError) as err:
             raise PlayerError("Couldn't init idle: %s" % err)
 
-    def idle(self):
-        try:
-            self._client.send_idle('database', 'playlist', 'player', 'options')
-            select([self._client], [], [], 60)
-            return self._client.fetch_idle()
-        except (MPDError, IOError) as err:
-            raise PlayerError("Couldn't init idle: %s" % err)
-
     def remove(self, position=0):
         self._client.delete(position)
 
@@ -134,6 +126,7 @@ class PlayerClient(Player):
     def current(self):
         return self.currentsong()
 
+    @property
     def playlist(self):
         """
         Override deprecated MPD playlist command
@@ -192,7 +185,6 @@ class PlayerClient(Player):
         # If that fails, don't worry, just ignore it and disconnect
         except (MPDError, IOError):
             pass
-
         try:
             self._client.disconnect()
         # Disconnecting failed, so use a new client object instead

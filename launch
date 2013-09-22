@@ -2,13 +2,20 @@
 # -*- coding: utf-8 -*-
 
 def main():
+    from logging import getLogger
+    ##
     from sima import core
     from sima.plugins.crop import Crop
+    from sima.lib.logger import set_logger
+    ##
+    set_logger(log_level='debug')
+    logger = getLogger('sima')
     m = core.Sima()
     m.register_plugin(Crop)
     try:
         m.run()
     except KeyboardInterrupt:
+        logger.info('Caught KeyboardInterrupt, stopping')
         m.shutdown()
 
 
