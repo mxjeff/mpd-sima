@@ -45,15 +45,14 @@ class Sima(object):
         """Dispatching callbacks to plugins
         """
         self.log.debug(self.player.status())
+        self.log.info(self.player.current)
         while 42:
             # hanging here untill a monitored event is raised in the player
             changed = self.player.monitor()
-            self.log.debug(self.player.current)
             if 'playlist' in changed:
                 self.foreach_plugin('callback_playlist')
             if 'player' in changed:
-                pass
-
+                self.log.info(self.player.current)
 
 
 # VIM MODLINE

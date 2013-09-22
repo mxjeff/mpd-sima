@@ -1,0 +1,5 @@
+Design for python >= 3.3
+
+Requires python-musicpd:
+
+		http://media.kaliko.me/src/musicpd/
