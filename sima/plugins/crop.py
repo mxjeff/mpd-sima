@@ -19,6 +19,7 @@ class Crop(Plugin):
         player = self._Plugin__daemon.player
         target_lengh = 10
         while player.currentsong().pos > target_lengh:
+            self.log.debug('cropping playlist')
             player.remove()
 
 

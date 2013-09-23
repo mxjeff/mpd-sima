@@ -36,8 +36,8 @@ from stat import (S_IMODE, ST_MODE, S_IRWXO, S_IRWXG)
 from . import utils
 
 # DEFAULTS
-DIRNAME = 'mpd_sima'
-CONF_FILE = 'mpd_sima.cfg'
+DIRNAME = 'sima'
+CONF_FILE = 'sima.cfg'
 
 DEFAULT_CONF = {
         'MPD': {
@@ -64,7 +64,7 @@ DEFAULT_CONF = {
 #
 
 
-class ConfMan(object):#CONFIG MANAGER CLASS
+class ConfMan(object):  # CONFIG MANAGER CLASS
     """
     Configuration manager.
     Default configuration is stored in DEFAULT_CONF dictionnary.
@@ -89,7 +89,7 @@ class ConfMan(object):#CONFIG MANAGER CLASS
         self.defaults = dict(DEFAULT_CONF)
         self.startopt = options
         ## Sima sqlite DB
-        self.userdb_file = None
+        self.db_file = None
 
         self.log = logger
         ## INIT CALLS
@@ -117,7 +117,7 @@ class ConfMan(object):#CONFIG MANAGER CLASS
         Controls conf file permissions.
         """
         mode = S_IMODE(stat(self.conf_file)[ST_MODE])
-        self.log.debug('file permision is: %o' % mode)
+        self.log.debug('file permission is: %o' % mode)
         if mode & S_IRWXO or mode & S_IRWXG:
             self.log.warning('File is readable by "other" and/or' +
                              ' "group" (actual permission %o octal).' %
@@ -184,7 +184,7 @@ class ConfMan(object):#CONFIG MANAGER CLASS
     def init_config(self):
         """
         Use XDG directory standard if exists
-        else use "HOME/(.config|.local/share)/mpd_sima/"
+        else use "HOME/(.config|.local/share)/sima/"
         http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
         """
 
@@ -223,7 +223,7 @@ class ConfMan(object):#CONFIG MANAGER CLASS
             self.log.error('Please use "--config" to locate the conf file')
             sys.exit(1)
 
-        self.userdb_file = join(data_dir, 'sima.db')
+        self.db_file = join(data_dir, 'sima.db')
 
         config = configparser.SafeConfigParser()
 

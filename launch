@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Sima
+"""
 
 import logging
+import sys
+
+from os.path import isfile
 ##
 
 from sima import core
 from sima.plugins.crop import Crop
+from sima.plugins.addhist import History
 from sima.lib.logger import set_logger
+from sima.lib.simadb import SimaDB
 from sima.utils.config import ConfMan
 from sima.utils.startopt import StartOpt
 from sima.utils.utils import exception_log
@@ -20,10 +27,10 @@ def main():
     # StartOpt gathers options from command line call (in StartOpt().options)
     sopt = StartOpt(info)
     # set logger
-    set_logger(level='debug')
+    verbosity = sopt.options.get('verbosity', 'warning')
+    cli_loglevel = getattr(logging, verbosity.upper())
+    set_logger(level=verbosity)
     logger = logging.getLogger('sima')
-    cli_loglevel = getattr(logging,
-                           sopt.options.get('verbosity', 'warning').upper())
     logger.setLevel(cli_loglevel)
     # loads configuration
     conf_manager = ConfMan(logger, sopt.options)
@@ -32,9 +39,21 @@ def main():
                     config.get('log', 'verbosity').upper()))  # pylint: disable=E1103
 
     logger.debug('Command line say: {0}'.format(sopt.options))
+
+    # Create Database
+    if (sopt.options.get('create_db', None)
+       or not isfile(conf_manager.db_file)):
+        logger.info('Creating database in "{}"'.format(conf_manager.db_file))
+        open(conf_manager.db_file, 'a').close()
+        SimaDB(db_path=conf_manager.db_file).create_db()
+        if sopt.options.get('create_db', None):
+            logger.info('Done, bye...')
+            sys.exit(0)
+
     logger.info('Starting...')
-    sima = core.Sima()
+    sima = core.Sima(config, conf_manager.db_file)
     sima.register_plugin(Crop)
+    sima.register_plugin(History)
     try:
         sima.run()
     except KeyboardInterrupt:

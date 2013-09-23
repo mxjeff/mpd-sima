@@ -27,7 +27,8 @@ import logging
 import sys
 
 LOG_FORMATS = {
-        logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) {levelname}: {message}',
+        logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) '
+                                 '{levelname}: {message}',
         logging.INFO:  '{asctime} {levelname}: {message}'
         }
 DATE_FMT = "%Y-%m-%d %H:%M:%S"

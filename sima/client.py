@@ -26,6 +26,7 @@ class PlayerError(Exception):
 class PlayerCommandError(PlayerError):
     """Command error"""
 
+PlayerUnHandledError = MPDError
 
 class PlayerClient(Player):
     """MPC Client
@@ -91,6 +92,13 @@ class PlayerClient(Player):
                 return Track(**ans)
         return ans
 
+    def __skipped_track(self, old_curr):
+        if (self.state == 'stop'
+            or not hasattr(old_curr, 'id')
+            or not hasattr(self.current, 'id')):
+            return False
+        return (self.current.id != old_curr.id)  # pylint: disable=no-member
+
     def find_track(self, artist, title=None):
         #return getattr(self, 'find')('artist', artist, 'title', title)
         if title:
@@ -108,10 +116,14 @@ class PlayerClient(Player):
         return self.find('artist', artist, 'album', album)
 
     def monitor(self):
+        curr = self.current
         try:
             self._client.send_idle('database', 'playlist', 'player', 'options')
             select([self._client], [], [], 60)
-            return self._client.fetch_idle()
+            ret = self._client.fetch_idle()
+            if self.__skipped_track(curr):
+                ret.append('skipped')
+            return ret
         except (MPDError, IOError) as err:
             raise PlayerError("Couldn't init idle: %s" % err)
 

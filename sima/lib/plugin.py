@@ -2,12 +2,19 @@
 
 class Plugin():
     def __init__(self, daemon):
+        self.log = daemon.log
         self.__daemon = daemon
         #self.history = daemon.player.history
 
     @property
     def name(self):
         return self.__class__.__name__.lower()
+
+    def callback_player(self):
+        """
+        Called on player changes
+        """
+        pass
 
     def callback_playlist(self):
         """
@@ -25,12 +32,6 @@ class Plugin():
 
     def callback_need_song(self):
         """Returns a list of Track objects to add
-        """
-        pass
-
-    def callback_player_stop(self):
-        """Not returning data,
-        Could be use to ensure player never stops
         """
         pass
 
