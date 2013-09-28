@@ -24,9 +24,9 @@
 import traceback
 import sys
 
-from argparse import (ArgumentError, Action)
-from os import (environ, access, getcwd, W_OK, R_OK)
-from os.path import (dirname, isabs, join, normpath, exists, isdir, isfile)
+from argparse import ArgumentError, Action
+from os import environ, access, getcwd, W_OK, R_OK
+from os.path import dirname, isabs, join, normpath, exists, isdir, isfile
 
 def get_mpd_environ():
     """
@@ -63,7 +63,6 @@ def exception_log():
     log.info('Quiting now!')
     sys.exit(1)
 
-
 # ArgParse Callbacks
 class Obsolete(Action):
     # pylint: disable=R0903
@@ -73,7 +72,7 @@ class Obsolete(Action):
         raise ArgumentError(self, 'obsolete argument')
 
 class FileAction(Action):
-    """Generic class to inherit from for ARgPArse action on file/dir
+    """Generic class to inherit from for ArgParse action on file/dir
     """
     # pylint: disable=R0903
     def __call__(self, parser, namespace, values, option_string=None):

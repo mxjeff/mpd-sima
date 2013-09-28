@@ -3,14 +3,15 @@
 # TODO:
 # Add decorator to filter through history?
 
-from sima.lib.track import Track
+# local import
+#from sima.lib.track import Track
 
 
 class Player(object):
 
     """Player interface to inherit from.
 
-    When querying palyer music library for tracks, Player instance *must* return
+    When querying player music library for tracks, Player instance *must* return
     Track objects (usually a list of them)
     """
 

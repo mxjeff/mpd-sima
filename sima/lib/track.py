@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009, 2010, 2011, 2013 Jack Kaliko <efrim@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2013 Jack Kaliko <kaliko@azylum.org>
 # Copyright (c) 2009 J. Alexander Treuman (Tag collapse method)
 # Copyright (c) 2008 Rick van Hattem
 #
-#  This file is part of MPD_sima
+#  This file is part of sima
 #
-#  MPD_sima is free software: you can redistribute it and/or modify
+#  sima is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  MPD_sima is distributed in the hope that it will be useful,
+#  sima is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with MPD_sima.  If not, see <http://www.gnu.org/licenses/>.
+#  along with sima.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
 

@@ -2,10 +2,9 @@
 """Add playing tracks to history
 """
 
-# standart library import
-#from select import select
+# standard library import
 
-# third parties componants
+# third parties components
 
 # local import
 from ..lib.plugin import Plugin

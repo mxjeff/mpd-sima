@@ -3,12 +3,18 @@
 """Sima
 """
 
+# standart library import
 import logging
 import sys
 
-from os.path import isfile
+from importlib import __import__
+from os.path import isfile, basename
 ##
 
+# third parties components
+##
+
+# local import
 from sima import core
 from sima.plugins.crop import Crop
 from sima.plugins.addhist import History
@@ -18,6 +24,32 @@ from sima.utils.config import ConfMan
 from sima.utils.startopt import StartOpt
 from sima.utils.utils import exception_log
 ##
+
+# official plugins to start
+PLUGINS = (Crop, History)
+
+
+def load_contrib_plugins(sima):
+    """Handles contrib/external plugins
+    """
+    if not sima.config.has_option('sima', 'plugins'):
+        return
+    logger = logging.getLogger('sima')
+    for plugin in sima.config.get('sima','plugins').split(','):
+        plugin = plugin.strip(' \n')
+        module = 'sima.plugins.contrib.{}'.format(plugin.lower())
+        try:
+            mod_obj = __import__(module, fromlist=[plugin])
+        except ImportError as err:
+            logger.error('Failed to load plugin\'s module: {0} ({1})'.format(module, err))
+            sima.shutdown()
+        try:
+            plugin_obj = getattr(mod_obj, plugin)
+        except AttributeError as err:
+            logger.error('Failed to load plugin {0} ({1})'.format(plugin, err))
+            sima.shutdown()
+        logger.info('Loading contrib plugin: {name} ({doc})'.format(**plugin_obj.info()))
+        sima.register_plugin(plugin_obj)
 
 
 def main():
@@ -52,8 +84,14 @@ def main():
 
     logger.info('Starting...')
     sima = core.Sima(config, conf_manager.db_file)
-    sima.register_plugin(Crop)
-    sima.register_plugin(History)
+
+    #  Loading internal plugins
+    for plugin in PLUGINS:
+        logger.info('Loading internal plugin: {name} ({doc})'.format(**plugin.info()))
+        sima.register_plugin(plugin)
+
+    #  Loading contrib plugins
+    load_contrib_plugins(sima)
     try:
         sima.run()
     except KeyboardInterrupt:

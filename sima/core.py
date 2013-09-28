@@ -40,6 +40,7 @@ class Sima(object):
     def foreach_plugin(self, method, *args, **kwds):
         """Plugin's callbacks dispatcher"""
         for plugin in self.plugins:
+            #self.log.debug('dispatching {0} to {1}'.format(method, plugin))
             getattr(plugin, method)(*args, **kwds)
 
     def reconnect_player(self):

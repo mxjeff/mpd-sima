@@ -13,6 +13,7 @@ from ..lib.plugin import Plugin
 class Crop(Plugin):
     """
     Crop playlist on next track
+    kinda MPD's consume
     """
 
     def callback_playlist(self):

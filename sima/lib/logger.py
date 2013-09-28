@@ -23,8 +23,10 @@
 Logging facility for sima.
 """
 
+# standard library import
 import logging
 import sys
+
 
 LOG_FORMATS = {
         logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) '
