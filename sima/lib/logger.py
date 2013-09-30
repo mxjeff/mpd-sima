@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009, 2010, 2013 Jack Kaliko <efrim@azylum.org>
+# Copyright (c) 2009, 2010, 2013 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #

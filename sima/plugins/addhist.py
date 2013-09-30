@@ -11,7 +11,7 @@ from ..lib.plugin import Plugin
 
 class History(Plugin):
     """
-    History
+    History management
     """
     def __init__(self, daemon):
         Plugin.__init__(self, daemon)

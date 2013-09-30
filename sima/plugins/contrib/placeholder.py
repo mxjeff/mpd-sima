@@ -16,8 +16,9 @@ class PlaceHolder(Plugin):
     """
 
     def callback_player(self):
-        self.log.info(self.plugin_conf)
-        self.log.debug('{0} contrib plugin!!!'.format(self))
+        #self.log.info(self.plugin_conf)
+        #self.log.debug('{0} contrib plugin!!!'.format(self))
+        pass
 
 
 

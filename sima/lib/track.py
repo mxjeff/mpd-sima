@@ -27,7 +27,7 @@ import time
 class Track(object):
     """
     Track object.
-    Instanciate with mpd replies.
+    Instanciate with Player replies.
     """
 
     def __init__(self, file=None, time=0, pos=0, **kwargs):

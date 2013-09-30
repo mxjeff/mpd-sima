@@ -16,17 +16,21 @@ from os.path import isfile, basename
 
 # local import
 from sima import core
-from sima.plugins.crop import Crop
-from sima.plugins.addhist import History
 from sima.lib.logger import set_logger
 from sima.lib.simadb import SimaDB
 from sima.utils.config import ConfMan
 from sima.utils.startopt import StartOpt
 from sima.utils.utils import exception_log
 ##
+# internal plugins
+from sima.plugins.crop import Crop
+from sima.plugins.addhist import History
+from sima.plugins.lastfm import Lastfm
+from sima.plugins.mpd import MpdOptions
 
 # official plugins to start
-PLUGINS = (Crop, History)
+PLUGINS = (Crop, History, MpdOptions,
+           Lastfm)
 
 
 def load_contrib_plugins(sima):
@@ -50,6 +54,12 @@ def load_contrib_plugins(sima):
             sima.shutdown()
         logger.info('Loading contrib plugin: {name} ({doc})'.format(**plugin_obj.info()))
         sima.register_plugin(plugin_obj)
+
+
+def load_internal_plugins(sima):
+    """Handles contrib/external plugins
+    """
+    raise NotImplementedError
 
 
 def main():

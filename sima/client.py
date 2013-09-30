@@ -130,6 +130,11 @@ class PlayerClient(Player):
     def remove(self, position=0):
         self._client.delete(position)
 
+    def add(self, track):
+        """Overriding MPD's add method to accept add signature with a Track
+        object"""
+        self._client.add(track.file)
+
     @property
     def state(self):
         return str(self._client.status().get('state'))
@@ -137,6 +142,12 @@ class PlayerClient(Player):
     @property
     def current(self):
         return self.currentsong()
+
+    @property
+    def queue(self):
+        plst = self.playlist
+        plst.reverse()
+        return [ trk for trk in plst if int(trk.pos) > int(self.current.pos)]
 
     @property
     def playlist(self):
@@ -178,7 +189,7 @@ class PlayerClient(Player):
                 raise PlayerError("Could not connect to '%s': "
                                   "error with password command: %s" %
                                   (self._host, err))
-        # Controls we have sufficient rights for MPD_sima
+        # Controls we have sufficient rights
         needed_cmds = ['status', 'stats', 'add', 'find', \
                        'search', 'currentsong', 'ping']
 

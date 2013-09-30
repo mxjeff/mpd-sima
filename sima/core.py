@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Core Object dealing with plugins and player client
 """
@@ -10,9 +9,10 @@ __url__ = 'git://git.kaliko.me/sima.git'
 import sys
 import time
 
+from collections import deque
 from logging import getLogger
 
-from .client import PlayerClient, Track
+from .client import PlayerClient
 from .client import PlayerError, PlayerUnHandledError
 from .lib.simadb import SimaDB
 
@@ -21,6 +21,7 @@ class Sima(object):
     """
 
     def __init__(self, conf, dbfile):
+        self.enabled = True
         self.config = conf
         self.sdb = SimaDB(db_path=dbfile)
         self.log = getLogger('sima')
@@ -31,7 +32,10 @@ class Sima(object):
         except (PlayerError, PlayerUnHandledError) as err:
             self.log.error('Fails to connect player: {}'.format(err))
             self.shutdown()
-        self.current_track = None
+        self.short_history = deque(maxlen=40)
+
+    def add_history(self):
+        self.short_history.appendleft(self.player.current)
 
     def register_plugin(self, plugin_class):
         """Registers plubin in Sima instance..."""
@@ -42,6 +46,27 @@ class Sima(object):
         for plugin in self.plugins:
             #self.log.debug('dispatching {0} to {1}'.format(method, plugin))
             getattr(plugin, method)(*args, **kwds)
+
+    def need_tracks(self):
+        if not self.enabled:
+            self.log.debug('Queueing disabled!')
+            return False
+        queue = self.player.queue
+        queue_trigger = self.config.getint('sima', 'queue_length')
+        self.log.debug('Currently {0} track(s) ahead. (target {1})'.format(
+                       len(queue), queue_trigger))
+        if len(queue) < queue_trigger:
+            return True
+        return False
+
+    def queue(self):
+        to_add = list()
+        for plugin in self.plugins:
+            pl_callback =  getattr(plugin, 'callback_need_track')()
+            if pl_callback:
+                to_add.extend(pl_callback)
+        for track in to_add:
+            self.player.add(track)
 
     def reconnect_player(self):
         """Trying to reconnect cycling through longer timeout
@@ -78,7 +103,6 @@ class Sima(object):
     def run(self):
         """
         """
-        self.current_track = Track()
         while 42:
             try:
                 self.loop()
@@ -96,21 +120,25 @@ class Sima(object):
         """Dispatching callbacks to plugins
         """
         # hanging here untill a monitored event is raised in the player
-        if getattr(self, 'changed', False): # first loop detection
+        if getattr(self, 'changed', False): # first iteration exception
             self.changed = self.player.monitor()
-        else:
+        else:  # first iteration goes through else
             self.changed = ['playlist', 'player', 'skipped']
         self.log.debug('changed: {}'.format(', '.join(self.changed)))
         if 'playlist' in self.changed:
             self.foreach_plugin('callback_playlist')
-        if 'player' in self.changed:
+        if ('player' in self.changed
+            or 'options' in self.changed):
             self.foreach_plugin('callback_player')
+        if 'database' in self.changed:
+            self.foreach_plugin('callback_player_database')
         if 'skipped' in self.changed:
             if self.player.state == 'play':
                 self.log.info('Playing: {}'.format(self.player.current))
+                self.add_history()
                 self.foreach_plugin('callback_next_song')
-                self.current_track = self.player.current
-
+        if self.need_tracks():
+            self.queue()
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

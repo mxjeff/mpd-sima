@@ -45,22 +45,25 @@ DEFAULT_CONF = {
             'password': "false",
             'port': "6600"},
         'sima': {
-            'similarity': "15",
-            'dynamic': "10",
-            'queue_mode': "track", #TODO control values
             'user_db': "false",
             'history_duration': "8",
             'queue_length': "1",
-            'track_to_add': "1",
-            'album_to_add': "1",
-            'consume': "0",
-            'single_album': "false",
-            'check_new_version':"false",},
+            'consume': "0",},
         'daemon':{
             'daemon': "false",
             'pidfile': "",},
         'log': {
-            'verbosity': "info"}}
+            'verbosity': "info"},
+        'lastfm': {
+            'dynamic': "10",
+            'similarity': "18",
+            'queue_mode': "track", #TODO control values
+            'single_album': "false",
+            'track_to_add': "1",
+            'album_to_add': "1",
+            'depth': "1",
+            }
+        }
 #
 
 

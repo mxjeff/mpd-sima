@@ -35,13 +35,19 @@ class Plugin():
         for sec in conf.sections():
             if sec.lower() == self.__class__.__name__.lower():
                 self.plugin_conf = dict(conf.items(sec))
-        if self.plugin_conf:
-            self.log.debug('Got config for {0}: {1}'.format(self,
-                                                            self.plugin_conf))
+        #if self.plugin_conf:
+        #    self.log.debug('Got config for {0}: {1}'.format(self,
+        #                                                    self.plugin_conf))
 
     def callback_player(self):
         """
-        Called on player changes
+        Called on player changes, stopped, paused, skipped
+        """
+        pass
+
+    def callback_player_database(self):
+        """
+        Called on player music library changes
         """
         pass
 
@@ -59,7 +65,7 @@ class Plugin():
         """
         pass
 
-    def callback_need_song(self):
+    def callback_need_track(self):
         """Returns a list of Track objects to add
         """
         pass
