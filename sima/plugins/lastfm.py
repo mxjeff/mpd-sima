@@ -79,12 +79,11 @@ class Lastfm(Plugin):
         """
         for _ , val in self._cache.items():
             if isinstance(val, dict):
-                while len(val) > 100:
+                while len(val) > 150:
                     val.popitem()
 
     def get_history(self, artist):
-        """Check against history for tracks already in history for a specific
-        artist.
+        """Constructs list of Track for already played titles for an artist.
         """
         duration = self.daemon_conf.getint('sima', 'history_duration')
         tracks_from_db = self.sdb.get_history(duration=duration, artist=artist)
@@ -311,12 +310,14 @@ class Lastfm(Plugin):
     def _album(self):
         """Get albums for album queue mode
         """
-        artists = self.get_local_similar_artists()
+        #artists = self.get_local_similar_artists()
+        pass
 
     def _top(self):
         """Get some tracks for top track queue mode
         """
-        artists = self.get_local_similar_artists()
+        #artists = self.get_local_similar_artists()
+        pass
 
     def callback_need_track(self):
         self._cleanup_cache()

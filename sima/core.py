@@ -26,13 +26,20 @@ class Sima(object):
         self.sdb = SimaDB(db_path=dbfile)
         self.log = getLogger('sima')
         self.plugins = list()
-        self.player = PlayerClient()  # Player client
+        self.player = self._get_player()  # Player client
         try:
             self.player.connect()
         except (PlayerError, PlayerUnHandledError) as err:
             self.log.error('Fails to connect player: {}'.format(err))
             self.shutdown()
-        self.short_history = deque(maxlen=40)
+        self.short_history = deque(maxlen=60)
+
+    def _get_player(self):
+        """Instanciate the player"""
+        host = self.config.get('MPD', 'host')
+        port = self.config.get('MPD', 'port')
+        pswd = self.config.get('MPD', 'password', fallback=None)
+        return PlayerClient(host, port, pswd)
 
     def add_history(self):
         self.short_history.appendleft(self.player.current)
@@ -65,6 +72,13 @@ class Sima(object):
             pl_callback =  getattr(plugin, 'callback_need_track')()
             if pl_callback:
                 to_add.extend(pl_callback)
+        if not to_add:
+            self.log.warning('Queue plugins returned anything!')
+            for plugin in self.plugins:
+                self.log.info('calling fb for {}'.format(plugin))
+                pl_callback =  getattr(plugin, 'callback_need_track_fb')()
+                if pl_callback:
+                    to_add.extend(pl_callback)
         for track in to_add:
             self.player.add(track)
 

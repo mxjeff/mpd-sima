@@ -8,7 +8,7 @@ import logging
 import sys
 
 from importlib import __import__
-from os.path import isfile, basename
+from os.path import isfile
 ##
 
 # third parties components
@@ -27,10 +27,11 @@ from sima.plugins.crop import Crop
 from sima.plugins.addhist import History
 from sima.plugins.lastfm import Lastfm
 from sima.plugins.mpd import MpdOptions
+from sima.plugins.randomfallback import RandomFallBack
 
 # official plugins to start
 PLUGINS = (Crop, History, MpdOptions,
-           Lastfm)
+           Lastfm, RandomFallBack)
 
 
 def load_contrib_plugins(sima):

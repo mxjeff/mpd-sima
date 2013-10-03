@@ -42,7 +42,7 @@ CONF_FILE = 'sima.cfg'
 DEFAULT_CONF = {
         'MPD': {
             'host': "localhost",
-            'password': "false",
+            #'password': "",
             'port': "6600"},
         'sima': {
             'user_db': "false",
@@ -56,12 +56,16 @@ DEFAULT_CONF = {
             'verbosity': "info"},
         'lastfm': {
             'dynamic': "10",
-            'similarity': "18",
+            'similarity': "20",
             'queue_mode': "track", #TODO control values
             'single_album': "false",
             'track_to_add': "1",
             'album_to_add': "1",
             'depth': "1",
+            },
+        'randomfallback': {
+            'flavour': "sensible", # in pure, sensible, genre
+            'track_to_add': "1",
             }
         }
 #

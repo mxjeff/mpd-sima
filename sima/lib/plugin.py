@@ -15,8 +15,11 @@ class Plugin():
     def info(cls):
         """self documenting class method
         """
+        doc = 'Undocumented plugin! Fill "{}" docstring'.format(cls.__name__)
+        if cls.__doc__:
+            doc = cls.__doc__.strip(' \n').splitlines()[0]
         return {'name': cls.__name__,
-                'doc': cls.__doc__.strip(' \n').splitlines()[0]
+                'doc': doc,
                 }
 
     def __init__(self, daemon):
@@ -67,6 +70,12 @@ class Plugin():
 
     def callback_need_track(self):
         """Returns a list of Track objects to add
+        """
+        pass
+
+    def callback_need_track_fb(self):
+        """Called when callback_next_song failled to find tracks to queue
+        Returns a list of Track objects to add
         """
         pass
 
