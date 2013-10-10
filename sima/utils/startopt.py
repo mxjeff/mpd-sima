@@ -89,7 +89,7 @@ OPTS = [
         'sw':['--var_dir'],
         'dest': 'var_dir',
         'action': Wdir,
-        'help': 'Directory to store var content (ie. database)'},
+        'help': 'Directory to store var content (ie. database, cache)'},
     {
         'sw': ['--create-db'],
         'action': 'store_true',

@@ -53,7 +53,8 @@ DEFAULT_CONF = {
             'daemon': "false",
             'pidfile': "",},
         'log': {
-            'verbosity': "info"},
+            'verbosity': "info",
+            'logfile': "",},
         'lastfm': {
             'dynamic': "10",
             'similarity': "20",
@@ -104,6 +105,7 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         self.init_config()
         self.control_conf()
         self.supersedes_config_with_cmd_line_options()
+        self.config['sima']['db_file'] = self.db_file
 
     def get_pw(self):
         try:
@@ -233,7 +235,6 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         self.db_file = join(data_dir, 'sima.db')
 
         config = configparser.SafeConfigParser()
-
         # If no conf file present, uses defaults
         if not isfile(self.conf_file):
             self.config = config

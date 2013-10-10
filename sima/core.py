@@ -20,13 +20,13 @@ class Sima(object):
     """Main class, plugin and player management
     """
 
-    def __init__(self, conf, dbfile):
+    def __init__(self, conf):
         self.enabled = True
         self.config = conf
-        self.sdb = SimaDB(db_path=dbfile)
+        self.sdb = SimaDB(db_path=conf.get('sima', 'db_file'))
         self.log = getLogger('sima')
         self.plugins = list()
-        self.player = self._get_player()  # Player client
+        self.player = self.__get_player()  # Player client
         try:
             self.player.connect()
         except (PlayerError, PlayerUnHandledError) as err:
@@ -34,7 +34,7 @@ class Sima(object):
             self.shutdown()
         self.short_history = deque(maxlen=60)
 
-    def _get_player(self):
+    def __get_player(self):
         """Instanciate the player"""
         host = self.config.get('MPD', 'host')
         port = self.config.get('MPD', 'port')

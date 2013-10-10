@@ -76,25 +76,24 @@ def main():
     logger = logging.getLogger('sima')
     logger.setLevel(cli_loglevel)
     # loads configuration
-    conf_manager = ConfMan(logger, sopt.options)
-    config = conf_manager.config
+    config = ConfMan(logger, sopt.options).config
     logger.setLevel(getattr(logging,
                     config.get('log', 'verbosity').upper()))  # pylint: disable=E1103
 
     logger.debug('Command line say: {0}'.format(sopt.options))
-
     # Create Database
+    db_file = config.get('sima', 'db_file')
     if (sopt.options.get('create_db', None)
-       or not isfile(conf_manager.db_file)):
-        logger.info('Creating database in "{}"'.format(conf_manager.db_file))
-        open(conf_manager.db_file, 'a').close()
-        SimaDB(db_path=conf_manager.db_file).create_db()
+       or not isfile(db_file)):
+        logger.info('Creating database in "{}"'.format(db_file))
+        open(db_file, 'a').close()
+        SimaDB(db_path=db_file).create_db()
         if sopt.options.get('create_db', None):
             logger.info('Done, bye...')
             sys.exit(0)
 
     logger.info('Starting...')
-    sima = core.Sima(config, conf_manager.db_file)
+    sima = core.Sima(config)
 
     #  Loading internal plugins
     for plugin in PLUGINS:
