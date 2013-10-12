@@ -7,16 +7,13 @@ Fetching similar artists from last.fm web services
 import random
 
 from collections import deque
-from difflib import get_close_matches
 from hashlib import md5
 
 # third parties componants
 
 # local import
-from ..utils.leven import levenshtein_ratio
 from ..lib.plugin import Plugin
 from ..lib.simafm import SimaFM, XmlFMHTTPError, XmlFMNotFound, XmlFMError
-from ..lib.simastr import SimaStr
 from ..lib.track import Track
 
 
@@ -46,7 +43,6 @@ class Lastfm(Plugin):
         Plugin.__init__(self, daemon)
         self.daemon_conf = daemon.config
         self.sdb = daemon.sdb
-        self.player = daemon.player
         self.history = daemon.short_history
         ##
         self.to_add = list()
@@ -77,6 +73,7 @@ class Lastfm(Plugin):
     def _cleanup_cache(self):
         """Avoid bloated cache
         """
+        # TODO: call cleanup once its dict instance are used somewhere XXX
         for _ , val in self._cache.items():
             if isinstance(val, dict):
                 while len(val) > 150:
@@ -116,6 +113,7 @@ class Lastfm(Plugin):
         Move around items in artists_list in order to play first not recently
         played artists
         """
+        # TODO: move to utils as a decorator
         duration = self.daemon_conf.getint('sima', 'history_duration')
         art_in_hist = list()
         for trk in self.sdb.get_history(duration=duration,
@@ -129,62 +127,6 @@ class Lastfm(Plugin):
         self.log.debug('history ordered: {}'.format(
                        ' / '.join(art_not_in_hist)))
         return art_not_in_hist
-
-    def _cross_check_artist(self, art):
-        """
-        Controls presence of artists in liste in music library.
-        Crosschecking artist names with SimaStr objects / difflib / levenshtein
-
-        TODO: proceed crosschecking even when an artist matched !!!
-              Not because we found "The Doors" as "The Doors" that there is no
-              remaining entries as "Doors" :/
-              not straight forward, need probably heavy refactoring.
-        """
-        matching_artists = list()
-        artist = SimaStr(art)
-        all_artists = self._cache.get('artists')
-
-        # Check against the actual string in artist list
-        if artist.orig in all_artists:
-            self.log.debug('found exact match for "%s"' % artist)
-            return [artist]
-        # Then proceed with fuzzy matching if got nothing
-        match = get_close_matches(artist.orig, all_artists, 50, 0.73)
-        if not match:
-            return []
-        self.log.debug('found close match for "%s": %s' %
-                       (artist, '/'.join(match)))
-        # Does not perform fuzzy matching on short and single word strings
-        # Only lowercased comparison
-        if ' ' not in artist.orig and len(artist) < 8:
-            for fuzz_art in match:
-                # Regular string comparison SimaStr().lower is regular string
-                if artist.lower() == fuzz_art.lower():
-                    matching_artists.append(fuzz_art)
-                    self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
-            return matching_artists
-        for fuzz_art in match:
-            # Regular string comparison SimaStr().lower is regular string
-            if artist.lower() == fuzz_art.lower():
-                matching_artists.append(fuzz_art)
-                self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
-                return matching_artists
-            # Proceed with levenshtein and SimaStr
-            leven = levenshtein_ratio(artist.stripped.lower(),
-                    SimaStr(fuzz_art).stripped.lower())
-            # SimaStr string __eq__, not regular string comparison here
-            if artist == fuzz_art:
-                matching_artists.append(fuzz_art)
-                self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
-                              (fuzz_art, artist))
-            elif leven >= 0.82:  # PARAM
-                matching_artists.append(fuzz_art)
-                self.log.debug('FZZZ: "%s" should match "%s" (lr=%1.3f)' %
-                               (fuzz_art, artist, leven))
-            else:
-                self.log.debug('FZZZ: "%s" does not match "%s" (lr=%1.3f)' %
-                               (fuzz_art, artist, leven))
-        return matching_artists
 
     @cache
     def get_artists_from_player(self, similarities):
@@ -203,8 +145,8 @@ class Lastfm(Plugin):
             art_pop, match = similarities.pop()
             if match < similarity:
                 break
-            results.extend(self._cross_check_artist(art_pop))
-        results and self.log.debug('Similarity: %d%%' % match)
+            results.extend(self.player.fuzzy_find(art_pop))
+        results and self.log.debug('Similarity: %d%%' % match) # pylint: disable=w0106
         return results
 
     def lfm_similar_artists(self, artist=None):
@@ -322,7 +264,7 @@ class Lastfm(Plugin):
     def callback_need_track(self):
         self._cleanup_cache()
         if not self.player.current:
-            self.log.info('No currently playing track, cannot queue')
+            self.log.info('Not currently playing track, cannot queue')
             return None
         self.queue_mode()
         candidates = self.to_add

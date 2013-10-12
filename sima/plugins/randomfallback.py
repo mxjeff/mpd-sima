@@ -17,7 +17,6 @@ class RandomFallBack(Plugin):
 
     def __init__(self, daemon):
         Plugin.__init__(self, daemon)
-        self.player = daemon.player
         self.daemon = daemon
         ##
         self.to_add = list()

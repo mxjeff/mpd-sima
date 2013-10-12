@@ -3,8 +3,11 @@
 
 This client is built above python-musicpd a fork of python-mpd
 """
+#  pylint: disable=C0111
 
 # standart library import
+
+from difflib import get_close_matches
 from select import select
 
 # third parties componants
@@ -18,6 +21,8 @@ except ImportError as err:
 # local import
 from .lib.player import Player
 from .lib.track import Track
+from .lib.simastr import SimaStr
+from .utils.leven import levenshtein_ratio
 
 
 class PlayerError(Exception):
@@ -26,7 +31,7 @@ class PlayerError(Exception):
 class PlayerCommandError(PlayerError):
     """Command error"""
 
-PlayerUnHandledError = MPDError
+PlayerUnHandledError = MPDError  # pylint: disable=C0103
 
 class PlayerClient(Player):
     """MPC Client
@@ -44,9 +49,9 @@ class PlayerClient(Player):
           find_aa, remove…)
     """
     def __init__(self, host="localhost", port="6600", password=None):
-        self._host = host
-        self._port = port
-        self._password = password
+        super().__init__()
+        self._comm = self._args = None
+        self._mpd = host, port, password
         self._client = MPDClient()
         self._client.iterate = True
 
@@ -77,13 +82,15 @@ class PlayerClient(Player):
         return self._track_format(ans)
 
     def _track_format(self, ans):
+        """
+        unicode_obj = ["idle", "listplaylist", "list", "sticker list",
+                "commands", "notcommands", "tagtypes", "urlhandlers",]
+        """
         # TODO: ain't working for "sticker find" and "sticker list"
         tracks_listing = ["playlistfind", "playlistid", "playlistinfo",
                 "playlistsearch", "plchanges", "listplaylistinfo", "find",
                 "search", "sticker find",]
         track_obj = ['currentsong']
-        unicode_obj = ["idle", "listplaylist", "list", "sticker list",
-                "commands", "notcommands", "tagtypes", "urlhandlers",]
         if self._comm in tracks_listing + track_obj:
             #  pylint: disable=w0142
             if isinstance(ans, list):
@@ -104,6 +111,62 @@ class PlayerClient(Player):
         if title:
             return self.find('artist', artist, 'title', title)
         return self.find('artist', artist)
+
+    def fuzzy_find(self, art):
+        """
+        Controls presence of artist in music library.
+        Crosschecking artist names with SimaStr objects / difflib / levenshtein
+
+        TODO: proceed crosschecking even when an artist matched !!!
+              Not because we found "The Doors" as "The Doors" that there is no
+              remaining entries as "Doors" :/
+              not straight forward, need probably heavy refactoring.
+        """
+        matching_artists = list()
+        artist = SimaStr(art)
+        all_artists = self.list('artist')
+
+        # Check against the actual string in artist list
+        if artist.orig in all_artists:
+            self.log.debug('found exact match for "%s"' % artist)
+            return [artist]
+        # Then proceed with fuzzy matching if got nothing
+        match = get_close_matches(artist.orig, all_artists, 50, 0.73)
+        if not match:
+            return []
+        self.log.debug('found close match for "%s": %s' %
+                       (artist, '/'.join(match)))
+        # Does not perform fuzzy matching on short and single word strings
+        # Only lowercased comparison
+        if ' ' not in artist.orig and len(artist) < 8:
+            for fuzz_art in match:
+                # Regular string comparison SimaStr().lower is regular string
+                if artist.lower() == fuzz_art.lower():
+                    matching_artists.append(fuzz_art)
+                    self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
+            return matching_artists
+        for fuzz_art in match:
+            # Regular string comparison SimaStr().lower is regular string
+            if artist.lower() == fuzz_art.lower():
+                matching_artists.append(fuzz_art)
+                self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
+                return matching_artists
+            # Proceed with levenshtein and SimaStr
+            leven = levenshtein_ratio(artist.stripped.lower(),
+                    SimaStr(fuzz_art).stripped.lower())
+            # SimaStr string __eq__, not regular string comparison here
+            if artist == fuzz_art:
+                matching_artists.append(fuzz_art)
+                self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
+                              (fuzz_art, artist))
+            elif leven >= 0.82:  # PARAM
+                matching_artists.append(fuzz_art)
+                self.log.debug('FZZZ: "%s" should match "%s" (lr=%1.3f)' %
+                               (fuzz_art, artist, leven))
+            else:
+                self.log.debug('FZZZ: "%s" does not match "%s" (lr=%1.3f)' %
+                               (fuzz_art, artist, leven))
+        return matching_artists
 
     def find_album(self, artist, album):
         """
@@ -157,14 +220,15 @@ class PlayerClient(Player):
         return self.playlistinfo()
 
     def connect(self):
+        host, port, password = self._mpd
         self.disconnect()
         try:
-            self._client.connect(self._host, self._port)
+            self._client.connect(host, port)
 
         # Catch socket errors
         except IOError as err:
             raise PlayerError('Could not connect to "%s:%s": %s' %
-                              (self._host, self._port, err.strerror))
+                              (host, port, err.strerror))
 
         # Catch all other possible errors
         # ConnectionError and ProtocolError are always fatal.  Others may not
@@ -172,23 +236,23 @@ class PlayerClient(Player):
         # they are instead of ignoring them.
         except MPDError as err:
             raise PlayerError('Could not connect to "%s:%s": %s' %
-                              (self._host, self._port, err))
+                              (host, port, err))
 
-        if self._password:
+        if password:
             try:
-                self._client.password(self._password)
+                self._client.password(password)
 
             # Catch errors with the password command (e.g., wrong password)
             except CommandError as err:
                 raise PlayerError("Could not connect to '%s': "
                                   "password command failed: %s" %
-                                  (self._host, err))
+                                  (host, err))
 
             # Catch all other possible errors
             except (MPDError, IOError) as err:
                 raise PlayerError("Could not connect to '%s': "
                                   "error with password command: %s" %
-                                  (self._host, err))
+                                  (host, err))
         # Controls we have sufficient rights
         needed_cmds = ['status', 'stats', 'add', 'find', \
                        'search', 'currentsong', 'ping']
@@ -199,7 +263,7 @@ class PlayerClient(Player):
                 self.disconnect()
                 raise PlayerError('Could connect to "%s", '
                                   'but command "%s" not available' %
-                                  (self._host, nddcmd))
+                                  (host, nddcmd))
 
     def disconnect(self):
         # Try to tell MPD we're closing the connection first

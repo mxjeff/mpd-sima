@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+    Deal with MPD options ‑ idle and repeat mode
 """
 
 # standard library import
@@ -31,6 +32,7 @@ class MpdOptions(Plugin):
             self.log.info('MPD "repeat" mode activated.')
             self.daemon.enabled = False
         else:
+            self.log.debug('enabling queuing (leaving single|repeat mode)')
             self.daemon.enabled = True
 
     def shutdown(self):

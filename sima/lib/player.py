@@ -3,6 +3,9 @@
 # TODO:
 # Add decorator to filter through history?
 
+# standart library import
+import logging
+
 # local import
 #from sima.lib.track import Track
 
@@ -16,8 +19,8 @@ class Player(object):
     """
 
     def __init__(self):
-        self.state = {}
-        self.current = {}
+        super().__init__()
+        self.log = logging.getLogger('sima')
 
     def monitor(self):
         """Monitor player for change
@@ -52,6 +55,17 @@ class Player(object):
         Returns a list of Track objects
         """
 
+    def fuzzy_find(self, artist):
+        """
+        Find artists based on a fuzzy search in the media library
+            >>> bea = player.fuzzy_find('beatles')
+            >>> print(bea)
+            >>> ['The Beatles']
+
+        Returns a list of strings (artist names)
+        """
+        raise NotImplementedError
+
     def disconnect(self):
         """Closing client connection with the Player
         """
@@ -64,4 +78,3 @@ class Player(object):
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
-

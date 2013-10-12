@@ -16,7 +16,6 @@ class History(Plugin):
     def __init__(self, daemon):
         Plugin.__init__(self, daemon)
         self.sdb = daemon.sdb
-        self.player = daemon.player
 
     def shutdown(self):
         self.log.info('Cleaning database')

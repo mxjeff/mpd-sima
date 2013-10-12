@@ -25,6 +25,7 @@ class Plugin():
     def __init__(self, daemon):
         self.log = daemon.log
         self.__daemon = daemon
+        self.player = daemon.player
         self.plugin_conf = None
         self.__get_config()
 
