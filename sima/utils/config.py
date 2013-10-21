@@ -54,10 +54,13 @@ DEFAULT_CONF = {
             'pidfile': "",},
         'log': {
             'verbosity': "info",
-            'logfile': "",},
+            'logfile': "",
+            },
+        'echonest': {
+            },
         'lastfm': {
             'dynamic': "10",
-            'similarity': "20",
+            'similarity': "15",
             'queue_mode': "track", #TODO control values
             'single_album': "false",
             'track_to_add': "1",
@@ -115,11 +118,11 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
             return None
         except ValueError:
             # ValueError if password not a boolean, hence an actual password.
-            pw = self.config.get('MPD', 'password')
-            if not pw:
+            pwd = self.config.get('MPD', 'password')
+            if not pwd:
                 self.log.debug('Password set as an empty string.')
                 return None
-            return pw
+            return pwd
 
     def control_mod(self):
         """

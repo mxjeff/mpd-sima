@@ -73,7 +73,6 @@ class Lastfm(Plugin):
     def _cleanup_cache(self):
         """Avoid bloated cache
         """
-        # TODO: call cleanup once its dict instance are used somewhere XXX
         for _ , val in self._cache.items():
             if isinstance(val, dict):
                 while len(val) > 150:
@@ -238,7 +237,7 @@ class Lastfm(Plugin):
             self.log.debug('Trying to find titles to add for "{}"'.format(
                            artist))
             found = self.player.find_track(artist)
-            # find tracks not in history
+            # find tracks not in history for artist
             self.filter_track(found)
             if len(self.to_add) == nbtracks_target:
                 break
