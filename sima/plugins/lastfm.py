@@ -36,15 +36,17 @@ def cache(func):
     return wrapper
 
 def blacklist(artist=False, album=False, track=False):
-    field = (bl for bl in (artist, album, track))
+    #pylint: disable=C0111,W0212
+    field = (artist, album, track)
     def decorated(func):
         def wrapper(*args, **kwargs):
             cls = args[0]
+            boolgen = (bl for bl in field)
             bl_fun = (cls._Plugin__daemon.sdb.get_bl_artist,
                       cls._Plugin__daemon.sdb.get_bl_album,
                       cls._Plugin__daemon.sdb.get_bl_track,)
-            #bl_getter = next(fn for fn, bl in zip(bl_fun, field) if bl is True)
-            bl_getter = next(dropwhile(lambda _: not next(field), bl_fun))
+            #bl_getter = next(fn for fn, bl in zip(bl_fun, boolgen) if bl is True)
+            bl_getter = next(dropwhile(lambda _: not next(boolgen), bl_fun))
             results = func(*args, **kwargs)
             cls.log.debug('using {0} as bl filter'.format(bl_getter.__name__))
             for elem in results:
