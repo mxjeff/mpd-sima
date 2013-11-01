@@ -22,7 +22,6 @@ except ImportError as err:
 from .lib.player import Player
 from .lib.track import Track
 from .lib.simastr import SimaStr
-from .utils.leven import levenshtein_ratio
 
 
 class PlayerError(Exception):
@@ -151,21 +150,14 @@ class PlayerClient(Player):
                 matching_artists.append(fuzz_art)
                 self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
                 return matching_artists
-            # Proceed with levenshtein and SimaStr
-            leven = levenshtein_ratio(artist.stripped.lower(),
-                    SimaStr(fuzz_art).stripped.lower())
-            # SimaStr string __eq__, not regular string comparison here
+            # SimaStr string __eq__ (not regular string comparison here)
             if artist == fuzz_art:
                 matching_artists.append(fuzz_art)
                 self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
                               (fuzz_art, artist))
-            elif leven >= 0.82:  # PARAM
-                matching_artists.append(fuzz_art)
-                self.log.debug('FZZZ: "%s" should match "%s" (lr=%1.3f)' %
-                               (fuzz_art, artist, leven))
             else:
-                self.log.debug('FZZZ: "%s" does not match "%s" (lr=%1.3f)' %
-                               (fuzz_art, artist, leven))
+                self.log.debug('FZZZ: "%s" does not match "%s"' %
+                               (fuzz_art, artist))
         return matching_artists
 
     def find_album(self, artist, album):

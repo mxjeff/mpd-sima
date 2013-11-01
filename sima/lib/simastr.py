@@ -24,12 +24,11 @@ SimaStr
 Special unicode() subclass to perform fuzzy match on specific strings with
 known noise.
 
-Artist names often contain a leading 'The ' which might, or might not be
-present. Some other noise sources in artist name are 'and' words :
-    'and'/'&'/'n'/'N'.
-
-The SimaStr() object removes these words and compute equality on "stripped"
-strings.
+ * SimaStr() object removes specific patterns from the string
+ * Diacritic are removed
+ * Equality test is done on lower-cased string
+ * Equality test is not an exact comparison, the levenshtein edition distance
+   between stripped and filtered strings is used
 
 >>> from simastr import SimaStr
 >>> art0 = SimaStr('The Desert Sessions & PJ Harvey')
@@ -38,9 +37,14 @@ strings.
 >>> True
 >>> art0 == 'Desert Sessions And PJ Harvey'
 >>> True
+>>> # diacritic filter + levenshtein  example
+>>> art0 = sima.lib.simastr.SimaStr('Hubert Félix Thiéphaine')
+>>> art1 = sima.lib.simastr.SimaStr('Hubert-Felix Thiephaine')
+>>> art0 == art1
+>>> True
 >>>
 
-Current stripped word patterns (usually English followed by French andx
+Current stripped word patterns (usually English followed by French and
 Spanish alternatives)
     leading (case-insensitive):
             "the","le","la","les","el","los"
@@ -50,10 +54,9 @@ Spanish alternatives)
             combination of "[- !?\.]+" "\(? ?[Ll]ive ?\)?"
 
 
-Possibility to access to stripped string :
+Possibility to access to stripped string:
 
 >>> art0 = SimaStr('The Desert Sessions & PJ Harvey')
->>> art.stripped
 >>> print (art0, art0.stripped)
 >>> ('The Desert Sessions & PJ Harvey', 'Desert Sessions PJ Harvey')
 
@@ -63,10 +66,13 @@ TODO:
 """
 
 __author__ = 'Jack Kaliko'
-__version__ = '0.3'
+__version__ = '0.4'
 
 # IMPORTS
+import unicodedata
 from re import (compile, U, I)
+
+from ..utils.leven import levenshtein_ratio
 
 
 class SimaStr(str):
@@ -95,11 +101,12 @@ class SimaStr(str):
     def __init__(self, fuzzstr):
         """
         """
-        str().__init__(fuzzstr)
+        super().__init__(fuzzstr)
         self.orig = str(fuzzstr)
         self.stripped = str(fuzzstr.strip())
         # fuzzy computation
         self._get_root()
+        self.remove_diacritics()
 
     def _get_root(self):
         """
@@ -121,13 +128,22 @@ class SimaStr(str):
             #print sea.groupdict()
             self.stripped = sea.group('root0')
 
+    def remove_diacritics(self):
+        self.stripped = ''.join(x for x in
+                                unicodedata.normalize('NFKD', self.stripped)
+                                if unicodedata.category(x) != 'Mn')
+
     def __hash__(self):
         return hash(self.stripped)
 
     def __eq__(self, other):
         if not isinstance(other, SimaStr):
-            return hash(self) == hash(SimaStr(other))
-        return hash(self) == hash(other)
+            other = SimaStr(other)
+        levenr = levenshtein_ratio(self.stripped.lower(),
+                                   other.stripped.lower())
+        if hash(self) == hash(other):
+            return True
+        return levenr >= 0.82
 
     def __ne__(self, other):
         if not isinstance(other, SimaStr):
