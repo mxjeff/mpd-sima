@@ -101,12 +101,14 @@ class SimaStr(str):
     def __init__(self, fuzzstr):
         """
         """
-        super().__init__(fuzzstr)
         self.orig = str(fuzzstr)
         self.stripped = str(fuzzstr.strip())
         # fuzzy computation
         self._get_root()
         self.remove_diacritics()
+
+    def __new__(cls, fuzzstr):
+        return super(SimaStr, cls).__new__(cls, fuzzstr)
 
     def _get_root(self):
         """
