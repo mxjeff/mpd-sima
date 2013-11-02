@@ -66,7 +66,8 @@ def load_internal_plugins(sima):
 def main():
     """Entry point, deal w/ CLI and starts application
     """
-    info = dict({'version': core.__version__,})
+    info = dict({'version': core.__version__,
+                 'prog': 'sima'})
     # StartOpt gathers options from command line call (in StartOpt().options)
     sopt = StartOpt(info)
     # set logger

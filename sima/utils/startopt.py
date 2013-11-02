@@ -125,7 +125,7 @@ class StartOpt(object):
         """
         self.parser = ArgumentParser(description=DESCRIPTION,
                                    usage='%(prog)s [options]',
-                                   prog='mpd_sima',
+                                   prog=self.info.get('prog')
                                    epilog='Happy Listening',
                 )
         self.parser.add_argument('--version', action='version',
