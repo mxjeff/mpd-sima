@@ -170,6 +170,16 @@ class PlayerClient(Player):
             return alb_art_search
         return self.find('artist', artist, 'album', album)
 
+    def find_albums(self, artist):
+        """
+        Special wrapper around album search:
+        Album lookup is made through AlbumArtist/Album instead of Artist/Album
+        """
+        alb_art_search = self.list('album', 'albumartist', artist,)
+        if alb_art_search:
+            return alb_art_search
+        return self.list('album', 'artist', artist)
+
     def monitor(self):
         curr = self.current
         try:

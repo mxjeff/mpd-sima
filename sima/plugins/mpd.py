@@ -32,8 +32,9 @@ class MpdOptions(Plugin):
             self.log.info('MPD "repeat" mode activated.')
             self.daemon.enabled = False
         else:
-            self.log.debug('enabling queuing (leaving single|repeat mode)')
-            self.daemon.enabled = True
+            if self.daemon.enabled is False:
+                self.log.debug('enabling queuing (leaving single|repeat mode)')
+                self.daemon.enabled = True
 
     def shutdown(self):
         pass

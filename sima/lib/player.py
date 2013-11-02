@@ -50,10 +50,20 @@ class Player(object):
     def find_album(self, artist, album):
         """
         Find tracks by track's album name
-            >>> player.find_track('Nirvana', 'Nevermind')
+            >>> player.find_album('Nirvana', 'Nevermind')
 
         Returns a list of Track objects
         """
+        raise NotImplementedError
+
+    def find_albums(self, artist):
+        """
+        Find albums by artist's name
+            >>> player.find_alums('Nirvana')
+
+        Returns a list of string objects
+        """
+        raise NotImplementedError
 
     def fuzzy_find(self, artist):
         """
