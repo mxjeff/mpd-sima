@@ -76,9 +76,8 @@ class Sima(Daemon):
             if pl_callback:
                 to_add.extend(pl_callback)
         if not to_add:
-            self.log.warning('Queue plugins returned anything!')
+            self.log.warning('Queue plugins returned nothing!')
             for plugin in self.plugins:
-                self.log.info('calling fb for {}'.format(plugin))
                 pl_callback =  getattr(plugin, 'callback_need_track_fb')()
                 if pl_callback:
                     to_add.extend(pl_callback)
