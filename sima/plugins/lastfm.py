@@ -35,6 +35,7 @@ def cache(func):
         return results
     return wrapper
 
+
 def blacklist(artist=False, album=False, track=False):
     #pylint: disable=C0111,W0212
     field = (artist, album, track)
@@ -47,13 +48,20 @@ def blacklist(artist=False, album=False, track=False):
                       cls._Plugin__daemon.sdb.get_bl_track,)
             #bl_getter = next(fn for fn, bl in zip(bl_fun, boolgen) if bl is True)
             bl_getter = next(dropwhile(lambda _: not next(boolgen), bl_fun))
-            results = func(*args, **kwargs)
             cls.log.debug('using {0} as bl filter'.format(bl_getter.__name__))
-            for elem in results:
-                if bl_getter(elem, add_not=True):
-                    cls.log.info('Blacklisted: {0}'.format(elem))
-                    results.remove(elem)
-            return results
+            if artist:
+                results = func(*args, **kwargs)
+                for elem in results:
+                    if bl_getter(elem, add_not=True):
+                        cls.log.info('Blacklisted: {0}'.format(elem))
+                        results.remove(elem)
+                return results
+            if track:
+                for elem in args[1]:
+                    if bl_getter(elem, add_not=True):
+                        cls.log.info('Blacklisted: {0}'.format(elem))
+                        args[1].remove(elem)
+                return func(*args, **kwargs)
         return wrapper
     return decorated
 
@@ -111,11 +119,13 @@ class Lastfm(Plugin):
                                file=tr[3]) for tr in tracks_from_db]
         return played_tracks
 
+    #@blacklist(track=True)
     def filter_track(self, tracks):
         """
         Extract one unplayed track from a Track object list.
             * not in history
             * not already in the queue
+            * not blacklisted
         """
         artist = tracks[0].artist
         black_list = self.player.queue + self.to_add
@@ -123,12 +133,27 @@ class Lastfm(Plugin):
         if not not_in_hist:
             self.log.debug('All tracks already played for "{}"'.format(artist))
         random.shuffle(not_in_hist)
-        candidate = [ trk for trk in not_in_hist if trk not in black_list ]
+        #candidate = [ trk for trk in not_in_hist if trk not in black_list 
+                      #if not self.sdb.get_bl_track(trk, add_not=True)]
+        candidate = []
+        for trk in [_ for _ in not_in_hist if _ not in black_list]:
+            if self.sdb.get_bl_track(trk, add_not=True):
+                self.log.info('Blacklisted: {0}: '.format(trk))
+                continue
+            if self.sdb.get_bl_album(trk, add_not=True):
+                self.log.info('Blacklisted album: {0}: '.format(trk))
+                continue
+            candidate.append(trk)
         if not candidate:
             self.log.debug('Unable to find title to add' +
-                          ' for "%s".' % artist)
+                           ' for "%s".' % artist)
             return None
+        #@blacklist(track=True)
+        #def deco(self, args):
+            #return args
+        #candidate = deco(self, candidate)
         self.to_add.append(random.choice(candidate))
+        return self.to_add
 
     def _get_artists_list_reorg(self, alist):
         """
