@@ -1,0 +1,8 @@
+Virtualenv installation:
+
+run ./vinstall.sh to generate the pyton virtualenv and install requirements.
+It should also write a vlaunch sh wrapper to run sima whithin the virtualenv.
+
+	./vlaunch --help
+
+
