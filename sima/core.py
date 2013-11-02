@@ -15,12 +15,15 @@ from logging import getLogger
 from .client import PlayerClient
 from .client import PlayerError, PlayerUnHandledError
 from .lib.simadb import SimaDB
+from .lib.daemon import Daemon
 
-class Sima(object):
+class Sima(Daemon):
     """Main class, plugin and player management
     """
 
     def __init__(self, conf):
+        ## Set daemon
+        Daemon.__init__(self, conf.get('daemon', 'pidfile'))
         self.enabled = True
         self.config = conf
         self.sdb = SimaDB(db_path=conf.get('sima', 'db_file'))

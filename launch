@@ -103,11 +103,16 @@ def main():
 
     #  Loading contrib plugins
     load_contrib_plugins(sima)
+
+    # Run as a daemon
+    if config.getboolean('daemon', 'daemon'):
+        sima.start()
+
     try:
-        sima.run()
+        sima.foreground()
     except KeyboardInterrupt:
         logger.info('Caught KeyboardInterrupt, stopping')
-        sima.shutdown()
+        #sima.shutdown()
 
 
 def run():
