@@ -6,6 +6,7 @@ __version__ = '0.12.0.b'
 __author__ = 'kaliko jack'
 __url__ = 'git://git.kaliko.me/sima.git'
 
+import random
 import sys
 import time
 
@@ -81,6 +82,7 @@ class Sima(Daemon):
                 pl_callback =  getattr(plugin, 'callback_need_track_fb')()
                 if pl_callback:
                     to_add.extend(pl_callback)
+        random.shuffle(to_add)
         for track in to_add:
             self.player.add(track)
 
