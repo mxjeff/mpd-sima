@@ -8,6 +8,8 @@ from setuptools import setup
 from os import listdir
 from os.path import isfile, isdir
 
+from sima.core import __version__ as VERSION
+
 DESCRIPTION = """
 sima is a Python application meant to feed your MPD playlist with tracks
 from artists similar to your currently playing track, provided that these
@@ -38,7 +40,7 @@ classifiers = [
         ]
 
 setup(name='sima',
-      version='0.12.0.dev',
+      version=VERSION,
       download_url='http://codingteam.net/project/sima/download',
       url='http://codingteam.net/project/sima',
       description='Automagically add titles to MPD playlist',
