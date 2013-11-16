@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-#   SCRIPT NAME
+#   vinstall.sh
 #
-#   version: 0.0 : Date: 1970/01/01 00:0:00
+#   version: 0.2 : Date: 2013/11/13
 #
 #   TODO:
 #           *
@@ -14,7 +14,6 @@ DEBUG=${DEBUG:-"0"}     #  Set to 1 in order to enable DEBUG message.
 
 
 PY3=${PY3:-$(which python3.3)}
-MUSICPD="http://media.kaliko.me/src/musicpd/dist/python-musicpd-0.3.1.tar.bz2"
 
 # Test virtualenv presence
 [ -x "$(which virtualenv)" ] || { echo "Cannot find virtualenv executable!"; exit 1; }
@@ -36,7 +35,7 @@ virtualenv $VENV_OPTIONS $INSTALL_DIR/venv || { echo "something went wrong gener
 PIP_OPTIONS=""
 [ "$DEBUG" = "0" ] && PIP_OPTIONS="$PIP_OPTIONS --quiet"
 
-pip $PIP_OPTIONS install $MUSICPD
+pip $PIP_OPTIONS install --pre python-musicpd || exit 1
 
 deactivate
 
@@ -47,7 +46,7 @@ SIMA_VLAUNCHER=$(readlink -f $(dirname $0))/vlaunch
 cat << EOF > $SIMA_VLAUNCHER
 #!/bin/sh
 . $INSTALL_DIR/venv/bin/activate
-python $SIMA_LAUNCHER $@
+python $SIMA_LAUNCHER "\$@"
 EOF
 chmod +x $SIMA_VLAUNCHER
 

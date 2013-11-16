@@ -1,7 +1,11 @@
 Virtualenv installation:
 
-run ./vinstall.sh to generate the pyton virtualenv and install requirements.
-It should also write a vlaunch sh wrapper to run sima whithin the virtualenv.
+Run ./vinstall.sh to generate the python virtualenv and install requirements.
+You might specify a python3 interpreter if the binary name defers from python3.3 :
+
+	PY3=/usr/bin/python ./vinstall.sh
+
+It should also write a vlaunch sh wrapper to run sima within the virtualenv.
 
 	./vlaunch --help
 

@@ -38,7 +38,7 @@ classifiers = [
         ]
 
 setup(name='sima',
-      version='0.11.dev',
+      version='0.12.0.dev',
       download_url='http://codingteam.net/project/sima/download',
       url='http://codingteam.net/project/sima',
       description='Automagically add titles to MPD playlist',
@@ -49,12 +49,12 @@ setup(name='sima',
       long_description=DESCRIPTION,
       classifiers=classifiers,
       install_requires=['distribute', 'python-musicpd'],
-      packages=['sima','sima.lib', 'sima.utils', 'sima.plugins'],
+      packages=['sima','sima.lib', 'sima.utils', 'sima.plugins', 'sima.plugins.contrib'],
       include_package_data=True,
       data_files=data_files,
       scripts=['launch'],
       entry_points={
-          'console_scripts': ['sima = launch:main',]
+          'console_scripts': ['sima = launch:run',]
           },
 )
 
