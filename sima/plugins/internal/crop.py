@@ -8,7 +8,7 @@
 # third parties componants
 
 # local import
-from ..lib.plugin import Plugin
+from ...lib.plugin import Plugin
 
 class Crop(Plugin):
     """

@@ -13,9 +13,9 @@ from hashlib import md5
 # third parties componants
 
 # local import
-from ..lib.plugin import Plugin
-from ..lib.simafm import SimaFM, XmlFMHTTPError, XmlFMNotFound, XmlFMError
-from ..lib.track import Track
+from ...lib.plugin import Plugin
+from ...lib.simafm import SimaFM, XmlFMHTTPError, XmlFMNotFound, XmlFMError
+from ...lib.track import Track
 
 
 def cache(func):

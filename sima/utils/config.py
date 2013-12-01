@@ -45,6 +45,8 @@ DEFAULT_CONF = {
             #'password': "",
             'port': "6600"},
         'sima': {
+            'internal': "Crop, History, MpdOptions, Lastfm, RandomFallBack",
+            'contrib': "",
             'user_db': "false",
             'history_duration': "8",
             'queue_length': "1",

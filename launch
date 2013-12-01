@@ -22,27 +22,19 @@ from sima.utils.config import ConfMan
 from sima.utils.startopt import StartOpt
 from sima.utils.utils import exception_log
 ##
-# internal plugins
-from sima.plugins.crop import Crop
-from sima.plugins.addhist import History
-from sima.plugins.lastfm import Lastfm
-from sima.plugins.mpd import MpdOptions
-from sima.plugins.randomfallback import RandomFallBack
-
-# official plugins to start
-PLUGINS = (Crop, History, MpdOptions,
-           Lastfm, RandomFallBack)
 
 
-def load_contrib_plugins(sima):
-    """Handles contrib/external plugins
+def load_plugins(sima, source):
+    """Handles internal/external plugins
+        sima:   sima.core.Sima instance
+        source: ['internal', 'contrib']
     """
-    if not sima.config.has_option('sima', 'plugins'):
+    if not sima.config.get('sima', source ):
         return
     logger = logging.getLogger('sima')
-    for plugin in sima.config.get('sima','plugins').split(','):
+    for plugin in sima.config.get('sima', source).split(','):
         plugin = plugin.strip(' \n')
-        module = 'sima.plugins.contrib.{}'.format(plugin.lower())
+        module = 'sima.plugins.{0}.{1}'.format(source, plugin.lower())
         try:
             mod_obj = __import__(module, fromlist=[plugin])
         except ImportError as err:
@@ -53,14 +45,8 @@ def load_contrib_plugins(sima):
         except AttributeError as err:
             logger.error('Failed to load plugin {0} ({1})'.format(plugin, err))
             sima.shutdown()
-        logger.info('Loading contrib plugin: {name} ({doc})'.format(**plugin_obj.info()))
+        logger.info('Loading {0} plugin: {name} ({doc})'.format(source, **plugin_obj.info()))
         sima.register_plugin(plugin_obj)
-
-
-def load_internal_plugins(sima):
-    """Handles contrib/external plugins
-    """
-    raise NotImplementedError
 
 
 def main():
@@ -98,12 +84,10 @@ def main():
     sima = core.Sima(config)
 
     #  Loading internal plugins
-    for plugin in PLUGINS:
-        logger.info('Loading internal plugin: {name} ({doc})'.format(**plugin.info()))
-        sima.register_plugin(plugin)
+    load_plugins(sima, 'internal')
 
     #  Loading contrib plugins
-    load_contrib_plugins(sima)
+    load_plugins(sima, 'contrib')
 
     # Run as a daemon
     if config.getboolean('daemon', 'daemon'):

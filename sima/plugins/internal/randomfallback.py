@@ -9,8 +9,8 @@ import random
 # third parties componants
 
 # local import
-from ..lib.plugin import Plugin
-from ..lib.track import Track
+from ...lib.plugin import Plugin
+from ...lib.track import Track
 
 
 class RandomFallBack(Plugin):

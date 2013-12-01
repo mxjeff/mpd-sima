@@ -8,7 +8,7 @@
 # third parties components
 
 # local import
-from ..lib.plugin import Plugin
+from ...lib.plugin import Plugin
 
 
 class MpdOptions(Plugin):
