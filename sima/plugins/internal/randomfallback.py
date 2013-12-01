@@ -16,27 +16,36 @@ from ...lib.track import Track
 class RandomFallBack(Plugin):
 
     def __init__(self, daemon):
-        Plugin.__init__(self, daemon)
+        super().__init__(daemon)
         self.daemon = daemon
-        ##
-        self.to_add = list()
+        if not self.plugin_conf:
+            return
+        self.mode = self.plugin_conf.get('flavour', None)
+        if self.mode not in ['pure', 'sensible', 'genre']:
+            self.log.warning('Bad value for flavour, '
+                    '{} not in ["pure", "sensible", "genre"]'.format(self.mode))
+            self.mode = 'pure'
 
-    def get_history(self):
-        """Constructs list of Track for already played titles.
+    def get_played_artist(self,):
+        """Constructs list of already played artists.
         """
         duration = self.daemon.config.getint('sima', 'history_duration')
-        tracks_from_db = self.daemon.sdb.get_history(duration=duration,)
+        tracks_from_db = self.daemon.sdb.get_history(duration=duration)
         # Construct Track() objects list from database history
-        played_tracks = [Track(artist=tr[-1], album=tr[1], title=tr[2],
-                               file=tr[3]) for tr in tracks_from_db]
-        return played_tracks
+        artists = [ tr[-1] for tr in tracks_from_db ]
+        return set(artists)
 
     def callback_need_track_fb(self):
-        mode = self.plugin_conf.get('flavour')
         art = random.choice(self.player.list('artist'))
         self.log.debug('Random art: {}'.format(art))
+        if self.mode == 'sensitive':
+            played_art = self.get_played_artist()
+            while 42:
+                art = random.choice(self.player.list('artist'))
+                if art not in played_art:
+                    break
         trk  = random.choice(self.player.find_track(art))
-        self.log.info('random fallback ({}): {}'.format(mode, trk))
+        self.log.info('random fallback ({}): {}'.format(self.mode, trk))
         return [trk]
 
 

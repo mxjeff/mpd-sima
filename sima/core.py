@@ -6,7 +6,6 @@ __version__ = '0.12.0.b'
 __author__ = 'kaliko jack'
 __url__ = 'git://git.kaliko.me/sima.git'
 
-import random
 import sys
 import time
 
