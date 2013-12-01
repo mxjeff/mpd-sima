@@ -43,17 +43,19 @@ DEFAULT_CONF = {
         'MPD': {
             'host': "localhost",
             #'password': "",
-            'port': "6600"},
+            'port': "6600",
+            },
         'sima': {
             'internal': "Crop, History, MpdOptions, Lastfm, RandomFallBack",
             'contrib': "",
             'user_db': "false",
             'history_duration': "8",
             'queue_length': "1",
-            'consume': "0",},
+            },
         'daemon':{
             'daemon': "false",
-            'pidfile': "",},
+            'pidfile': "",
+            },
         'log': {
             'verbosity': "info",
             'logfile': "",

@@ -82,7 +82,6 @@ class Sima(Daemon):
                 pl_callback =  getattr(plugin, 'callback_need_track_fb')()
                 if pl_callback:
                     to_add.extend(pl_callback)
-        random.shuffle(to_add)
         for track in to_add:
             self.player.add(track)
 

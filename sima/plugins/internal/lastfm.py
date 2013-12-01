@@ -387,6 +387,8 @@ class Lastfm(Plugin):
         self.queue_mode()
         candidates = self.to_add
         self.to_add = list()
+        if self.plugin_conf.get('queue_mode') != 'album':
+            random.shuffle(candidates)
         return candidates
 
     def callback_player_database(self):
