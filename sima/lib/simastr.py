@@ -80,6 +80,8 @@ class SimaStr(str):
     Specific string object for artist names and song titles.
     Here follows some class variables for regex to run on strings.
     """
+    diafilter = True
+    leven_ratio = 0.82
     regexp_dict = dict()
 
     # Leading patterns: The Le Les
@@ -105,7 +107,8 @@ class SimaStr(str):
         self.stripped = str(fuzzstr.strip())
         # fuzzy computation
         self._get_root()
-        self.remove_diacritics()
+        if self.__class__.diafilter:
+           self.remove_diacritics()
 
     def __new__(cls, fuzzstr):
         return super(SimaStr, cls).__new__(cls, fuzzstr)
@@ -145,7 +148,7 @@ class SimaStr(str):
                                    other.stripped.lower())
         if hash(self) == hash(other):
             return True
-        return levenr >= 0.82
+        return levenr >= self.__class__.leven_ratio
 
     def __ne__(self, other):
         if not isinstance(other, SimaStr):
