@@ -276,6 +276,20 @@ class SimaFM():
         for track in elem.getiterator(tag='track'):
             yield str(track.findtext('name')), int(track.attrib.get('rank'))
 
+    def get_similartracks(self, track=None, artist=None):
+        """
+        """
+        # Construct URL
+        url = SimaFM.root_url + SimaFM.request.get('track')
+        self._url = url % (urllib.parse.quote(artist.encode('UTF-8'), safe=''),
+                           urllib.parse.quote(track.encode('UTF-8'), safe=''))
+        self._fetch()
+        elem = self.current_element
+        for trk in elem.getiterator(tag='track'):
+            yield (str(trk.findtext('artist/name')),
+                   str(trk.findtext('name')),
+                   100 * float(trk.findtext('match')))
+
     def get_mbid(self, artist=None):
         """
         """
@@ -291,8 +305,8 @@ class SimaFM():
 
 def run():
     test = SimaFM()
-    for a, m in test.get_similar(artist='Tool'):
-        pass
+    for t, a, m in test.get_similartracks(artist='Nirvana', track='Smells Like Teen Spirit'):
+        print(a, t, m)
     return
 
 if __name__ == '__main__':
