@@ -21,6 +21,9 @@ from sima.lib.simadb import SimaDB
 from sima.utils.config import ConfMan
 from sima.utils.startopt import StartOpt
 from sima.utils.utils import exception_log
+ # core plugins
+from sima.plugins.core.history import History
+from sima.plugins.core.mpdoptions import MpdOptions
 ##
 
 
@@ -82,6 +85,10 @@ def main():
 
     logger.info('Starting...')
     sima = core.Sima(config)
+
+    # core plugins
+    sima.register_plugin(History)
+    sima.register_plugin(MpdOptions)
 
     #  Loading internal plugins
     load_plugins(sima, 'internal')

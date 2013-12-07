@@ -46,7 +46,7 @@ DEFAULT_CONF = {
             'port': "6600",
             },
         'sima': {
-            'internal': "Crop, History, MpdOptions, Lastfm, RandomFallBack",
+            'internal': "Crop, Lastfm, RandomFallBack",
             'contrib': "",
             'user_db': "false",
             'history_duration': "8",
