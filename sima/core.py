@@ -2,7 +2,7 @@
 """Core Object dealing with plugins and player client
 """
 
-__version__ = '0.12.0.b'
+__version__ = '0.12.0pr1'
 __author__ = 'kaliko jack'
 __url__ = 'git://git.kaliko.me/sima.git'
 
