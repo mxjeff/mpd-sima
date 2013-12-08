@@ -142,6 +142,13 @@ class Lastfm(Plugin):
             if self.sdb.get_bl_album(trk, add_not=True):
                 self.log.info('Blacklisted album: {0}: '.format(trk))
                 continue
+            # Should use albumartist heuristic as well
+            if self.plugin_conf.getboolean('single_album'):
+                if (trk.album == self.player.current.album or
+                    trk.album in [trk.alb for trk in self.to_add]):
+                    self.log.debug('Found unplayed track ' +
+                               'but from an album already queued: %s' % (trk))
+                    continue
             candidate.append(trk)
         if not candidate:
             self.log.debug('Unable to find title to add' +

@@ -38,7 +38,7 @@ class Plugin():
         conf = self.__daemon.config
         for sec in conf.sections():
             if sec.lower() == self.__class__.__name__.lower():
-                self.plugin_conf = dict(conf.items(sec))
+                self.plugin_conf = conf[sec]
         #if self.plugin_conf:
         #    self.log.debug('Got config for {0}: {1}'.format(self,
         #                                                    self.plugin_conf))

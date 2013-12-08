@@ -13,7 +13,7 @@ DEBUG=${DEBUG:-"0"}     #  Set to 1 in order to enable DEBUG message.
                         ## Only error message will be printed with DEBUG="0"
 
 
-PY3=${PY3:-$(which python3.3)}
+PY3=${PY3:-$(which python3)}
 
 # Test virtualenv presence
 [ -x "$(which virtualenv)" ] || { echo "Cannot find virtualenv executable!"; exit 1; }

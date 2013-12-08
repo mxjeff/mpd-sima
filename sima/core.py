@@ -114,7 +114,6 @@ class Sima(Daemon):
         self.log.info('The way is shut, it was made by those who are dead. '
                       'And the dead keep it…')
         self.log.info('bye...')
-        sys.exit(0)
 
     def run(self):
         """
