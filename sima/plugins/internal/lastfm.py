@@ -30,6 +30,7 @@ def cache(func):
             results = cls._cache.get('asearch').get(hashedlst)
         else:
             results = func(*args, **kwargs)
+            cls.log.debug('caching request')
             cls._cache.get('asearch').update({hashedlst:list(results)})
         random.shuffle(results)
         return results
@@ -244,6 +245,8 @@ class Lastfm(Plugin):
         for artist in extra_arts:
             self.log.debug('Looking for artist similar to "{0.artist}" as well'.format(artist))
             similar = self.lfm_similar_artists(artist=artist)
+            if not similar:
+                return ret_extra
             similar = sorted(similar, key=lambda sim: sim[1], reverse=True)
             ret_extra.extend(self.get_artists_from_player(similar))
             if current.artist in ret_extra:
