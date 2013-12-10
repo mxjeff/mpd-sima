@@ -146,7 +146,7 @@ class Lastfm(Plugin):
             # Should use albumartist heuristic as well
             if self.plugin_conf.getboolean('single_album'):
                 if (trk.album == self.player.current.album or
-                    trk.album in [trk.alb for trk in self.to_add]):
+                    trk.album in [tr.album for tr in self.to_add]):
                     self.log.debug('Found unplayed track ' +
                                'but from an album already queued: %s' % (trk))
                     continue
