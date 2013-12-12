@@ -31,4 +31,3 @@ class TestSequenceFunctions(unittest.TestCase):
             assertfunc(fuzzystr(sta, stb), '"{0}" == "{1}"'.format(sta, stb))
 
 # vim: ai ts=4 sw=4 sts=4 expandtab
-
