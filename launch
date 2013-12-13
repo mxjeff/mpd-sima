@@ -104,7 +104,7 @@ def main():
         sima.foreground()
     except KeyboardInterrupt:
         logger.info('Caught KeyboardInterrupt, stopping')
-        sima.shutdown()
+        sys.exit(0)
 
 
 def run():

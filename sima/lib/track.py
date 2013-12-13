@@ -30,17 +30,17 @@ class Track(object):
     Instanciate with Player replies.
     """
 
-    def __init__(self, file=None, time=0, pos=0, **kwargs):
+    def __init__(self, file=None, time=0, pos=-1, **kwargs):
         self.title = self.artist = self.album = self.albumartist = ''
-        self._pos = pos
-        self.empty = False
+        self.pos = pos
+        self._empty = False
         self._file = file
         if not kwargs:
-            self.empty = True
+            self._empty = True
         self.time = time
         self.__dict__.update(**kwargs)
-        self.tags_to_collapse = list(['artist', 'album', 'title', 'date',
-            'genre', 'albumartist'])
+        self.tags_to_collapse = ['artist', 'album', 'title', 'date',
+                                 'genre', 'albumartist']
         #  have tags been collapsed?
         self.collapse_tags_bool = False
         self.collapsed_tags = list()
@@ -59,12 +59,6 @@ class Track(object):
                 self.collapse_tags_bool = True
                 self.collapsed_tags.append(tag)
                 self.__dict__.update({tag: ', '.join(set(value))})
-
-    def get_filename(self):
-        """return filename"""
-        if not self.file:
-            return None
-        return self.file
 
     def __repr__(self):
         return '%s(artist="%s", album="%s", title="%s", filename="%s")' % (
@@ -103,12 +97,7 @@ class Track(object):
         return hash(self) != hash(other)
 
     def __bool__(self):
-        return not self.empty
-
-    @property
-    def pos(self):
-        """return position of track in the playlist"""
-        return int(self._pos)
+        return not self._empty
 
     @property
     def file(self):

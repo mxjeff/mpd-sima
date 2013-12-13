@@ -147,7 +147,7 @@ class SimaDB(object):
         if not in database insert new entry."""
         art = track.artist
         nam = track.title
-        fil = track.get_filename()
+        fil = track.file
         if with_connection:
             connection = with_connection
         else:
