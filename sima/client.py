@@ -86,10 +86,6 @@ class PlayerClient(Player):
         wrapper = self._execute
         return lambda *args: wrapper(command, args)
 
-    def __del__(self):
-        """Avoid hanging sockets"""
-        self.disconnect()
-
     def _execute(self, command, args):
         self._write_command(command, args)
         return self._client_wrapper()
