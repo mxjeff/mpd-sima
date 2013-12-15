@@ -131,6 +131,7 @@ class Sima(Daemon):
             except PlayerError as err:
                 self.log.warning('Player error: %s' % err)
                 self.reconnect_player()
+                del(self.changed)
 
     def loop(self):
         """Dispatching callbacks to plugins
