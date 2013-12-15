@@ -32,7 +32,7 @@ class Track(object):
 
     def __init__(self, file=None, time=0, pos=-1, **kwargs):
         self.title = self.artist = self.album = self.albumartist = ''
-        self.pos = pos
+        self.pos = int(pos)
         self._empty = False
         self._file = file
         if not kwargs:
