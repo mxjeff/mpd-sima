@@ -2,10 +2,10 @@
 """Crops playlist
 """
 
-# standart library import
+# standard library import
 #from select import select
 
-# third parties componants
+# third parties components
 
 # local import
 from sima.lib.plugin import Plugin

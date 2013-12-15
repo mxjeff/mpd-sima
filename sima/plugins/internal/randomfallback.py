@@ -3,10 +3,10 @@
 Fetching similar artists from last.fm web services
 """
 
-# standart library import
+# standard library import
 import random
 
-# third parties componants
+# third parties components
 
 # local import
 from ...lib.plugin import Plugin

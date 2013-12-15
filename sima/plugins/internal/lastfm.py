@@ -3,14 +3,14 @@
 Fetching similar artists from last.fm web services
 """
 
-# standart library import
+# standard library import
 import random
 
 from collections import deque
 from itertools import dropwhile
 from hashlib import md5
 
-# third parties componants
+# third parties components
 
 # local import
 from ...lib.plugin import Plugin
@@ -96,11 +96,9 @@ class Lastfm(Plugin):
         else:
             self.log.info('Lastfm: Initialising cache!')
         self._cache = {
-                'artists': None,
                 'asearch': dict(),
                 'tsearch': dict(),
                 }
-        self._cache['artists'] = frozenset(self.player.list('artist'))
 
     def _cleanup_cache(self):
         """Avoid bloated cache
@@ -184,10 +182,10 @@ class Lastfm(Plugin):
         Look in player library for availability of similar artists in
         similarities
         """
-        dynamic = int(self.plugin_conf.get('dynamic'))
+        dynamic = self.plugin_conf.getint('dynamic')
         if dynamic <= 0:
             dynamic = 100
-        similarity = int(self.plugin_conf.get('similarity'))
+        similarity = self.plugin_conf.getint('similarity')
         results = list()
         similarities.reverse()
         while (len(results) < dynamic
@@ -195,7 +193,7 @@ class Lastfm(Plugin):
             art_pop, match = similarities.pop()
             if match < similarity:
                 break
-            results.extend(self.player.fuzzy_find(art_pop))
+            results.extend(self.player.fuzzy_find_artist(art_pop))
         results and self.log.debug('Similarity: %d%%' % match) # pylint: disable=w0106
         return results
 
@@ -231,7 +229,7 @@ class Lastfm(Plugin):
         depth = 0
         current = self.player.current
         extra_arts = list()
-        while depth < int(self.plugin_conf.get('depth')):
+        while depth < self.plugin_conf.getint('depth'):
             if len(history) == 0:
                 break
             trk = history.popleft()
@@ -282,29 +280,6 @@ class Lastfm(Plugin):
         # artist first.
         return self._get_artists_list_reorg(ret)
 
-    def _detects_var_artists_album(self, album, artist):
-        """Detects either an album is a "Various Artists" or a
-        single artist release."""
-        art_first_track = None
-        for track in self.player.find_album(artist, album):
-            if not art_first_track:  # set artist for the first track
-                art_first_track = track.artist
-            alb_art = track.albumartist
-            #  Special heuristic used when AlbumArtist is available
-            if (alb_art):
-                if artist == alb_art:
-                    # When album artist field is similar to the artist we're
-                    # looking an album for, the album is considered good to
-                    # queue
-                    return False
-                else:
-                    self.log.debug(track)
-                    self.log.debug('album art says "%s", looking for "%s",'
-                                   ' not queueing this album' %
-                                   (alb_art, artist))
-                    return True
-        return False
-
     def _get_album_history(self, artist=None):
         """Retrieve album history"""
         duration = self.daemon_conf.getint('sima', 'history_duration')
@@ -318,10 +293,10 @@ class Lastfm(Plugin):
         """
         self.to_add = list()
         nb_album_add = 0
-        target_album_to_add = int(self.plugin_conf.get('album_to_add'))
+        target_album_to_add = self.plugin_conf.getint('album_to_add')
         for artist in artists:
             self.log.info('Looking for an album to add for "%s"...' % artist)
-            albums = set(self.player.find_albums(artist))
+            albums = self.player.find_albums(artist)
             # albums yet in history for this artist
             albums_yet_in_hist = albums & self._get_album_history(artist=artist)
             albums_not_in_hist = list(albums - albums_yet_in_hist)
@@ -332,9 +307,7 @@ class Lastfm(Plugin):
             album_to_queue = str()
             random.shuffle(albums_not_in_hist)
             for album in albums_not_in_hist:
-                tracks = self.player.find('album', album)
-                if self._detects_var_artists_album(album, artist):
-                    continue
+                tracks = self.player.find_album(artist, album)
                 if tracks and self.sdb.get_bl_album(tracks[0], add_not=True):
                     self.log.info('Blacklisted album: "%s"' % album)
                     self.log.debug('using track: "%s"' % tracks[0])
@@ -361,7 +334,7 @@ class Lastfm(Plugin):
         """Get some tracks for track queue mode
         """
         artists = self.get_local_similar_artists()
-        nbtracks_target = int(self.plugin_conf.get('track_to_add'))
+        nbtracks_target = self.plugin_conf.getint('track_to_add')
         for artist in artists:
             self.log.debug('Trying to find titles to add for "{}"'.format(
                            artist))

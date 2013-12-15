@@ -3,7 +3,7 @@
 """Sima
 """
 
-# standart library import
+# standard library import
 import logging
 import sys
 

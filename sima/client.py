@@ -5,12 +5,11 @@ This client is built above python-musicpd a fork of python-mpd
 """
 #  pylint: disable=C0111
 
-# standart library import
-
+# standard library import
 from difflib import get_close_matches
 from select import select
 
-# third parties componants
+# third parties components
 try:
     from musicpd import (MPDClient, MPDError, CommandError)
 except ImportError as err:
@@ -31,6 +30,7 @@ class PlayerCommandError(PlayerError):
     """Command error"""
 
 PlayerUnHandledError = MPDError  # pylint: disable=C0103
+
 
 class PlayerClient(Player):
     """MPC Client
@@ -53,17 +53,22 @@ class PlayerClient(Player):
         self._mpd = host, port, password
         self._client = MPDClient()
         self._client.iterate = True
+        self._cache = None
 
     def __getattr__(self, attr):
         command = attr
         wrapper = self._execute
         return lambda *args: wrapper(command, args)
 
+    def __del__(self):
+        """Avoid hanging sockets"""
+        self.disconnect()
+
     def _execute(self, command, args):
         self._write_command(command, args)
         return self._client_wrapper()
 
-    def _write_command(self, command, args=[]):
+    def _write_command(self, command, args=None):
         self._comm = command
         self._args = list()
         for arg in args:
@@ -105,13 +110,26 @@ class PlayerClient(Player):
             return False
         return (self.current.id != old_curr.id)  # pylint: disable=no-member
 
+    def _flush_cache(self):
+        """
+        Both flushes and instantiates _cache
+        """
+        if isinstance(self._cache, dict):
+            self.log.info('Player: Flushing cache!')
+        else:
+            self.log.info('Player: Initialising cache!')
+        self._cache = {
+                'artists': None,
+                }
+        self._cache['artists'] = frozenset(self._client.list('artist'))
+
     def find_track(self, artist, title=None):
         #return getattr(self, 'find')('artist', artist, 'title', title)
         if title:
             return self.find('artist', artist, 'title', title)
         return self.find('artist', artist)
 
-    def fuzzy_find(self, art):
+    def fuzzy_find_artist(self, art):
         """
         Controls presence of artist in music library.
         Crosschecking artist names with SimaStr objects / difflib / levenshtein
@@ -123,14 +141,13 @@ class PlayerClient(Player):
         """
         matching_artists = list()
         artist = SimaStr(art)
-        all_artists = self.list('artist')
 
         # Check against the actual string in artist list
-        if artist.orig in all_artists:
+        if artist.orig in self.artists:
             self.log.debug('found exact match for "%s"' % artist)
             return [artist]
         # Then proceed with fuzzy matching if got nothing
-        match = get_close_matches(artist.orig, all_artists, 50, 0.73)
+        match = get_close_matches(artist.orig, self.artists, 50, 0.73)
         if not match:
             return []
         self.log.debug('found close match for "%s": %s' %
@@ -172,13 +189,20 @@ class PlayerClient(Player):
 
     def find_albums(self, artist):
         """
-        Special wrapper around album search:
-        Album lookup is made through AlbumArtist/Album instead of Artist/Album
+        Fetch all albums for "AlbumArtist" == artist
+        Filter albums returned for "artist" == artist since MPD returns any
+               album containing at least a single track for artist
         """
-        alb_art_search = self.list('album', 'albumartist', artist,)
-        if alb_art_search:
-            return alb_art_search
-        return self.list('album', 'artist', artist)
+        albums = set()
+        albums.update(self.list('album', 'albumartist', artist))
+        for album in self.list('album', 'artist', artist):
+            arts = set([trk.artist for trk in self.find('album', album)])
+            if len(arts) < 2:
+                albums.add(album)
+            else:
+                self.log.debug('"{0}" probably not an album of "{1}"'.format(
+                             album, artist) + '({0})'.format('/'.join(arts)))
+        return albums
 
     def monitor(self):
         curr = self.current
@@ -188,6 +212,8 @@ class PlayerClient(Player):
             ret = self._client.fetch_idle()
             if self.__skipped_track(curr):
                 ret.append('skipped')
+            if 'database' in ret:
+                self._flush_cache()
             return ret
         except (MPDError, IOError) as err:
             raise PlayerError("Couldn't init idle: %s" % err)
@@ -199,6 +225,10 @@ class PlayerClient(Player):
         """Overriding MPD's add method to accept add signature with a Track
         object"""
         self._client.add(track.file)
+
+    @property
+    def artists(self):
+        return self._cache.get('artists')
 
     @property
     def state(self):
@@ -266,6 +296,7 @@ class PlayerClient(Player):
                 raise PlayerError('Could connect to "%s", '
                                   'but command "%s" not available' %
                                   (host, nddcmd))
+        self._flush_cache()
 
     def disconnect(self):
         # Try to tell MPD we're closing the connection first

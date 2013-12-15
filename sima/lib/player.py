@@ -3,7 +3,7 @@
 # TODO:
 # Add decorator to filter through history?
 
-# standart library import
+# standard library import
 import logging
 
 # local import
@@ -16,6 +16,14 @@ class Player(object):
 
     When querying player music library for tracks, Player instance *must* return
     Track objects (usually a list of them)
+
+    Player instance should expose the following immutable attributes:
+        * artists
+        * state
+        * current
+        * queue
+        * playlist
+        *
     """
 
     def __init__(self):
@@ -65,10 +73,10 @@ class Player(object):
         """
         raise NotImplementedError
 
-    def fuzzy_find(self, artist):
+    def fuzzy_find_artist(self, artist):
         """
         Find artists based on a fuzzy search in the media library
-            >>> bea = player.fuzzy_find('beatles')
+            >>> bea = player.fuzzy_find_artist('beatles')
             >>> print(bea)
             >>> ['The Beatles']
 
