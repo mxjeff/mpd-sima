@@ -265,7 +265,13 @@ class Lastfm(Plugin):
         for artist in artists:
             self.log.info('Looking for an album to add for "%s"...' % artist)
             albums = self.player.find_albums(artist)
+            # str conversion while Album type is not propagated
+            albums = [ str(album) for album in albums]
+            if albums:
+                self.log.debug('Albums candidate: {0:s}'.format(' / '.join(albums)))
+            else: continue
             # albums yet in history for this artist
+            albums = set(albums)
             albums_yet_in_hist = albums & self._get_album_history(artist=artist)
             albums_not_in_hist = list(albums - albums_yet_in_hist)
             # Get to next artist if there are no unplayed albums
@@ -276,10 +282,6 @@ class Lastfm(Plugin):
             random.shuffle(albums_not_in_hist)
             for album in albums_not_in_hist:
                 tracks = self.player.find_album(artist, album)
-                if tracks and self.sdb.get_bl_album(tracks[0], add_not=True):
-                    self.log.info('Blacklisted album: "%s"' % album)
-                    self.log.debug('using track: "%s"' % tracks[0])
-                    continue
                 # Look if one track of the album is already queued
                 # Good heuristic, at least enough to guess if the whole album is
                 # already queued.

@@ -21,6 +21,7 @@ except ImportError as err:
 # local import
 from .lib.player import Player
 from .lib.track import Track
+from .lib.album import Album
 from .lib.simastr import SimaStr
 
 
@@ -213,24 +214,26 @@ class PlayerClient(Player):
             return alb_art_search
         return self.find('artist', artist, 'album', album)
 
-    #@blacklist(album=True)
+    @blacklist(album=True)
     def find_albums(self, artist):
         """
         Fetch all albums for "AlbumArtist"  == artist
         Filter albums returned for "artist" == artist since MPD returns any
                album containing at least a single track for artist
         """
-        albums = set()
-        albums.update(self.list('album', 'albumartist', artist))
+        albums = []
+        kwalbart = {'albumartist':artist, 'artist':artist}
+        for album in self.list('album', 'albumartist', artist):
+            if album not in albums:
+                albums.append(Album(name=album, **kwalbart))
         for album in self.list('album', 'artist', artist):
             arts = set([trk.artist for trk in self.find('album', album)])
-            if len(arts) < 2:
-                albums.add(album)
-            else:
+            if len(arts) < 2:  # TODO: better heuristic, use a ratio instead
+                if album not in albums:
+                    albums.append(Album(name=album, albumartist=artist))
+            elif album not in albums:
                 self.log.debug('"{0}" probably not an album of "{1}"'.format(
-                             album, artist) + '({0})'.format('/'.join(arts)))
-        if albums:
-            self.log.debug('Albums candidate: {0}'.format('/'.join(albums)))
+                               album, artist) + '({0})'.format('/'.join(arts)))
         return albums
 
     def monitor(self):
