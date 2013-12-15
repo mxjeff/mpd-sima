@@ -7,6 +7,7 @@ This client is built above python-musicpd a fork of python-mpd
 
 # standard library import
 from difflib import get_close_matches
+from itertools import dropwhile
 from select import select
 
 # third parties components
@@ -32,6 +33,28 @@ class PlayerCommandError(PlayerError):
 PlayerUnHandledError = MPDError  # pylint: disable=C0103
 
 
+def blacklist(artist=False, album=False, track=False):
+    #pylint: disable=C0111,W0212
+    field = (artist, album, track)
+    def decorated(func):
+        def wrapper(*args, **kwargs):
+            cls = args[0]
+            boolgen = (bl for bl in field)
+            bl_fun = (cls.database.get_bl_artist,
+                      cls.database.get_bl_album,
+                      cls.database.get_bl_track,)
+            #bl_getter = next(fn for fn, bl in zip(bl_fun, boolgen) if bl is True)
+            bl_getter = next(dropwhile(lambda _: not next(boolgen), bl_fun))
+            #cls.log.debug('using {0} as bl filter'.format(bl_getter.__name__))
+            results = func(*args, **kwargs)
+            for elem in results:
+                if bl_getter(elem, add_not=True):
+                    cls.log.info('Blacklisted: {0}'.format(elem))
+                    results.remove(elem)
+            return results
+        return wrapper
+    return decorated
+
 class PlayerClient(Player):
     """MPC Client
     From python-musicpd:
@@ -47,6 +70,8 @@ class PlayerClient(Player):
     TODO: handle exception in command not going through _client_wrapper() (ie.
           find_aa, remove…)
     """
+    database = None  # sima database (history, blaclist)
+
     def __init__(self, host="localhost", port="6600", password=None):
         super().__init__()
         self._comm = self._args = None
@@ -129,6 +154,7 @@ class PlayerClient(Player):
             return self.find('artist', artist, 'title', title)
         return self.find('artist', artist)
 
+    @blacklist(artist=True)
     def fuzzy_find_artist(self, art):
         """
         Controls presence of artist in music library.
@@ -187,9 +213,10 @@ class PlayerClient(Player):
             return alb_art_search
         return self.find('artist', artist, 'album', album)
 
+    #@blacklist(album=True)
     def find_albums(self, artist):
         """
-        Fetch all albums for "AlbumArtist" == artist
+        Fetch all albums for "AlbumArtist"  == artist
         Filter albums returned for "artist" == artist since MPD returns any
                album containing at least a single track for artist
         """
@@ -202,6 +229,8 @@ class PlayerClient(Player):
             else:
                 self.log.debug('"{0}" probably not an album of "{1}"'.format(
                              album, artist) + '({0})'.format('/'.join(arts)))
+        if albums:
+            self.log.debug('Albums candidate: {0}'.format('/'.join(albums)))
         return albums
 
     def monitor(self):

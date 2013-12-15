@@ -7,7 +7,6 @@ Fetching similar artists from last.fm web services
 import random
 
 from collections import deque
-from itertools import dropwhile
 from hashlib import md5
 
 # third parties components
@@ -35,36 +34,6 @@ def cache(func):
         random.shuffle(results)
         return results
     return wrapper
-
-
-def blacklist(artist=False, album=False, track=False):
-    #pylint: disable=C0111,W0212
-    field = (artist, album, track)
-    def decorated(func):
-        def wrapper(*args, **kwargs):
-            cls = args[0]
-            boolgen = (bl for bl in field)
-            bl_fun = (cls._Plugin__daemon.sdb.get_bl_artist,
-                      cls._Plugin__daemon.sdb.get_bl_album,
-                      cls._Plugin__daemon.sdb.get_bl_track,)
-            #bl_getter = next(fn for fn, bl in zip(bl_fun, boolgen) if bl is True)
-            bl_getter = next(dropwhile(lambda _: not next(boolgen), bl_fun))
-            cls.log.debug('using {0} as bl filter'.format(bl_getter.__name__))
-            if artist:
-                results = func(*args, **kwargs)
-                for elem in results:
-                    if bl_getter(elem, add_not=True):
-                        cls.log.info('Blacklisted: {0}'.format(elem))
-                        results.remove(elem)
-                return results
-            if track:
-                for elem in args[1]:
-                    if bl_getter(elem, add_not=True):
-                        cls.log.info('Blacklisted: {0}'.format(elem))
-                        args[1].remove(elem)
-                return func(*args, **kwargs)
-        return wrapper
-    return decorated
 
 
 class Lastfm(Plugin):
@@ -175,7 +144,6 @@ class Lastfm(Plugin):
                        ' / '.join(art_not_in_hist)))
         return art_not_in_hist
 
-    @blacklist(artist=True)
     @cache
     def get_artists_from_player(self, similarities):
         """

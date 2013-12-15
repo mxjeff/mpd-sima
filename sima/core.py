@@ -27,6 +27,7 @@ class Sima(Daemon):
         self.enabled = True
         self.config = conf
         self.sdb = SimaDB(db_path=conf.get('sima', 'db_file'))
+        PlayerClient.database = self.sdb
         self.log = getLogger('sima')
         self.plugins = list()
         self.player = self.__get_player()  # Player client

@@ -272,7 +272,7 @@ class SimaDB(object):
 
     def get_bl_album(self, track,
             with_connection=None, add_not=None):
-        """get blacklisted track information from the database."""
+        """get blacklisted album information from the database."""
         if with_connection:
             connection = with_connection
         else:
