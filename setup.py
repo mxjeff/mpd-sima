@@ -59,7 +59,7 @@ setup(name='sima',
       data_files=data_files,
       scripts=['launch'],
       entry_points={
-          'console_scripts': ['sima = launch:run',]
+          'console_scripts': ['sima = launch:mainc',]
           },
 )
 

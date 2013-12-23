@@ -63,6 +63,9 @@ def exception_log():
     log.info('Quiting now!')
     sys.exit(1)
 
+class SigHup(Exception):
+    pass
+
 # ArgParse Callbacks
 class Obsolete(Action):
     # pylint: disable=R0903

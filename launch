@@ -20,7 +20,7 @@ from sima.lib.logger import set_logger
 from sima.lib.simadb import SimaDB
 from sima.utils.config import ConfMan
 from sima.utils.startopt import StartOpt
-from sima.utils.utils import exception_log
+from sima.utils.utils import exception_log, SigHup
  # core plugins
 from sima.plugins.core.history import History
 from sima.plugins.core.mpdoptions import MpdOptions
@@ -52,13 +52,9 @@ def load_plugins(sima, source):
         sima.register_plugin(plugin_obj)
 
 
-def main():
-    """Entry point, deal w/ CLI and starts application
+def start(sopt, restart=False):
+    """starts application
     """
-    info = dict({'version': core.__version__,
-                 'prog': 'sima'})
-    # StartOpt gathers options from command line call (in StartOpt().options)
-    sopt = StartOpt(info)
     # set logger
     verbosity = sopt.options.get('verbosity', 'warning')
     logfile = sopt.options.get('logfile', None)
@@ -95,11 +91,15 @@ def main():
 
     #  Loading contrib plugins
     load_plugins(sima, 'contrib')
-
     # Run as a daemon
     if config.getboolean('daemon', 'daemon'):
-        sima.start()
+        if restart:
+            sima.run()
+        else:
+            logger.info('Daemonize process...')
+            sima.start()
 
+    logger.error('starting')
     try:
         sima.foreground()
     except KeyboardInterrupt:
@@ -107,18 +107,30 @@ def main():
         sys.exit(0)
 
 
-def run():
-    """Catching broad exception
+def run(sopt, restart=False):
+    """
+    Handles SigHup exception
+    Catches Unhandled exception
     """
     # pylint: disable=broad-except
     try:
-        main()
-    except Exception:
+        start(sopt, restart)
+    except SigHup as err:  # SigHup inherit from Exception
+        run(sopt, True)
+    except Exception:  # Unhandled exception
         exception_log()
 
 # Script starts here
+def main():
+    info = dict({'version': core.__version__,
+                 'prog': 'sima'})
+    # StartOpt gathers options from command line call (in StartOpt().options)
+    sopt = StartOpt(info)
+    run(sopt)
+
+
 if __name__ == '__main__':
-    run()
+    main()
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

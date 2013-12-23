@@ -16,6 +16,7 @@ from .client import PlayerClient
 from .client import PlayerError, PlayerUnHandledError
 from .lib.simadb import SimaDB
 from .lib.daemon import Daemon
+from .utils.utils import SigHup
 
 class Sima(Daemon):
     """Main class, plugin and player management
@@ -104,6 +105,12 @@ class Sima(Daemon):
                 self.log.warning('Unhandled player exception: %s' % err)
             self.log.info('Got reconnected')
             break
+
+    def hup_handler(self, signum, frame):
+        self.log.warning('Caught a sighup!')
+        self.player.disconnect()
+        self.foreach_plugin('shutdown')
+        raise SigHup('SIGHUP caught!')
 
     def shutdown(self):
         """General shutdown method

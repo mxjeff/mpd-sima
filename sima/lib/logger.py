@@ -71,15 +71,17 @@ def set_logger(level='info', logfile=None, name='sima'):
         fileh = logging.FileHandler(logfile)
         #fileh.setLevel(user_log_level)
         fileh.setFormatter(formatter)
-        logg.addHandler(fileh)
+        if not logg.hasHandlers():
+            logg.addHandler(fileh)
     else:
-        # create console handler with a specified log level (STDOUT)
-        couth = logging.StreamHandler(sys.stdout)
-        #couth.setLevel(user_log_level)
-        couth.addFilter(LevelFilter(logging.WARNING))
+        if not logg.hasHandlers():
+            # create console handler with a specified log level (STDOUT)
+            couth = logging.StreamHandler(sys.stdout)
+            #couth.setLevel(user_log_level)
+            couth.addFilter(LevelFilter(logging.WARNING))
 
-        # create console handler with warning log level (STDERR)
-        cerrh = logging.StreamHandler(sys.stderr)
+            # create console handler with warning log level (STDERR)
+            cerrh = logging.StreamHandler(sys.stderr)
         #cerrh.setLevel(logging.WARNING)
         cerrh.setLevel(logging.ERROR)
 

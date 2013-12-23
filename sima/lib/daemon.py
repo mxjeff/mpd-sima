@@ -27,7 +27,7 @@ import atexit
 import os
 import sys
 import time
-from signal import signal, SIGTERM
+from signal import signal, SIGTERM, SIGHUP, SIGUSR1
 
 
 class Daemon(object):
@@ -124,9 +124,15 @@ class Daemon(object):
         """Declare signal handlers
         """
         signal(SIGTERM, self.exit_handler)
+        signal(SIGHUP, self.hup_handler)
+        signal(SIGUSR1, self.hup_handler)
 
     def exit_handler(self, signum, frame):
         sys.exit(1)
+
+    def hup_handler(self, signum, frame):
+        """SIGHUP handler"""
+        pass
 
     def delpid(self):
         """Remove PID file"""
