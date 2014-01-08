@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Sima
 """
@@ -15,15 +14,15 @@ from os.path import isfile
 ##
 
 # local import
-from sima import core
-from sima.lib.logger import set_logger
-from sima.lib.simadb import SimaDB
-from sima.utils.config import ConfMan
-from sima.utils.startopt import StartOpt
-from sima.utils.utils import exception_log, SigHup
+from . import core, info
+from .lib.logger import set_logger
+from .lib.simadb import SimaDB
+from .utils.config import ConfMan
+from .utils.startopt import StartOpt
+from .utils.utils import exception_log, SigHup
  # core plugins
-from sima.plugins.core.history import History
-from sima.plugins.core.mpdoptions import MpdOptions
+from .plugins.core.history import History
+from .plugins.core.mpdoptions import MpdOptions
 ##
 
 
@@ -99,7 +98,6 @@ def start(sopt, restart=False):
             logger.info('Daemonize process...')
             sima.start()
 
-    logger.error('starting')
     try:
         sima.foreground()
     except KeyboardInterrupt:
@@ -122,10 +120,10 @@ def run(sopt, restart=False):
 
 # Script starts here
 def main():
-    info = dict({'version': core.__version__,
+    nfo = dict({'version': info.__version__,
                  'prog': 'sima'})
     # StartOpt gathers options from command line call (in StartOpt().options)
-    sopt = StartOpt(info)
+    sopt = StartOpt(nfo)
     run(sopt)
 
 

@@ -3,23 +3,12 @@
 
 import glob
 
-from setuptools import setup
-#from distutils.core import setup
+from setuptools import setup, find_packages  # >= 2.0.2
 from os import listdir
 from os.path import isfile, isdir
 
-from sima.core import __version__ as VERSION
-
-DESCRIPTION = """
-sima is a Python application meant to feed your MPD playlist with tracks
-from artists similar to your currently playing track, provided that these
-artists are found in MPD library. Similar artists are fetched from last.fm.
-
-sima can queue track, top track or whole album for similar artists.
-
-This client allows you to never run out of music when your playlist
-queue is getting short.
-"""
+from sima.info import __version__ as VERSION, __author__ as AUTHOR
+from sima.info import __doc__ as DESCRIPTION, __email__ as EMAIL
 
 data_files = [
     #('share/man/man1', ['data/mpd-sima.1', 'data/simadb_cli.1',]),
@@ -44,22 +33,19 @@ setup(name='sima',
       download_url='http://codingteam.net/project/sima/download',
       url='http://codingteam.net/project/sima',
       description='Automagically add titles to MPD playlist',
-      author='Jack Kaliko',
-      author_email='Jack Kaliko <kaliko@azylum.org>',
+      author=AUTHOR,
+      author_email= EMAIL,
       license='GPLv3',
       keywords='MPD',
       long_description=DESCRIPTION,
       classifiers=classifiers,
-      install_requires=['distribute', 'python-musicpd'],
-      packages=['sima','sima.lib', 'sima.utils',
-                'sima.plugins.core',
-                'sima.plugins.internal',
-                'sima.plugins.contrib'],
+      install_requires=['python-musicpd'],
+      packages=find_packages(),
       include_package_data=True,
       data_files=data_files,
-      scripts=['launch'],
+      #scripts=['mpd-sima'],
       entry_points={
-          'console_scripts': ['sima = launch:mainc',]
+          'console_scripts': ['mpd-sima = sima.launch:main',]
           },
 )
 
