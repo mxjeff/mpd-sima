@@ -1,12 +1,17 @@
 Virtualenv installation:
 
 Run ./vinstall.sh to generate the python virtualenv and install requirements.
-You might specify a python3 interpreter if the binary name defers from python3.3 :
 
-	PY3=/usr/bin/python ./vinstall.sh
-
+Default looks for python3 on the system.
+It will setup a virtualenv within a "venv" directory (same level as vinstall.sh file).
 It should also write a shell wrapper to run mpd-sima within the virtualenv.
 
 	./vmpd-sima --help
 
+You might specify a python3 interpreter if the binary name differs from python3:
 
+    PY3=/usr/bin/python ./vinstall.sh
+
+You can locate the virtalenv somewhere else:
+
+    INSTALL_DIR=/tmp/crap_test/ ./vinstall.sh
