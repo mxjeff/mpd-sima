@@ -37,19 +37,21 @@ PIP_OPTIONS=""
 
 pip $PIP_OPTIONS install --pre python-musicpd || exit 1
 
+echo Installing mpd-siuma
+$(dirname $0)/setup.py --quiet install || exit 1
+
 deactivate
 
-SIMA_LAUNCHER=$(readlink -f $(dirname $0))/launch
-SIMA_VLAUNCHER=$(readlink -f $(dirname $0))/vlaunch
-[ -x "$SIMA_LAUNCHER" ] || { echo "$SIMA_LAUNCHER not available"; exit 1; }
+SIMA_LAUNCHER=mpd-sima
+SIMA_VLAUNCHER=$(readlink -f $(dirname $0))/vmpd-sima
 
 cat << EOF > $SIMA_VLAUNCHER
 #!/bin/sh
 . $INSTALL_DIR/venv/bin/activate
-python $SIMA_LAUNCHER "\$@"
+$SIMA_LAUNCHER "\$@"
 EOF
 chmod +x $SIMA_VLAUNCHER
 
-echo 
+echo
 
 # vim: fileencoding=utf8

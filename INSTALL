@@ -5,8 +5,8 @@ You might specify a python3 interpreter if the binary name defers from python3.3
 
 	PY3=/usr/bin/python ./vinstall.sh
 
-It should also write a vlaunch sh wrapper to run sima within the virtualenv.
+It should also write a shell wrapper to run mpd-sima within the virtualenv.
 
-	./vlaunch --help
+	./vmpd-sima --help
 
 
