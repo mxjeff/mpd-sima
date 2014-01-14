@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE info [
+  <!ENTITY dhfirstname "Jack">
+  <!ENTITY dhsurname   "Kaliko">
+  <!ENTITY dhemail     "kaliko@azylum.org">
+  <!ENTITY dhusername  "&dhfirstname; &dhsurname;">
+  <!ENTITY dhpackage "mpd-sima">
+  <!ENTITY release   "0.12.0">
+  <!-- TITLE should be something like "User commands" or similar (see
+       http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
+  <!ENTITY dhtitle     "&dhpackage; &release; User Manual">
+  ]>
+    <info>
+        <title>&dhtitle;</title>
+        <productname>&dhpackage;</productname>
+        <authorgroup>
+            <author>
+                <firstname>&dhfirstname;</firstname>
+                <surname>&dhsurname;</surname>
+                <contrib>Wrote this man page and is currently leading MPD_sima project.</contrib>
+                <address>
+                    <email>&dhemail;</email>
+                </address>
+            </author>
+        </authorgroup>
+        <copyright>
+            <year>2009</year>
+            <year>2010</year>
+            <year>2011</year>
+            <year>2012</year>
+            <year>2013</year>
+            <year>2014</year>
+            <holder>&dhusername;</holder>
+        </copyright>
+        <legalnotice>
+            <para>This manual page was written for the Debian system
+                (and may be used by others).</para>
+            <para>Permission is granted to copy, distribute and/or modify this
+                document under the terms of the GNU General Public License,
+                Version 3 published by the Free Software Foundation.</para>
+            <para>On Debian systems, the complete text of the GNU General Public
+                License can be found in
+                <filename>/usr/share/common-licenses/GPL</filename>.</para>
+        </legalnotice>
+    </info>

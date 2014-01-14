@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <refsect1 id="feedback">
+      <title>FEEDBACK/BUGS</title>
+      <para>The maintainer would be more than happy to ear from you, don't hesitate to send feedback, <ulink url="http://kaliko.me/id/"/>.</para>
+      <para><acronym>XMPP</acronym> users are welcome to join the dedicated chat room at <ulink type="xmpp" url="kaliko.me@conf.azylum.org">kaliko.me@conf.azylum.org</ulink>.</para>
+  </refsect1>
+  <!-- vim:filetype=docbk
+  -->
