@@ -60,7 +60,7 @@ OPTS = [
         'type': str,
         'dest': 'verbosity',
         'choices': ['debug', 'info', 'warning', 'error'],
-        'help': 'file to log message to, default is stdout/stderr'},
+        'help': 'Log messages verbosity, default is info'},
     {
         'sw': ['-p', '--pid'],
         'dest': 'pidfile',
