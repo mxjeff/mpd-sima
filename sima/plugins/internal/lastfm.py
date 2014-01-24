@@ -236,12 +236,12 @@ class Lastfm(Plugin):
         ret_extra = None
         if len(self.history) >= 2:
             ret_extra = self.get_recursive_similar_artist()
+        if ret_extra:
+            ret = list(set(ret) | set(ret_extra))
         if not ret:
             self.log.warning('Got nothing from music library.')
             self.log.warning('Try running in debug mode to guess why...')
             return []
-        if ret_extra:
-            ret = list(set(ret) | set(ret_extra))
         self.log.info('Got {} artists in library'.format(len(ret)))
         self.log.info(' / '.join(ret))
         # Move around similars items to get in unplayed|not recently played
