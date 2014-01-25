@@ -11,9 +11,10 @@ from sima.info import __version__ as VERSION, __author__ as AUTHOR
 from sima.info import __doc__ as DESCRIPTION, __email__ as EMAIL
 
 data_files = [
+    ('share/man/man1', ['data/mpd-sima.1',]),
     #('share/man/man1', ['data/mpd-sima.1', 'data/simadb_cli.1',]),
     #('share/man/man5', ['data/mpd-sima.cfg.5',]),
-    #('share/doc/mpd-sima/examples/', glob.glob('doc/examples/*')),
+    ('share/doc/mpd-sima/examples/', glob.glob('doc/examples/*')),
     #('share/doc/mpd-sima/', [fi for fi in listdir('doc') if isfile(fi)]),
 ]
 classifiers = [
@@ -30,8 +31,8 @@ classifiers = [
 
 setup(name='sima',
       version=VERSION,
-      download_url='http://codingteam.net/project/sima/download',
-      url='http://codingteam.net/project/sima',
+      download_url='http://kaliko.me/media/src/sima/releases/',
+      url='http://kaliko.me/code/mpd-sima',
       description='Automagically add titles to MPD playlist',
       author=AUTHOR,
       author_email= EMAIL,

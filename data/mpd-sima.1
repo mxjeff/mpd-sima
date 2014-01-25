@@ -1,0 +1,281 @@
+'\" t
+.\"     Title: mpd-sima
+.\"    Author: Jack Kaliko <kaliko@azylum.org>
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 01/25/2014
+.\"    Manual: mpd-sima 0.12.0 User Manual
+.\"    Source: mpd-sima
+.\"  Language: English
+.\"
+.TH "MPD\-SIMA" "1" "01/25/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+mpd-sima \- mpd\-sima will try to maintain some titles ahead in your play list following different policies\&.
+.SH "SYNOPSIS"
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR [\fB\-\-daemon\fR] [\fB\-\-config=\fR\fIconf_file\fR] [\fB\-\-var_dir=\fR\fIvar_directory\fR] [\fB\-\-pid=\fR\fIpid_file\fR] [\fB\-\-log=\fR\fIlog_file\fR] [\fB\-\-log\-level=\fR\fIlog_level\fR] [\fB\-\-host=\fR\fImpd_host\fR] [\fB\-\-mpd_port=\fR\fImpd_port\fR]
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR [\fB\-\-var_dir=\fR\fIvar_directory\fR] [\fB\-\-create\-db>\fR]
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | \fB\-\-version\fR]
+.SH "DESCRIPTION"
+.PP
+This manual page documents briefly the
+\fBmpd\-sima\fR
+commands\&.
+.PP
+At start up default configuration is first overridden by user configuration in mpd_sima\&.cfg (see
+the section called \(lqFILES\(rq) and finally command lines options are honored\&. For instance you can override default MPD_HOST set in defaults (localhost) or in your configuration file with
+\fB\-S\ \&my_mpd_server\fR
+option\&. For default configuration see
+the section called \(lqCONFIGURATION\(rq\&.
+.SH "EXAMPLE"
+.SS "Launch as a system service (d\(aemon)\&."
+.PP
+Here follows an example on how to launch mpd\-sima as a service on your system, not attach to regular user configuration/database\&.
+.PP
+\fBmpd\-sima \-\-daemon \-\-conf=/etc/mpd_sima\&.cfg \-\-var_dir=/var/cache/mpd\-sima/ \-\-pid=/run/mpd\-sima\&.pid \-\-log=/var/log/mpd\-sima\&.log\fR
+.SS "Launch in user land"
+.PP
+Launching mpd\-sima from/whithin your user account is easy, you can simply call
+\fBmpd\-sima\fR
+from your shell or one of the following command:
+.PP
+Background execution (d\(aemonise), log in the specified file, save pid:
+.PP
+\fBmpd\-sima \-\-daemon \-\-pid=$HOME/var/run/mpd\-sima\&.pid \-\-log=$HOME/var/log/mpd\-sima\&.log\fR
+.PP
+Foreground execution, connect
+\fImy\&.mpd\&.server\&.org\fR, log to std(out|err):
+.PP
+\fBmpd\-sima \-\-host=my\&.mpd\&.server\&.org\fR
+.SH "OPTIONS"
+.PP
+The program follows the usual GNU command line syntax, with long options starting with two dashes (`\-\*(Aq)\&. A summary of options is included below\&.
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Print help and exit\&.
+.RE
+.PP
+\fB\-\-version\fR
+.RS 4
+Print version and exit\&.
+.RE
+.PP
+\fB\-\-daemon\fR
+.RS 4
+Start as a daemon\&. Log redirected to /dev/null, usually setting
+\fB\-\-log\fR
+and
+\fB\-\-pid\fR
+options in daemon mode are a good idea to monitor/stop the process\&.
+.RE
+.PP
+\fB\-p \fR\fB\fIpid_file\fR\fR, \fB\-\-pid=\fR\fB\fIpid_file\fR\fR
+.RS 4
+Use the specific file
+\fIpid_file\fR
+to store pid to\&.
+.br
+Default is not to store pid info\&.
+.RE
+.PP
+\fB\-l \fR\fB\fIlog_file\fR\fR, \fB\-\-log=\fR\fB\fIlog_file\fR\fR
+.RS 4
+Use the specific file
+\fIlog_file\fR
+to log messages to\&.
+.br
+Default is to log to stdout/stderr\&.
+.RE
+.PP
+\fB\-v \fR\fB\fIlog_level\fR\fR, \fB\-\-log\-level=\fR\fB\fIlog_level\fR\fR
+.RS 4
+Verbosity in [debug,info,warning,error]\&.
+.br
+Default is to log info messages\&.
+.RE
+.PP
+\fB\-c \fR\fB\fIconf_file\fR\fR, \fB\-\-config=\fR\fB\fIconf_file\fR\fR
+.RS 4
+Use the specific file
+\fIconf_file\fR
+to set up configuration instead of looking for the default user configuration file\&.
+.br
+Default is to look for
+\fB$XDG_CONFIG_HOME/mpd_sima/mpd_sima\&.cfg\fR\&. Concerning this file see also
+the section called \(lqFILES\(rq\&.
+.br
+Pay attention: Because you load a specific configuration file from command line interface
+\fIdoes not mean\fR
+it will override others options pass to mpd_sima\&. In other words launching with
+\fB\-P 6666\fR
+will override port setting whatever the configuration file your using, default or command line specified\&.
+.RE
+.PP
+\fB\-\-var_dir=\fR\fB\fIvar_directory\fR\fR
+.RS 4
+Use the specific path
+\fIvar_directory\fR
+to look for (or create) var files (ie\&. database) instead of looking at the default user data location\&.
+.br
+Default is to look in
+\fB$XDG_DATA_HOME/mpd_sima/\fR\&. Concerning
+\fB$XDG_DATA_HOME\fR
+see also
+the section called \(lqFILES\(rq
+.RE
+.PP
+\fB\-\-create\-db\fR
+.RS 4
+Create the database and exit\&. Uses folder specified with
+\fB\-\-var_dir\fR
+or default directory\&.
+.br
+Default is to use
+\fB$XDG_DATA_HOME/mpd_sima/\fR\&. Concerning
+\fB$XDG_DATA_HOME\fR
+see also
+the section called \(lqFILES\(rq
+.RE
+.PP
+\fB\-S \fR\fB\fImpd_host\fR\fR, \fB\-\-host=\fR\fB\fImpd_host\fR\fR
+.RS 4
+Use the specific host
+\fImpd_host\fR
+as MPD server\&.
+.br
+\fImpd_host\fR
+can be an
+IP
+or a fully qualified domain name as long as your system can resolve it\&. This overrides
+\fBMPD_HOST\fR
+environment variable\&.
+.br
+Default is
+\fIlocalhost\fR\&.
+.sp
+See also
+the section called \(lqENVIRONMENT\(rq\&.
+.RE
+.PP
+\fB\-P \fR\fB\fImpd_port\fR\fR, \fB\-\-port=\fR\fB\fImpd_port\fR\fR
+.RS 4
+Use the specific port number
+\fImpd_port\fR
+on MPD server\&. This overrides
+\fBMPD_PORT\fR
+environment variable\&.
+.br
+Default is
+\fI6600\fR\&.
+.sp
+See also
+the section called \(lqENVIRONMENT\(rq
+.RE
+.SH "FILES"
+.PP
+${XDG_CONFIG_HOME}/mpd_sima/mpd_sima\&.cfg
+.RS 4
+The per\-user configuration file\&. Usually
+\fBXDG_CONFIG_HOME\fR
+is set to
+${HOME}/\&.config\&.
+.RE
+.PP
+${XDG_DATA_HOME}/mpd_sima/sima\&.db
+.RS 4
+SQLite database\&. Usually
+\fBXDG_DATA_HOME\fR
+is set to
+${HOME}/\&.local/share\&.
+.RE
+.SH "ENVIRONMENT"
+.PP
+\fBMPD_HOST\fR, \fBMPD_PORT\fR
+.RS 4
+mpd\-sima will look for
+\fBMPD_HOST\fR
+and
+\fBMPD_PORT\fR
+to override built\-in configuration (set to "localhost:6600")\&.
+.sp
+mpd\-sima expects
+\fBMPD_HOST\fR
+syntax as documented in mpc manual, cf\&.
+\fBmpc\fR(1)\&.
+
+.br
+To use a password, provide a value of the form "password@host"\&.
+.RE
+.SH "CONFIGURATION"
+.PP
+mpd_sima\&.cfg
+.RS 4
+mpd_sima\&.cfg
+is read if present\&. Otherwise built\-in defaults are used\&. An example should be provided in the tarball within
+doc/examples/mpd_sima\&.cfg\&. On Debian system please look in
+/usr/share/doc/mpd\-sima\&.
+.RE
+.PP
+DEFAULTS
+.RS 4
+Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env\&. var\&. if set)\&.
+.sp
+The default behavior is to add one track, this track is to be chosen among titles from artists similar to the artist of the currently played track\&. MPD_sima will add one track when the play list is one track long\&.
+.sp
+To change these defaults, use the configuration file
+mpd_sima\&.cfg
+.RE
+.SH "FEEDBACK/BUGS"
+.PP
+The maintainer would be more than happy to ear from you, don\*(Aqt hesitate to send feedback,
+\m[blue]\fB\%http://kaliko.me/id/\fR\m[]\&.
+.PP
+XMPP
+users are welcome to join the dedicated chat room at
+\m[blue]\fBkaliko\&.me@conf\&.azylum\&.org\fR\m[]\&.
+.SH "SEE ALSO"
+.PP
+\fBmpc\fR(1),
+\fBmpd\fR(1),
+\fBmpd-sima.cfg\fR(5)
+.PP
+/usr/share/doc/mpd\-sima/
+.SH "AUTHOR"
+.PP
+\fBJack Kaliko\fR <\&kaliko@azylum\&.org\&>
+.RS 4
+Wrote this man page and is currently leading MPD_sima project\&.
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 2009-2014 Jack Kaliko
+.br
+.PP
+This manual page was written for the Debian system (and may be used by others)\&.
+.PP
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 3 published by the Free Software Foundation\&.
+.PP
+On Debian systems, the complete text of the GNU General Public License can be found in
+/usr/share/common\-licenses/GPL\&.
+.sp
