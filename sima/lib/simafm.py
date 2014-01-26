@@ -23,7 +23,7 @@ Consume last.fm web service
 
 """
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 __author__ = 'Jack Kaliko'
 
 
@@ -34,6 +34,10 @@ from http.client import BadStatusLine
 from socket import timeout as SocketTimeOut
 from time import sleep
 from xml.etree.cElementTree import ElementTree
+
+from sima import LFM
+from sima.utils.utils import getws
+getws(LFM)
 
 # Some definitions
 WAIT_BETWEEN_REQUESTS = timedelta(0, 0.4)
@@ -138,18 +142,15 @@ class AudioScrobblerCache():
 class SimaFM():
     """
     """
-    api_key = '4a1c9ddec29816ed803d7be9113ba4cb'
-    host = 'ws.audioscrobbler.com'
-    version = '2.0'
-    root_url = 'http://%s/%s/' % (host, version)
+    root_url = 'http://{host}/{version}/'.format(**LFM)
     request = dict({'similar': '?method=artist.getsimilar&artist=%s&' +\
-                                'api_key=%s' % api_key,
+                                'api_key={apikey}'.format(**LFM),
                     'top': '?method=artist.gettoptracks&artist=%s&' +\
-                            'api_key=%s' % api_key,
+                                'api_key={apikey}'.format(**LFM),
                     'track': '?method=track.getsimilar&artist=%s' +\
-                            '&track=%s' + '&api_key=%s' % api_key,
+                            '&track=%s' + 'api_key={apikey}'.format(**LFM),
                     'info': '?method=artist.getinfo&artist=%s' +\
-                            '&api_key=%s' % api_key,
+                            'api_key={apikey}'.format(**LFM),
                     })
     cache = dict({})
     timestamp = datetime.utcnow()

@@ -18,15 +18,28 @@
 #  along with sima.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-"""generic tools and utilitaries for sima
+"""generic tools and utilities for sima
 """
 
 import traceback
 import sys
 
 from argparse import ArgumentError, Action
+from base64 import b64decode as push
+from codecs import getencoder
 from os import environ, access, getcwd, W_OK, R_OK
 from os.path import dirname, isabs, join, normpath, exists, isdir, isfile
+
+
+def getws(dic):
+    """
+    Decode Obfuscated api key.
+    Only preventing API keys harvesting over the network
+    https://developer.echonest.com/forums/thread/105
+    """
+    aka = push(bytes(dic.get('apikey') + '=', 'utf-8'))
+    aka = getencoder('rot-13')(str((aka), 'utf-8'))[0]
+    dic.update({'apikey':aka})
 
 def get_mpd_environ():
     """
