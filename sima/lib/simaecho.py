@@ -19,20 +19,18 @@
 
 """
 Consume EchoNest web service
-
 """
 
 __version__ = '0.0.1'
 __author__ = 'Jack Kaliko'
 
 
-import urllib.request, urllib.error, urllib.parse
+import logging
 
 from datetime import datetime, timedelta
-from socket import timeout as SocketTimeOut
 from time import sleep
 
-from requests import get
+from requests import get, Timeout, ConnectionError
 
 from sima import ECH
 from sima.lib.meta import Artist
@@ -41,10 +39,20 @@ if len(ECH.get('apikey')) == 23:
     getws(ECH)
 
 # Some definitions
-WAIT_BETWEEN_REQUESTS = timedelta(0, 0.4)
+WAIT_BETWEEN_REQUESTS = timedelta(0, 1)
+SOCKET_TIMEOUT = 4
 
 
-class SimaEchoError(Exception):
+class EchoError(Exception):
+    pass
+
+class EchoNotFound(EchoError):
+    pass
+
+class EchoTimeout(EchoError):
+    pass
+
+class EchoHTTPError(EchoError):
     pass
 
 class Throttle():
@@ -76,68 +84,82 @@ class Cache():
         return self.elem
 
 
-class SimaFM():
+class SimaEch():
     """
     """
     root_url = 'http://{host}/api/{version}'.format(**ECH)
-    cache = dict({})
+    cache = {}
     timestamp = datetime.utcnow()
 
     def __init__(self, cache=True):
+        self.artist = None
         self._ressource = None
-        self._payload = {'api_key': ECH.get('apikey')}
         self.current_element = None
         self.caching = cache
         self.purge_cache()
 
-    def _fetch(self):
+    def _fetch(self, payload):
         """Use cached elements or proceed http request"""
-        self._req = get(self._ressource, params=self._payload, timeout=5)
-        if self._req.url in SimaFM.cache:
-            print('got from SimaFM cache')
-            self.current_element = SimaFM.cache.get(self._req.url).get()
+        url = Request('GET', self._ressource, params=payload,).prepare().url
+        if url in SimaEch.cache:
+            self.current_element = SimaEch.cache.get(url).elem
             return
-        self._fetch_lfm()
+        try:
+            self._fetch_lfm(payload)
+        except Timeout:
+            raise EchoTimeout('Failed to reach server within {0}s'.format(
+                               SOCKET_TIMEOUT))
+        except ConnectionError as err:
+            raise EchoError(err)
 
     @Throttle(WAIT_BETWEEN_REQUESTS)
-    def _fetch_lfm(self):
+    def _fetch_lfm(self, payload):
         """fetch from web service"""
-        if self._req.status_code is not 200:
-            raise SimaEchoError(self._req.status_code)
-        self.current_element = self._req.json()
-        self._controls_lfm_answer()
+        req = get(self._ressource, params=payload,
+                            timeout=SOCKET_TIMEOUT)
+        if 'x-ratelimit-remaining' in req.headers:
+            logging.debug('x-ratelimit-remaining {x-ratelimit-remaining}'.format(**req.headers))
+        if req.status_code is not 200:
+            raise EchoHTTPError(req.status_code)
+        self.current_element = req.json()
+        self._controls_answer()
         if self.caching:
-            SimaFM.cache.update({self._req.url:
+            SimaEch.cache.update({req.url:
                                  Cache(self.current_element)})
 
-    def _controls_lfm_answer(self):
+    def _controls_answer(self):
         """Controls last.fm answer.
         """
         status = self.current_element.get('response').get('status')
-        if status.get('code') is 0:
+        code = status.get('code')
+        if code is 0:
             return True
-        raise SimaEchoError(status.get('message'))
+        if code is 5:
+            raise EchoNotFound('Artist not found: "{0}"'.format(self.artist))
+        raise EchoError(status.get('message'))
 
-    def _controls_artist(self, artist):
+    def _forge_payload(self, artist):
         """
         """
+        payload = {'api_key': ECH.get('apikey')}
         if not isinstance(artist, Artist):
             raise TypeError('"{0!r}" not an Artist object'.format(artist))
         self.artist = artist
         if artist.mbid:
-            self._payload.update(
+            payload.update(
                     id='musicbrainz:artist:{0}'.format(artist.mbid))
         else:
-           self._payload.update(name=artist.name)
-        self._payload.update(bucket='id:musicbrainz')
-        self._payload.update(results=30)
+           payload.update(name=artist.name)
+        payload.update(bucket='id:musicbrainz')
+        payload.update(results=30)
+        return payload
 
     def purge_cache(self, age=4):
         now = datetime.utcnow()
-        if now.hour == SimaFM.timestamp.hour:
+        if now.hour == SimaEch.timestamp.hour:
             return
-        SimaFM.timestamp = datetime.utcnow()
-        cache = SimaFM.cache
+        SimaEch.timestamp = datetime.utcnow()
+        cache = SimaEch.cache
         delta = timedelta(hours=age)
         for url in list(cache.keys()):
             timestamp = cache.get(url).created()
@@ -147,10 +169,10 @@ class SimaFM():
     def get_similar(self, artist=None):
         """
         """
-        self._controls_artist(artist)
+        payload = self._forge_payload(artist)
         # Construct URL
-        self._ressource = '{0}/artist/similar'.format(SimaFM.root_url)
-        self._fetch()
+        self._ressource = '{0}/artist/similar'.format(SimaEch.root_url)
+        self._fetch(payload)
         for art in self.current_element.get('response').get('artists'):
             artist = {}
             mbid = None
@@ -159,23 +181,6 @@ class SimaFM():
                    if frgnid.get('catalog') == 'musicbrainz':
                        mbid = frgnid.get('foreign_id').lstrip('musicbrainz:artist:')
             yield Artist(mbid=mbid, name=art.get('name'))
-
-
-def run():
-    test = SimaFM()
-    for t, a, m in test.get_similartracks(artist='Nirvana', track='Smells Like Teen Spirit'):
-        print(a, t, m)
-    return
-
-if __name__ == '__main__':
-    try:
-        run()
-    except XmlFMHTTPError as conn_err:
-        print("error trying to connect: %s" % conn_err)
-    except XmlFMNotFound as not_found:
-        print("looks like no artists were found: %s" % not_found)
-    except XmlFMError as err:
-        print(err)
 
 
 # VIM MODLINE
