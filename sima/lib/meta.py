@@ -36,6 +36,33 @@ class Meta:
                 return self.mbid == other.mbid
         return SimaStr(str(self)) == SimaStr(str(other))
 
+    def __hash__(self):
+        if self.mbid is not None:
+            return hash(self.mbid)
+        else:
+            return id(self)
+
+
+class Album(Meta):
+    __hash__ = Meta.__hash__
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __eq__(self, other):
+        """
+        Perform mbid equality test if present,
+        else fallback on self.name equality
+        """
+        if hasattr(other, 'mbid'):
+            if other.mbid and self.mbid:
+                return self.mbid == other.mbid
+        return str(self) == str(other)
+
+    @property
+    def album(self):
+        return self.name
+
 
 class Artist(Meta):
 

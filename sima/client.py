@@ -21,7 +21,7 @@ except ImportError as err:
 # local import
 from .lib.player import Player
 from .lib.track import Track
-from .lib.album import Album
+from .lib.meta import Album
 from .lib.simastr import SimaStr
 
 
@@ -57,7 +57,7 @@ def blacklist(artist=False, album=False, track=False):
     return decorated
 
 class PlayerClient(Player):
-    """MPC Client
+    """MPD Client
     From python-musicpd:
         _fetch_nothing  …
         _fetch_item     single str
@@ -69,7 +69,7 @@ class PlayerClient(Player):
         _fetch_songs    list of dict, especially tracks
         _fetch_plugins,
     TODO: handle exception in command not going through _client_wrapper() (ie.
-          find_aa, remove…)
+          remove…)
     """
     database = None  # sima database (history, blaclist)
 
