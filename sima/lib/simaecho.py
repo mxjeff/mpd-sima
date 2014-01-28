@@ -84,6 +84,19 @@ class Cache():
         return self.elem
 
 
+def purge_cache(self, age=4):
+    now = datetime.utcnow()
+    if now.hour == SimaEch.timestamp.hour:
+        return
+    SimaEch.timestamp = datetime.utcnow()
+    cache = SimaEch.cache
+    delta = timedelta(hours=age)
+    for url in list(cache.keys()):
+        timestamp = cache.get(url).created()
+        if now - timestamp > delta:
+            cache.pop(url)
+
+
 class SimaEch():
     """
     """
@@ -154,18 +167,6 @@ class SimaEch():
         payload.update(results=30)
         return payload
 
-    def purge_cache(self, age=4):
-        now = datetime.utcnow()
-        if now.hour == SimaEch.timestamp.hour:
-            return
-        SimaEch.timestamp = datetime.utcnow()
-        cache = SimaEch.cache
-        delta = timedelta(hours=age)
-        for url in list(cache.keys()):
-            timestamp = cache.get(url).created()
-            if now - timestamp > delta:
-                cache.pop(url)
-
     def get_similar(self, artist=None):
         """
         """
@@ -177,9 +178,10 @@ class SimaEch():
             artist = {}
             mbid = None
             if 'foreign_ids' in art:
-               for frgnid in art.get('foreign_ids'):
-                   if frgnid.get('catalog') == 'musicbrainz':
-                       mbid = frgnid.get('foreign_id').lstrip('musicbrainz:artist:')
+                for frgnid in art.get('foreign_ids'):
+                    if frgnid.get('catalog') == 'musicbrainz':
+                        mbid = frgnid.get('foreign_id'
+                                          ).lstrip('musicbrainz:artist:')
             yield Artist(mbid=mbid, name=art.get('name'))
 
 
