@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009, 2010, 2013 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -29,10 +29,10 @@ import sys
 
 
 LOG_FORMATS = {
+        logging.DEBUG:  '{asctime} {filename: >10}:{lineno: <3} {levelname: <5}: {message}',
+        logging.INFO:  '{asctime} {levelname: <7}: {message}',
         #logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) '
                                  #'{levelname}: {message}',
-        logging.DEBUG:  '{asctime} {filename}:{lineno}  {levelname}: {message}',
-        logging.INFO:  '{asctime} {levelname}: {message}',
         }
 DATE_FMT = "%Y-%m-%d %H:%M:%S"
 
