@@ -61,6 +61,11 @@ DEFAULT_CONF = {
             'logfile': "",
             },
         'echonest': {
+            'queue_mode': "track", #TODO control values
+            'single_album': "false",
+            'track_to_add': "1",
+            'album_to_add': "1",
+            'depth': "1",
             },
         'lastfm': {
             'dynamic': "10",
