@@ -235,7 +235,8 @@ class Lastfm(Plugin):
         ret = self.get_artists_from_player(similar)
         ret_extra = None
         if len(self.history) >= 2:
-            ret_extra = self.get_recursive_similar_artist()
+            if self.plugin_conf.getint('depth') > 1:
+                ret_extra = self.get_recursive_similar_artist()
         if ret_extra:
             ret = list(set(ret) | set(ret_extra))
         if not ret:
