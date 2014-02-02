@@ -329,6 +329,7 @@ class PlayerClient(Player):
     def disconnect(self):
         # Try to tell MPD we're closing the connection first
         try:
+            self._client.noidle()
             self._client.close()
         # If that fails, don't worry, just ignore it and disconnect
         except (MPDError, IOError):
