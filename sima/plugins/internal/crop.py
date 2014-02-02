@@ -33,8 +33,9 @@ class Crop(Plugin):
         if not self.target:
             return
         player = self._Plugin__daemon.player
-        while player.currentsong().pos > self.target:
+        if player.currentsong().pos > self.target:
             self.log.debug('cropping playlist')
+        while player.currentsong().pos > self.target:
             player.remove()
 
 
