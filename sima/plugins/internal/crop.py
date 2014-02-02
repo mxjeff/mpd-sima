@@ -29,7 +29,7 @@ class Crop(Plugin):
         else:
             self.target = int(target)
 
-    def callback_playlist(self):
+    def callback_next_song(self):
         if not self.target:
             return
         player = self._Plugin__daemon.player
