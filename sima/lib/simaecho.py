@@ -30,7 +30,7 @@ import logging
 from datetime import datetime, timedelta
 from time import sleep
 
-from requests import get, Timeout, ConnectionError
+from requests import get, Request, Timeout, ConnectionError
 
 from sima import ECH
 from sima.lib.meta import Artist
@@ -84,7 +84,7 @@ class Cache():
         return self.elem
 
 
-def purge_cache(self, age=4):
+def purge_cache(age=4):
     now = datetime.utcnow()
     if now.hour == SimaEch.timestamp.hour:
         return
@@ -103,13 +103,14 @@ class SimaEch():
     root_url = 'http://{host}/api/{version}'.format(**ECH)
     cache = {}
     timestamp = datetime.utcnow()
+    ratelimit = None
 
     def __init__(self, cache=True):
         self.artist = None
         self._ressource = None
         self.current_element = None
         self.caching = cache
-        self.purge_cache()
+        purge_cache()
 
     def _fetch(self, payload):
         """Use cached elements or proceed http request"""
@@ -118,7 +119,7 @@ class SimaEch():
             self.current_element = SimaEch.cache.get(url).elem
             return
         try:
-            self._fetch_lfm(payload)
+            self._fetch_ech(payload)
         except Timeout:
             raise EchoTimeout('Failed to reach server within {0}s'.format(
                                SOCKET_TIMEOUT))
@@ -126,12 +127,11 @@ class SimaEch():
             raise EchoError(err)
 
     @Throttle(WAIT_BETWEEN_REQUESTS)
-    def _fetch_lfm(self, payload):
+    def _fetch_ech(self, payload):
         """fetch from web service"""
         req = get(self._ressource, params=payload,
                             timeout=SOCKET_TIMEOUT)
-        if 'x-ratelimit-remaining' in req.headers:
-            logging.debug('x-ratelimit-remaining {x-ratelimit-remaining}'.format(**req.headers))
+        self.__class__.ratelimit = req.headers.get('x-ratelimit-remaining', None)
         if req.status_code is not 200:
             raise EchoHTTPError(req.status_code)
         self.current_element = req.json()
