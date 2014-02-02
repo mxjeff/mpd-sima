@@ -36,7 +36,7 @@ from stat import (S_IMODE, ST_MODE, S_IRWXO, S_IRWXG)
 from . import utils
 
 # DEFAULTS
-DIRNAME = 'sima'
+DIRNAME = 'mpd_sima'
 CONF_FILE = 'sima.cfg'
 
 DEFAULT_CONF = {

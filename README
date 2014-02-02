@@ -5,9 +5,3 @@ Requires python-musicpd:
 		http://media.kaliko.me/src/musicpd/
 
 
-Changes with MPD_sima
-
-  * project renamed sima
-    → defaults to
-        config : ~/.config/sima/sima.cfg
-        cache  : ~/.local/share/sima/sima.db
