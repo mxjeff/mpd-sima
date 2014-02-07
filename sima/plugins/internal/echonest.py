@@ -175,7 +175,10 @@ class EchoNest(Plugin):
         as_artists = simaech.get_similar(artist=current)
         self.log.debug('Requesting EchoNest for "{0}"'.format(current))
         try:
-            [as_art.append(str(a)) for a in as_artists]
+            for art in as_artists:
+                if len(as_art) > self.plugin_conf.getint('artists'):
+                    break
+                as_art.append(str(art))
         except EchoNotFound as err:
             self.log.warning(err)
         except EchoError as err:
@@ -313,7 +316,7 @@ class EchoNest(Plugin):
                             'history getting too large?')
             return None
         for track in self.to_add:
-            self.log.info('last.fm candidate: {0!s}'.format(track))
+            self.log.info('echonest candidates: {0!s}'.format(track))
 
     def _album(self):
         """Get albums for album queue mode

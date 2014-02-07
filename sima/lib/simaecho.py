@@ -141,7 +141,7 @@ class SimaEch():
                                  Cache(self.current_element)})
 
     def _controls_answer(self):
-        """Controls last.fm answer.
+        """Controls answer.
         """
         status = self.current_element.get('response').get('status')
         code = status.get('code')
@@ -164,7 +164,7 @@ class SimaEch():
         else:
            payload.update(name=artist.name)
         payload.update(bucket='id:musicbrainz')
-        payload.update(results=30)
+        payload.update(results=100)
         return payload
 
     def get_similar(self, artist=None):
