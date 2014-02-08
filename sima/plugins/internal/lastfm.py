@@ -13,8 +13,9 @@ from hashlib import md5
 
 # local import
 from ...lib.plugin import Plugin
-from ...lib.simafm import SimaFM, XmlFMHTTPError, XmlFMNotFound, XmlFMError
+from ...lib.simafm import SimaFM, WSHTTPError, WSNotFound, WSError
 from ...lib.track import Track
+from ...lib.meta import Artist
 
 
 def cache(func):
@@ -22,7 +23,7 @@ def cache(func):
     def wrapper(*args, **kwargs):
         #pylint: disable=W0212,C0111
         cls = args[0]
-        similarities = [art + str(match) for art, match in args[1]]
+        similarities = [art for art, _ in args[1]]
         hashedlst = md5(''.join(similarities).encode('utf-8')).hexdigest()
         if hashedlst in cls._cache.get('asearch'):
             cls.log.debug('cached request')
@@ -60,10 +61,11 @@ class Lastfm(Plugin):
         """
         Both flushes and instanciates _cache
         """
+        name = self.__class__.__name__
         if isinstance(self._cache, dict):
-            self.log.info('Lastfm: Flushing cache!')
+            self.log.info('{0}: Flushing cache!'.format(name))
         else:
-            self.log.info('Lastfm: Initialising cache!')
+            self.log.info('{0}: Initialising cache!'.format(name))
         self._cache = {
                 'asearch': dict(),
                 'tsearch': dict(),
@@ -170,21 +172,25 @@ class Lastfm(Plugin):
         Retrieve similar artists on last.fm server.
         """
         if artist is None:
-            current = self.player.current
+            curr = self.player.current.__dict__
+            name = curr.get('artist')
+            mbid = curr.get('musicbrainz_artistid', None)
+            current = Artist(name=name, mbid=mbid)
         else:
             current = artist
         simafm = SimaFM()
         # initialize artists deque list to construct from DB
         as_art = deque()
-        as_artists = simafm.get_similar(artist=current.artist)
-        self.log.debug('Requesting last.fm for "{0.artist}"'.format(current))
+        as_artists = simafm.get_similar(artist=current)
+        self.log.debug('Requesting last.fm for "{0}"'.format(current))
         try:
-            [as_art.append((a, m)) for a, m in as_artists]
-        except XmlFMHTTPError as err:
+            # TODO: let's propagate Artist type
+            [as_art.append((str(a), m)) for a, m in as_artists]
+        except WSHTTPError as err:
             self.log.warning('last.fm http error: %s' % err)
-        except XmlFMNotFound as err:
+        except WSNotFound as err:
             self.log.warning("last.fm: %s" % err)
-        except XmlFMError as err:
+        except WSError as err:
             self.log.warning('last.fm module error: %s' % err)
         if as_art:
             self.log.debug('Fetched %d artist(s) from last.fm' % len(as_art))
@@ -230,7 +236,7 @@ class Lastfm(Plugin):
             return []
         similar = sorted(similar, key=lambda sim: sim[1], reverse=True)
         self.log.info('First five similar artist(s): {}...'.format(
-                      ' / '.join([a for a, m in similar[0:5]])))
+                      ' / '.join([a for a, _ in similar[0:5]])))
         self.log.info('Looking availability in music library')
         ret = self.get_artists_from_player(similar)
         ret_extra = None
@@ -319,7 +325,7 @@ class Lastfm(Plugin):
                             'history getting too large?')
             return None
         for track in self.to_add:
-            self.log.info('last.fm candidate: {0!s}'.format(track))
+            self.log.info('last.fm candidates: {0!s}'.format(track))
 
     def _album(self):
         """Get albums for album queue mode

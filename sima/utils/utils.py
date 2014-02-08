@@ -27,9 +27,10 @@ import sys
 from argparse import ArgumentError, Action
 from base64 import b64decode as push
 from codecs import getencoder
-from datetime import datetime
+from datetime import datetime, timedelta
 from os import environ, access, getcwd, W_OK, R_OK
 from os.path import dirname, isabs, join, normpath, exists, isdir, isfile
+from time import sleep
 
 
 def getws(dic):
@@ -76,6 +77,19 @@ def exception_log():
     log.info('thanks for your help :)')
     log.info('Quiting now!')
     sys.exit(1)
+
+def purge_cache(obj, age=4):
+    now = datetime.utcnow()
+    if now.hour == obj.timestamp.hour:
+        return
+    obj.timestamp = datetime.utcnow()
+    cache = obj.cache
+    delta = timedelta(hours=age)
+    for url in list(cache.keys()):
+        timestamp = cache.get(url).created()
+        if now - timestamp > delta:
+            cache.pop(url)
+
 
 class SigHup(Exception):
     pass
