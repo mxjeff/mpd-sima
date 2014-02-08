@@ -74,7 +74,6 @@ class SimaFM():
         url = Request('GET', self._url, params=payload,).prepare().url
         if url in SimaFM.cache:
             self.current_element = SimaFM.cache.get(url).elem
-            print('is cached')
             return
         try:
             self._fetch_ech(payload)

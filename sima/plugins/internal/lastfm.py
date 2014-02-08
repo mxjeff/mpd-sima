@@ -342,7 +342,11 @@ class Lastfm(Plugin):
     def callback_need_track(self):
         self._cleanup_cache()
         if not self.player.current:
-            self.log.info('Not currently playing track, cannot queue')
+            self.log.info('No current track, cannot queue')
+            return None
+        if not self.player.current.artist:
+            self.log.warning('No artist set for the current track')
+            self.log.debug(repr(self.player.current))
             return None
         self.queue_mode()
         candidates = self.to_add
