@@ -62,7 +62,7 @@ DEFAULT_CONF = {
             },
         'echonest': {
             'queue_mode': "track", #TODO control values
-            'artists': "80",
+            'dynamic': "15",
             'single_album': "false",
             'track_to_add': "1",
             'album_to_add': "1",

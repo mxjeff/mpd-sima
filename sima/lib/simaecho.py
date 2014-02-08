@@ -35,7 +35,7 @@ from requests import get, Request, Timeout, ConnectionError
 from sima import ECH
 from sima.lib.meta import Artist
 from sima.utils.utils import getws
-if len(ECH.get('apikey')) == 23:
+if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
     getws(ECH)
 
 # Some definitions

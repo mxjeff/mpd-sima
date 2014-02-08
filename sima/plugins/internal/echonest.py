@@ -152,8 +152,13 @@ class EchoNest(Plugin):
         Look in player library for availability of similar artists in
         similarities
         """
+        dynamic = self.plugin_conf.getint('dynamic')
+        if dynamic <= 0:
+            dynamic = 100
+        similarity = self.plugin_conf.getint('similarity')
         results = list()
-        while len(similarities) > 0:
+        while (len(results) < dynamic
+            and len(similarities) > 0):
             art_pop = similarities.pop()
             results.extend(self.player.fuzzy_find_artist(art_pop))
         return results
@@ -175,10 +180,7 @@ class EchoNest(Plugin):
         as_artists = simaech.get_similar(artist=current)
         self.log.debug('Requesting EchoNest for "{0}"'.format(current))
         try:
-            for art in as_artists:
-                if len(as_art) > self.plugin_conf.getint('artists'):
-                    break
-                as_art.append(str(art))
+            [as_art.append(str(art)) for art in as_artists]
         except EchoNotFound as err:
             self.log.warning(err)
         except EchoError as err:
@@ -218,13 +220,13 @@ class EchoNest(Plugin):
         return ret_extra
 
     def get_local_similar_artists(self):
-        """Check against local player for similar artists fetched from last.fm
+        """Check against local player for similar artists fetched from echonest
         """
         current = self.player.current
         self.log.info('Looking for artist similar to "{0.artist}"'.format(current))
         similar = list(self.lfm_similar_artists())
         if not similar:
-            self.log.info('Got nothing from last.fm!')
+            self.log.info('Got nothing from echonest!')
             return []
         self.log.info('First five similar artist(s): {}...'.format(
                       ' / '.join([a for a in similar[0:5]])))
