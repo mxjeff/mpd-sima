@@ -33,6 +33,7 @@ class Sima(Daemon):
         except (PlayerError, PlayerUnHandledError) as err:
             self.log.error('Fails to connect player: {}'.format(err))
             self.shutdown()
+            sys.exit(1)
         self.short_history = deque(maxlen=60)
 
     def __get_player(self):

@@ -42,11 +42,13 @@ def load_plugins(sima, source):
         except ImportError as err:
             logger.error('Failed to load plugin\'s module: {0} ({1})'.format(module, err))
             sima.shutdown()
+            sys.exit(1)
         try:
             plugin_obj = getattr(mod_obj, plugin)
         except AttributeError as err:
             logger.error('Failed to load plugin {0} ({1})'.format(plugin, err))
             sima.shutdown()
+            sys.exit(1)
         logger.info('Loading {0} plugin: {name} ({doc})'.format(source, **plugin_obj.info()))
         sima.register_plugin(plugin_obj)
 
