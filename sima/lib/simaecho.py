@@ -34,7 +34,7 @@ from requests import get, Request, Timeout, ConnectionError
 
 from sima import ECH
 from sima.lib.meta import Artist
-from sima.utils.utils import getws
+from sima.utils.utils import getws, Throttle, Cache, purge_cache
 if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
     getws(ECH)
 
@@ -55,48 +55,6 @@ class EchoTimeout(EchoError):
 class EchoHTTPError(EchoError):
     pass
 
-class Throttle():
-    def __init__(self, wait):
-        self.wait = wait
-        self.last_called = datetime.now()
-
-    def __call__(self, func):
-        def wrapper(*args, **kwargs):
-            while self.last_called + self.wait > datetime.now():
-                sleep(0.1)
-            result = func(*args, **kwargs)
-            self.last_called = datetime.now()
-            return result
-        return wrapper
-
-
-class Cache():
-    def __init__(self, elem, last=None):
-        self.elem = elem
-        self.requestdate = last
-        if not last:
-            self.requestdate = datetime.utcnow()
-
-    def created(self):
-        return self.requestdate
-
-    def get(self):
-        return self.elem
-
-
-def purge_cache(age=4):
-    now = datetime.utcnow()
-    if now.hour == SimaEch.timestamp.hour:
-        return
-    SimaEch.timestamp = datetime.utcnow()
-    cache = SimaEch.cache
-    delta = timedelta(hours=age)
-    for url in list(cache.keys()):
-        timestamp = cache.get(url).created()
-        if now - timestamp > delta:
-            cache.pop(url)
-
-
 class SimaEch():
     """
     """
@@ -110,7 +68,7 @@ class SimaEch():
         self._ressource = None
         self.current_element = None
         self.caching = cache
-        purge_cache()
+        purge_cache(self.__class__)
 
     def _fetch(self, payload):
         """Use cached elements or proceed http request"""

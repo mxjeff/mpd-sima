@@ -180,6 +180,7 @@ class EchoNest(Plugin):
         as_artists = simaech.get_similar(artist=current)
         self.log.debug('Requesting EchoNest for "{0}"'.format(current))
         try:
+            # TODO: let's propagate Artist type
             [as_art.append(str(art)) for art in as_artists]
         except EchoNotFound as err:
             self.log.warning(err)
@@ -293,7 +294,7 @@ class EchoNest(Plugin):
             if not album_to_queue:
                 self.log.info('No album found for "%s"' % artist)
                 continue
-            self.log.info('last.fm album candidate: {0} - {1}'.format(
+            self.log.info('echonest album candidates: {0} - {1}'.format(
                            artist, album_to_queue))
             nb_album_add += 1
             self.to_add.extend(self.player.find_album(artist, album_to_queue))
