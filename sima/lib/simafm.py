@@ -23,7 +23,7 @@ Consume last.fm web service
 
 """
 
-__version__ = '0.3.1'
+__version__ = '0.4.0'
 __author__ = 'Jack Kaliko'
 
 
@@ -32,28 +32,17 @@ import urllib.request, urllib.error, urllib.parse
 from datetime import datetime, timedelta
 from http.client import BadStatusLine
 from socket import timeout as SocketTimeOut
-from time import sleep
 from xml.etree.cElementTree import ElementTree
 
+from request import get
+
 from sima import LFM
-from sima.utils.utils import getws
-getws(LFM)
+from sima.utils.utils import getws, Throttle, Cache
+if len(LFM.get('apikey')) == 43:  # simple hack allowing imp.reload
+    getws(LFM)
 
 # Some definitions
 WAIT_BETWEEN_REQUESTS = timedelta(0, 0.4)
-LFM_ERRORS = dict({'2': 'Invalid service -This service does not exist',
-    '3': 'Invalid Method - No method with that name in this package',
-    '4': 'Authentication Failed - You do not have permissions to access the service',
-    '5': "'Invalid format - This service doesn't exist in that format",
-    '6': 'Invalid parameters - Your request is missing a required parameter',
-    '7': 'Invalid resource specified',
-    '9': 'Invalid session key - Please re-authenticate',
-    '10': 'Invalid API key - You must be granted a valid key by last.fm',
-    '11': 'Service Offline - This service is temporarily offline. Try again later.',
-    '12': 'Subscription Error - The user needs to be subscribed in order to do that',
-    '13': 'Invalid method signature supplied',
-    '26': 'Suspended API key - Access for your account has been suspended, please contact Last.fm',
-    })
 
 
 class XmlFMError(Exception):  # Errors
@@ -111,34 +100,6 @@ class XmlFMTimeOut(XmlFMError):
         self.expression = (message)
 
 
-class Throttle():
-    def __init__(self, wait):
-        self.wait = wait
-        self.last_called = datetime.now()
-
-    def __call__(self, func):
-        def wrapper(*args, **kwargs):
-            while self.last_called + self.wait > datetime.now():
-                #print('waiting…')
-                sleep(0.1)
-            result = func(*args, **kwargs)
-            self.last_called = datetime.now()
-            return result
-        return wrapper
-
-
-class AudioScrobblerCache():
-    def __init__(self, elem, last):
-        self.elemtree = elem
-        self.requestdate = last
-
-    def created(self):
-        return self.requestdate
-
-    def gettree(self):
-        return self.elemtree
-
-
 class SimaFM():
     """
     """
@@ -151,6 +112,16 @@ class SimaFM():
                             '&track=%s' + 'api_key={apikey}'.format(**LFM),
                     'info': '?method=artist.getinfo&artist=%s' +\
                             'api_key={apikey}'.format(**LFM),
+                    })
+    payloads = dict({'similar': {'method':'artist.getsimilar',
+                                'artist':None, 'api_key':LFM.get('apikey'),},
+                    'top': {'method':'artist.gettoptracks',
+                            'artist':None, 'api_key':LFM.get('apikey'),},
+                    'track': {'method':'track.getsimilar',
+                              'artist':None, 'track':None,
+                              'api_key':LFM.get('apikey'),},
+                    'info': {'method':'artist.getinfo', 'artist':None,
+                             'api_key':LFM.get('apikey'),},
                     })
     cache = dict({})
     timestamp = datetime.utcnow()
@@ -177,6 +148,10 @@ class SimaFM():
             self.current_element = SimaFM.cache.get(self._url).gettree()
             return
         self._fetch_lfm()
+
+    @Throttle(WAIT_BETWEEN_REQUESTS)
+    def _fetch_ws(self):
+        pass
 
     @Throttle(WAIT_BETWEEN_REQUESTS)
     def _fetch_lfm(self):
@@ -212,8 +187,7 @@ class SimaFM():
             fd.close()
         self._controls_lfm_answer()
         if self.caching:
-            SimaFM.cache[self._url] = AudioScrobblerCache(self.current_element,
-                    datetime.utcnow())
+            SimaFM.cache[self._url] = Cache(self.current_element)
 
     def _controls_lfm_answer(self):
         """Controls last.fm answer.
@@ -224,8 +198,6 @@ class SimaFM():
         if status == 'failed':
             error = self.current_element.find('error').attrib.get('code')
             errormsg = self.current_element.findtext('error')
-            #if error in LFM_ERRORS.keys():
-            #    print LFM_ERRORS.get(error)
             raise XmlFMNotFound(errormsg)
 
     def _controls_artist(self, artist):
@@ -250,6 +222,21 @@ class SimaFM():
             timestamp = cache.get(url).created()
             if now - timestamp > delta:
                 cache.pop(url)
+
+    def get_similar_ng(self, artist=None):
+        """
+        """
+        self._controls_artist(artist)
+        # Construct URL
+        self._req = get(SimaFM.root_url, params=None, timeout=5)
+        self._url = req.url
+        if self._is_in_cache():
+            self.current_element = SimaFM.cache.get(self._url).gettree()
+        else:
+            self._fetch_ws()
+        elem = self.current_element
+        for art in elem.getiterator(tag='artist'):
+            yield str(art.findtext('name')), 100 * float(art.findtext('match'))
 
     def get_similar(self, artist=None):
         """

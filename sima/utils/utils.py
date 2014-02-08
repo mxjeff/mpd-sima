@@ -27,6 +27,7 @@ import sys
 from argparse import ArgumentError, Action
 from base64 import b64decode as push
 from codecs import getencoder
+from datetime import datetime
 from os import environ, access, getcwd, W_OK, R_OK
 from os.path import dirname, isabs, join, normpath, exists, isdir, isfile
 
@@ -143,6 +144,32 @@ class Wdir(FileAction):
         if not access(self._file, W_OK):
             self.parser.error('no write access to "{0}"'.format(self._file))
 
+class Throttle():
+    def __init__(self, wait):
+        self.wait = wait
+        self.last_called = datetime.now()
+
+    def __call__(self, func):
+        def wrapper(*args, **kwargs):
+            while self.last_called + self.wait > datetime.now():
+                sleep(0.1)
+            result = func(*args, **kwargs)
+            self.last_called = datetime.now()
+            return result
+        return wrapper
+
+class Cache():
+    def __init__(self, elem, last=None):
+        self.elem = elem
+        self.requestdate = last
+        if not last:
+            self.requestdate = datetime.utcnow()
+
+    def created(self):
+        return self.requestdate
+
+    def get(self):
+        return self.elem
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
