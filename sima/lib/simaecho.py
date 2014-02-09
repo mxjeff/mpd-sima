@@ -34,6 +34,7 @@ from requests import get, Request, Timeout, ConnectionError
 
 from sima import ECH
 from sima.lib.meta import Artist
+from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
 from sima.utils.utils import getws, Throttle, Cache, purge_cache
 if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
     getws(ECH)
@@ -43,18 +44,6 @@ WAIT_BETWEEN_REQUESTS = timedelta(0, 1)
 SOCKET_TIMEOUT = 4
 
 
-class EchoError(Exception):
-    pass
-
-class EchoNotFound(EchoError):
-    pass
-
-class EchoTimeout(EchoError):
-    pass
-
-class EchoHTTPError(EchoError):
-    pass
-
 class SimaEch():
     """
     """
@@ -62,6 +51,7 @@ class SimaEch():
     cache = {}
     timestamp = datetime.utcnow()
     ratelimit = None
+    name = 'EchoNest'
 
     def __init__(self, cache=True):
         self.artist = None
@@ -79,10 +69,10 @@ class SimaEch():
         try:
             self._fetch_ech(payload)
         except Timeout:
-            raise EchoTimeout('Failed to reach server within {0}s'.format(
+            raise WSTimeout('Failed to reach server within {0}s'.format(
                                SOCKET_TIMEOUT))
         except ConnectionError as err:
-            raise EchoError(err)
+            raise WSError(err)
 
     @Throttle(WAIT_BETWEEN_REQUESTS)
     def _fetch_ech(self, payload):
@@ -91,7 +81,7 @@ class SimaEch():
                             timeout=SOCKET_TIMEOUT)
         self.__class__.ratelimit = req.headers.get('x-ratelimit-remaining', None)
         if req.status_code is not 200:
-            raise EchoHTTPError(req.status_code)
+            raise WSHTTPError(req.status_code)
         self.current_element = req.json()
         self._controls_answer()
         if self.caching:
@@ -106,8 +96,8 @@ class SimaEch():
         if code is 0:
             return True
         if code is 5:
-            raise EchoNotFound('Artist not found: "{0}"'.format(self.artist))
-        raise EchoError(status.get('message'))
+            raise WSNotFound('Artist not found: "{0}"'.format(self.artist))
+        raise WSError(status.get('message'))
 
     def _forge_payload(self, artist):
         """

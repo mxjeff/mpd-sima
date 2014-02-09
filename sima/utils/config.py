@@ -62,16 +62,15 @@ DEFAULT_CONF = {
             },
         'echonest': {
             'queue_mode': "track", #TODO control values
-            'dynamic': "15",
+            'max_art': "15",
             'single_album': "false",
             'track_to_add': "1",
             'album_to_add': "1",
             'depth': "1",
             },
         'lastfm': {
-            'dynamic': "10",
-            'similarity': "15",
             'queue_mode': "track", #TODO control values
+            'max_art': "10",
             'single_album': "false",
             'track_to_add': "1",
             'album_to_add': "1",

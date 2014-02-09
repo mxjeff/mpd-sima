@@ -185,5 +185,21 @@ class Cache():
     def get(self):
         return self.elem
 
+
+# http client exceptions (for webservices)
+
+class WSError(Exception):
+    pass
+
+class WSNotFound(WSError):
+    pass
+
+class WSTimeout(WSError):
+    pass
+
+class WSHTTPError(WSError):
+    pass
+
+
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

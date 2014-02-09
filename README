@@ -1,7 +1,9 @@
 Design for python >= 3.3
 
-Requires python-musicpd:
+Requires: python-musicpd >= 0.4.0 [0],
+          requests >= 2.2.0 [1]
 
-		http://media.kaliko.me/src/musicpd/
+	[0] http://media.kaliko.me/src/musicpd/
+	[1] http://docs.python-requests.org/
 
 

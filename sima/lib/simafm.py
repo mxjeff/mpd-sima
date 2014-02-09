@@ -31,6 +31,7 @@ from requests import get, Request, Timeout, ConnectionError
 
 from sima import LFM
 from sima.lib.meta import Artist
+from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
 from sima.utils.utils import getws, Throttle, Cache, purge_cache
 if len(LFM.get('apikey')) == 43:  # simple hack allowing imp.reload
     getws(LFM)
@@ -40,27 +41,14 @@ WAIT_BETWEEN_REQUESTS = timedelta(0, 1)
 SOCKET_TIMEOUT = 4
 
 
-class WSError(Exception):
-    pass
-
-class WSNotFound(WSError):
-    pass
-
-class WSTimeout(WSError):
-    pass
-
-class WSHTTPError(WSError):
-    pass
-
-
-
 class SimaFM():
     """
     """
     root_url = 'http://{host}/{version}/'.format(**LFM)
     cache = {}
     timestamp = datetime.utcnow()
-    #ratelimit = None
+    name = 'Last.fm'
+    ratelimit = None
 
     def __init__(self, cache=True):
         self.artist = None
@@ -137,9 +125,7 @@ class SimaFM():
         # Construct URL
         self._fetch(payload)
         for art in self.current_element.get('similarartists').get('artist'):
-            match = 100 * float(art.get('match'))
-            yield Artist(mbid=art.get('mbid', None),
-                         name=art.get('name')), match
+            yield Artist(name=art.get('name'), mbid=art.get('mbid', None))
 
 
 # VIM MODLINE
