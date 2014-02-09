@@ -13,7 +13,7 @@ from hashlib import md5
 
 # local import
 from ...lib.plugin import Plugin
-from ...lib.simaecho import SimaEch, EchoError, EchoNotFound
+from ...lib.simaecho import SimaEch, EchoError
 from ...lib.track import Track
 from ...lib.meta import Artist
 
@@ -182,13 +182,10 @@ class EchoNest(Plugin):
         try:
             # TODO: let's propagate Artist type
             [as_art.append(str(art)) for art in as_artists]
-        except EchoNotFound as err:
-            self.log.warning(err)
         except EchoError as err:
             self.log.warning('EchoNest: {0}'.format(err))
         if as_art:
-            self.log.debug('Fetched  {0} artist(s) from echonest'.format(
-                            len(as_art)))
+            self.log.debug('Fetched {0} artist(s)'.format(len(as_art)))
         self.log.debug('x-ratelimit-remaining: {}'.format(SimaEch.ratelimit))
         return as_art
 

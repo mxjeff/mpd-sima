@@ -13,7 +13,7 @@ from hashlib import md5
 
 # local import
 from ...lib.plugin import Plugin
-from ...lib.simafm import SimaFM, WSHTTPError, WSNotFound, WSError
+from ...lib.simafm import SimaFM, WSError
 from ...lib.track import Track
 from ...lib.meta import Artist
 
@@ -186,14 +186,10 @@ class Lastfm(Plugin):
         try:
             # TODO: let's propagate Artist type
             [as_art.append((str(a), m)) for a, m in as_artists]
-        except WSHTTPError as err:
-            self.log.warning('last.fm http error: %s' % err)
-        except WSNotFound as err:
-            self.log.warning("last.fm: %s" % err)
         except WSError as err:
-            self.log.warning('last.fm module error: %s' % err)
+            self.log.warning('Last.fm: {0}'.format(err))
         if as_art:
-            self.log.debug('Fetched %d artist(s) from last.fm' % len(as_art))
+            self.log.debug('Fetched {0} artist(s)'.format(len(as_art)))
         return as_art
 
     def get_recursive_similar_artist(self):
