@@ -29,7 +29,7 @@ import sys
 
 
 LOG_FORMATS = {
-        logging.DEBUG:  '{asctime} {filename: >11}:{lineno: <3} {levelname: <5}: {message}',
+        logging.DEBUG:  '{asctime} {filename: >11}:{lineno: <3} {levelname: <7}: {message}',
         logging.INFO:  '{asctime} {levelname: <7}: {message}',
         #logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) '
                                  #'{levelname}: {message}',

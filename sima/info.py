@@ -11,7 +11,7 @@ queue is getting short.
 """
 
 
-__version__ = '0.12.0pr2'
+__version__ = '0.12.0pr4'
 __author__ = 'kaliko jack'
 __email__ = 'kaliko@azylum.org'
 __url__ = 'git://git.kaliko.me/sima.git'

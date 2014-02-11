@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 Consume EchoNest web service
 """
 
-__version__ = '0.0.1'
+__version__ = '0.5.0'
 __author__ = 'Jack Kaliko'
 
 
@@ -38,7 +38,7 @@ if len(LFM.get('apikey')) == 43:  # simple hack allowing imp.reload
 
 # Some definitions
 WAIT_BETWEEN_REQUESTS = timedelta(0, 1)
-SOCKET_TIMEOUT = 4
+SOCKET_TIMEOUT = 6
 
 
 class SimaFM():
