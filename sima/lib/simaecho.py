@@ -67,7 +67,7 @@ class SimaEch():
             self.current_element = SimaEch.cache.get(url).elem
             return
         try:
-            self._fetch_ech(payload)
+            self._fetch_ws(payload)
         except Timeout:
             raise WSTimeout('Failed to reach server within {0}s'.format(
                                SOCKET_TIMEOUT))
@@ -75,7 +75,7 @@ class SimaEch():
             raise WSError(err)
 
     @Throttle(WAIT_BETWEEN_REQUESTS)
-    def _fetch_ech(self, payload):
+    def _fetch_ws(self, payload):
         """fetch from web service"""
         req = get(self._ressource, params=payload,
                             timeout=SOCKET_TIMEOUT)
