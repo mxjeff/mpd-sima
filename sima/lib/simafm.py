@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -112,7 +111,8 @@ class SimaFM():
         if artist.mbid:
             payload.update(mbid='{0}'.format(artist.mbid))
         else:
-           payload.update(artist=artist.name)
+           payload.update(artist=artist.name,
+                          autocorrect=1)
         payload.update(results=100)
         if method == 'track':
             payload.update(track=track)
@@ -124,6 +124,15 @@ class SimaFM():
         payload = self._forge_payload(artist)
         # Construct URL
         self._fetch(payload)
+        # Artist might be found be return no 'artist' list…
+        # cf. "Mulatu Astatqe" vs. "Mulatu Astatqé" with autocorrect=0
+        # json format is broken IMHO, xml is more consistent IIRC
+        # Here what we got:
+        # >>> {"similarartists":{"#text":"\n","artist":"Mulatu Astatqe"}}
+        # autocorrect=1 should fix it, checking anyway.
+        simarts = self.current_element.get('similarartists').get('artist')
+        if not isinstance(simarts, list):
+            raise WSError('Artist found but no similarities returned')
         for art in self.current_element.get('similarartists').get('artist'):
             yield Artist(name=art.get('name'), mbid=art.get('mbid', None))
 
