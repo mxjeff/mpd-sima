@@ -32,6 +32,7 @@ from ...lib.track import Track
 
 
 class RandomFallBack(Plugin):
+    """Add random track as fallback"""
 
     def __init__(self, daemon):
         super().__init__(daemon)
@@ -39,9 +40,9 @@ class RandomFallBack(Plugin):
         if not self.plugin_conf:
             return
         self.mode = self.plugin_conf.get('flavour', None)
-        if self.mode not in ['pure', 'sensible', 'genre']:
+        if self.mode not in ['pure', 'sensible']:
             self.log.warning('Bad value for flavour, '
-                    '{} not in ["pure", "sensible", "genre"]'.format(self.mode))
+                    '"{}" not in ["pure", "sensible"]'.format(self.mode))
             self.mode = 'pure'
 
     def get_played_artist(self,):
@@ -54,17 +55,26 @@ class RandomFallBack(Plugin):
         return set(artists)
 
     def callback_need_track_fb(self):
-        art = random.choice(self.player.list('artist'))
-        self.log.debug('Random art: {}'.format(art))
+        trks = list()
+        target = self.plugin_conf.getint('track_to_add')
+        while len(trks) < target:
+            trks.append(self.get_trk())
+        return trks
+
+    def get_trk(self):
+        artists = list(self.player.artists)
         if self.mode == 'sensitive':
             played_art = self.get_played_artist()
             while 42:
-                art = random.choice(self.player.list('artist'))
+                art = random.choice(artists)
                 if art not in played_art:
                     break
+        elif self.mode == 'pure':
+            art = random.choice(artists)
+        self.log.debug('Random art: {}'.format(art))
         trk  = random.choice(self.player.find_track(art))
         self.log.info('random fallback ({}): {}'.format(self.mode, trk))
-        return [trk]
+        return trk
 
 
 

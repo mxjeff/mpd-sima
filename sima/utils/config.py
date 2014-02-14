@@ -76,7 +76,7 @@ DEFAULT_CONF = {
             'depth': "1",
             },
         'randomfallback': {
-            'flavour': "sensible", # in pure, sensible, genre
+            'flavour': "sensible", # in pure, sensible
             'track_to_add': "1",
             }
         }
