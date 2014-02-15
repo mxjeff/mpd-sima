@@ -33,7 +33,8 @@ _sima() {
           -S --host \
           -P --mpd_port \
           -h --help --version \
-          --var_dir"
+          --var_dir \
+          -d --daemon"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
