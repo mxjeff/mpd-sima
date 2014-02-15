@@ -17,7 +17,7 @@
 #
 
 """
-Consume EchoNest web service
+Consume Last.fm web service
 """
 
 __version__ = '0.5.0'
@@ -40,8 +40,8 @@ WAIT_BETWEEN_REQUESTS = timedelta(0, 1)
 SOCKET_TIMEOUT = 6
 
 
-class SimaFM():
-    """
+class SimaFM:
+    """Last.fm http client
     """
     root_url = 'http://{host}/{version}/'.format(**LFM)
     cache = {}
@@ -96,7 +96,7 @@ class SimaFM():
         return True
 
     def _forge_payload(self, artist, method='similar', track=None):
-        """
+        """Build payload
         """
         payloads = dict({'similar': {'method':'artist.getsimilar',},
                         'top': {'method':'artist.gettoptracks',},
@@ -111,15 +111,15 @@ class SimaFM():
         if artist.mbid:
             payload.update(mbid='{0}'.format(artist.mbid))
         else:
-           payload.update(artist=artist.name,
-                          autocorrect=1)
+            payload.update(artist=artist.name,
+                           autocorrect=1)
         payload.update(results=100)
         if method == 'track':
             payload.update(track=track)
         return payload
 
     def get_similar(self, artist=None):
-        """
+        """Fetch similar artists
         """
         payload = self._forge_payload(artist)
         # Construct URL

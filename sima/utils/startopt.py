@@ -19,11 +19,10 @@
 #
 #
 
-import sys
 from argparse import (ArgumentParser, SUPPRESS)
 
 
-from .utils import Obsolete, Wfile, Rfile, Wdir
+from .utils import Wfile, Rfile, Wdir
 
 USAGE = """USAGE:  %prog [--help] [options]"""
 DESCRIPTION = """
@@ -115,6 +114,7 @@ class StartOpt(object):
     """
 
     def __init__(self, script_info,):
+        self.parser = None
         self.info = dict(script_info)
         self.options = dict()
         self.main()

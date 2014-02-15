@@ -29,7 +29,6 @@ import logging
 
 
 class Player(object):
-
     """Player interface to inherit from.
 
     When querying player music library for tracks, Player instance *must* return

@@ -25,10 +25,7 @@ __version__ = '0.0.1'
 __author__ = 'Jack Kaliko'
 
 
-import logging
-
 from datetime import datetime, timedelta
-from time import sleep
 
 from requests import get, Request, Timeout, ConnectionError
 
@@ -44,8 +41,8 @@ WAIT_BETWEEN_REQUESTS = timedelta(0, 1)
 SOCKET_TIMEOUT = 4
 
 
-class SimaEch():
-    """
+class SimaEch:
+    """EchoNest http client
     """
     root_url = 'http://{host}/api/{version}'.format(**ECH)
     cache = {}
@@ -100,7 +97,7 @@ class SimaEch():
         raise WSError(status.get('message'))
 
     def _forge_payload(self, artist):
-        """
+        """Build payload
         """
         payload = {'api_key': ECH.get('apikey')}
         if not isinstance(artist, Artist):
@@ -110,13 +107,13 @@ class SimaEch():
             payload.update(
                     id='musicbrainz:artist:{0}'.format(artist.mbid))
         else:
-           payload.update(name=artist.name)
+            payload.update(name=artist.name)
         payload.update(bucket='id:musicbrainz')
         payload.update(results=100)
         return payload
 
     def get_similar(self, artist=None):
-        """
+        """Fetch similar artists
         """
         payload = self._forge_payload(artist)
         # Construct URL

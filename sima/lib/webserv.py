@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2014 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -227,7 +227,9 @@ class WebService(Plugin):
         self.log.info('EXTRA ARTS: {}'.format(
             '/'.join([trk.artist for trk in extra_arts])))
         for artist in extra_arts:
-            self.log.debug('Looking for artist similar to "{0.artist}" as well'.format(artist))
+            self.log.debug(
+                    'Looking for artist similar to "{0.artist}" as well'.format(
+                        artist))
             similar = self.lfm_similar_artists(artist=artist)
             if not similar:
                 return ret_extra
@@ -285,7 +287,8 @@ class WebService(Plugin):
             # str conversion while Album type is not propagated
             albums = [ str(album) for album in albums]
             if albums:
-                self.log.debug('Albums candidate: {0:s}'.format(' / '.join(albums)))
+                self.log.debug('Albums candidate: {0:s}'.format(
+                               ' / '.join(albums)))
             else: continue
             # albums yet in history for this artist
             albums = set(albums)

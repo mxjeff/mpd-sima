@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Copyright (c) 2009, 2010, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
@@ -29,7 +28,7 @@ import sys
 
 
 LOG_FORMATS = {
-        logging.DEBUG:  '{asctime} {filename: >11}:{lineno: <3} {levelname: <7}: {message}',
+        logging.DEBUG: '{asctime} {filename: >11}:{lineno: <3} {levelname: <7}: {message}',
         logging.INFO:  '{asctime} {levelname: <7}: {message}',
         #logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) '
                                  #'{levelname}: {message}',

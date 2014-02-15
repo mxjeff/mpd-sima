@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#
 # Copyright (c) 2009-2013 Jack Kaliko <jack@azylum.org>
 # Copyright (c) 2009, Eric Casteleijn <thisfred@gmail.com>
 # Copyright (c) 2008 Rick van Hattem
@@ -20,6 +20,8 @@
 #  along with sima.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
+"""SQlite database library
+"""
 
 #    DOC:
 #    MuscicBrainz ID: <http://musicbrainz.org/doc/MusicBrainzIdentifier>
@@ -27,7 +29,7 @@
 #             <http://musicbrainz.org/doc/Same_Artist_With_Different_Names>
 
 __DB_VERSION__ = 2
-__HIST_DURATION__ = int(7 * 24)  # in hours
+__HIST_DURATION__ = int(30 * 24)  # in hours
 
 import sqlite3
 
@@ -67,6 +69,7 @@ class SimaDB(object):
         self.db_path_mod_control()
 
     def db_path_mod_control(self):
+        """Controls DB path access & write permissions"""
         db_path = self._db_path
         # Controls directory access
         if not isdir(dirname(db_path)):
@@ -347,7 +350,7 @@ class SimaDB(object):
         """Retrieve complete play history, most recent tracks first
         artist  : filter history for specific artist
         artists : filter history for specific artists list
-        """
+        """ # pylint: disable=C0301
         date = datetime.utcnow() - timedelta(hours=duration)
         connection = self.get_database_connection()
         if artist:
@@ -380,7 +383,8 @@ class SimaDB(object):
         yield ('Row ID', 'Artist',)
         for row in rows:
             yield row
-        rows = connection.execute('SELECT black_list.rowid, albums.name, artists.name'
+        rows = connection.execute(
+                'SELECT black_list.rowid, albums.name, artists.name'
                 ' FROM artists, albums INNER JOIN black_list'
                 ' ON albums.id = black_list.album'
                 ' WHERE artists.id = albums.artist')
@@ -388,7 +392,8 @@ class SimaDB(object):
         yield ('Row ID', 'Album', 'Artist name')
         for row in rows:
             yield row
-        rows = connection.execute('SELECT black_list.rowid, tracks.name, artists.name'
+        rows = connection.execute(
+                'SELECT black_list.rowid, tracks.name, artists.name'
                 ' FROM artists, tracks INNER JOIN black_list'
                 ' ON tracks.id = black_list.track'
                 ' WHERE tracks.artist = artists.id')
@@ -522,9 +527,11 @@ class SimaDB(object):
         """Add to history"""
         connection = self.get_database_connection()
         track_id = self.get_track(track, with_connection=connection)[0]
-        rows = connection.execute("SELECT * FROM history WHERE track = ? ", (track_id,))
+        rows = connection.execute("SELECT * FROM history WHERE track = ? ",
+                                  (track_id,))
         if not rows.fetchone():
-            connection.execute("INSERT INTO history (track) VALUES (?)", (track_id,))
+            connection.execute("INSERT INTO history (track) VALUES (?)",
+                               (track_id,))
         connection.execute("UPDATE history SET last_play = DATETIME('now') "
                 " WHERE track = ?", (track_id,))
         connection.commit()
@@ -668,6 +675,7 @@ class SimaDB(object):
         self.close_database_connection(connection)
 
     def _set_dbversion(self):
+        """Add db version"""
         connection = self.get_database_connection()
         connection.execute('INSERT INTO db_info (version, name) VALUES (?, ?)',
                 (__DB_VERSION__, 'Sima DB'))
@@ -704,13 +712,13 @@ class SimaDB(object):
             'CREATE TABLE IF NOT EXISTS history (last_play DATE,'
             ' track integer)')
         connection.execute(
-            "CREATE INDEX IF NOT EXISTS a2aa1x ON usr_artist_2_artist (artist1)")
+          "CREATE INDEX IF NOT EXISTS a2aa1x ON usr_artist_2_artist (artist1)")
         connection.execute(
-            "CREATE INDEX IF NOT EXISTS a2aa2x ON usr_artist_2_artist (artist2)")
+          "CREATE INDEX IF NOT EXISTS a2aa2x ON usr_artist_2_artist (artist2)")
         connection.execute(
-            "CREATE INDEX IF NOT EXISTS lfma2aa1x ON lfm_artist_2_artist (artist1)")
+        "CREATE INDEX IF NOT EXISTS lfma2aa1x ON lfm_artist_2_artist (artist1)")
         connection.execute(
-            "CREATE INDEX IF NOT EXISTS lfma2aa2x ON lfm_artist_2_artist (artist2)")
+        "CREATE INDEX IF NOT EXISTS lfma2aa2x ON lfm_artist_2_artist (artist2)")
         connection.commit()
         self.close_database_connection(connection)
         self._set_dbversion()

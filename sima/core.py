@@ -20,7 +20,6 @@
 """Core Object dealing with plugins and player client
 """
 
-import sys
 import time
 
 from collections import deque
@@ -60,6 +59,7 @@ class Sima(Daemon):
         return PlayerClient(host, port, pswd)
 
     def add_history(self):
+        """Handle local short history"""
         self.short_history.appendleft(self.player.current)
 
     def register_plugin(self, plugin_class):
@@ -73,6 +73,7 @@ class Sima(Daemon):
             getattr(plugin, method)(*args, **kwds)
 
     def need_tracks(self):
+        """Is the player in need for tracks"""
         if not self.enabled:
             self.log.debug('Queueing disabled!')
             return False

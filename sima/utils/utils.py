@@ -20,6 +20,7 @@
 #
 """generic tools and utilities for sima
 """
+# pylint: disable=C0111
 
 import traceback
 import sys
@@ -79,6 +80,8 @@ def exception_log():
     sys.exit(1)
 
 def purge_cache(obj, age=4):
+    """purge old entries in http client cache
+    """
     now = datetime.utcnow()
     if now.hour == obj.timestamp.hour:
         return
@@ -92,6 +95,7 @@ def purge_cache(obj, age=4):
 
 
 class SigHup(Exception):
+    """SIGHUP raises this Exception"""
     pass
 
 # ArgParse Callbacks
@@ -158,7 +162,8 @@ class Wdir(FileAction):
         if not access(self._file, W_OK):
             self.parser.error('no write access to "{0}"'.format(self._file))
 
-class Throttle():
+class Throttle:
+    """throttle decorator"""
     def __init__(self, wait):
         self.wait = wait
         self.last_called = datetime.now()
@@ -172,7 +177,8 @@ class Throttle():
             return result
         return wrapper
 
-class Cache():
+class Cache:
+    """Plain cache object"""
     def __init__(self, elem, last=None):
         self.elem = elem
         self.requestdate = last

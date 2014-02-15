@@ -189,8 +189,8 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
                 self.log.debug('[%s] present in conf file' % section)
                 for option in self.defaults[section]:
                     if self.config.has_option(section, option):
-                        #self.log.debug(u'option "%s" set to "%s" in conf. file' %
-                        #              (option, self.config.get(section, option)))
+                        #self.log.debug('option "%s" set to "%s" in conf. file'%
+                        #            (option, self.config.get(section, option)))
                         pass
                     else:
                         self.log.debug(

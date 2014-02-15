@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 #
 # Copyright (c) 2009, 2010, 2013 Jack Kaliko <kaliko@azylum.org>
 #
@@ -18,7 +17,7 @@
 #  If not, see <http://www.gnu.org/licenses/>.
 #
 
-"""
+r"""
 SimaStr
 
 Special unicode() subclass to perform fuzzy match on specific strings with
@@ -70,7 +69,7 @@ __version__ = '0.4'
 
 # IMPORTS
 import unicodedata
-from re import (compile, U, I)
+from re import compile as re_compile, U, I
 
 from ..utils.leven import levenshtein_ratio
 
@@ -94,11 +93,11 @@ class SimaStr(str):
     # Trailing patterns: ! ? live
     # TODO: add "concert" key word
     #       add "Live at <somewhere>"
-    regexp_dict.update({'trail': '([- !?\.]|\(? ?[Ll]ive ?\)?)'})
+    regexp_dict.update({'trail': r'([- !?\.]|\(? ?[Ll]ive ?\)?)'})
 
-    reg_lead = compile('^(?P<lead>%(lead)s )(?P<root0>.*)$' % regexp_dict, I | U)
-    reg_midl = compile('^(?P<root0>.*)(?P<mid> %(mid)s )(?P<root1>.*)' % regexp_dict, U)
-    reg_trail = compile('^(?P<root0>.*?)(?P<trail>%(trail)s+$)' % regexp_dict, U)
+    reg_lead = re_compile('^(?P<lead>%(lead)s )(?P<root0>.*)$' % regexp_dict, I | U)
+    reg_midl = re_compile('^(?P<root0>.*)(?P<mid> %(mid)s )(?P<root1>.*)' % regexp_dict, U)
+    reg_trail = re_compile('^(?P<root0>.*?)(?P<trail>%(trail)s+$)' % regexp_dict, U)
 
     def __init__(self, fuzzstr):
         """
@@ -108,7 +107,7 @@ class SimaStr(str):
         # fuzzy computation
         self._get_root()
         if self.__class__.diafilter:
-           self.remove_diacritics()
+            self.remove_diacritics()
 
     def __new__(cls, fuzzstr):
         return super(SimaStr, cls).__new__(cls, fuzzstr)
@@ -134,6 +133,7 @@ class SimaStr(str):
             self.stripped = sea.group('root0')
 
     def remove_diacritics(self):
+        """converting diacritics"""
         self.stripped = ''.join(x for x in
                                 unicodedata.normalize('NFKD', self.stripped)
                                 if unicodedata.category(x) != 'Mn')

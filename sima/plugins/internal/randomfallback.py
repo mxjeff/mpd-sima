@@ -28,7 +28,6 @@ import random
 
 # local import
 from ...lib.plugin import Plugin
-from ...lib.track import Track
 
 
 class RandomFallBack(Plugin):
@@ -62,6 +61,8 @@ class RandomFallBack(Plugin):
         return trks
 
     def get_trk(self):
+        """Get a single track acording to random flavour
+        """
         artists = list(self.player.artists)
         if self.mode == 'sensitive':
             played_art = self.get_played_artist()

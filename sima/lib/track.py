@@ -24,7 +24,7 @@
 import time
 
 
-class Track(object):
+class Track:
     """
     Track object.
     Instanciate with Player replies.
@@ -37,7 +37,7 @@ class Track(object):
         self._file = file
         if not kwargs:
             self._empty = True
-        self.time = time
+        self._time = time
         self.__dict__.update(**kwargs)
         self.tags_to_collapse = ['artist', 'album', 'title', 'date',
                                  'genre', 'albumartist']
@@ -123,14 +123,6 @@ class Track(object):
         else:
             fmt = '%M:%S'
         return time.strftime(fmt, temps)
-
-
-def main():
-    pass
-
-# Script starts here
-if __name__ == '__main__':
-    main()
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

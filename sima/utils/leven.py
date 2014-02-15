@@ -16,7 +16,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with sima.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
+"""Computes levenshtein distance/ratio"""
 
 def levenshtein(a_st, b_st):
     """Computes the Levenshtein distance between two strings."""

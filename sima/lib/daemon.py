@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Public Domain
 #
 # Copyright 2007, 2009 Sander Marechal <s.marechal@jejik.com>
@@ -62,8 +61,8 @@ class Daemon(object):
         for details (ISBN 0201563177)
 
         Short explanation:
-            Unix processes belong to "process group" which in turn lies within a "session".
-            A session can have a controlling tty.
+            Unix processes belong to "process group" which in turn lies within a
+            "session".  A session can have a controlling tty.
             Forking twice allows to detach the session from a possible tty.
             The process lives then within the init process.
         """

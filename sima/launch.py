@@ -58,7 +58,8 @@ def load_plugins(sima, source):
         try:
             mod_obj = __import__(module, fromlist=[plugin])
         except ImportError as err:
-            logger.error('Failed to load plugin\'s module: {0} ({1})'.format(module, err))
+            logger.error('Failed to load plugin\'s module: ' +
+                         '{0} ({1})'.format(module, err))
             sima.shutdown()
             sys.exit(1)
         try:
@@ -67,7 +68,8 @@ def load_plugins(sima, source):
             logger.error('Failed to load plugin {0} ({1})'.format(plugin, err))
             sima.shutdown()
             sys.exit(1)
-        logger.info('Loading {0} plugin: {name} ({doc})'.format(source, **plugin_obj.info()))
+        logger.info('Loading {0} plugin: {name} ({doc})'.format(
+                             source, **plugin_obj.info()))
         sima.register_plugin(plugin_obj)
 
 
@@ -133,13 +135,14 @@ def run(sopt, restart=False):
     # pylint: disable=broad-except
     try:
         start(sopt, restart)
-    except SigHup as err:  # SigHup inherit from Exception
+    except SigHup:  # SigHup inherit from Exception
         run(sopt, True)
     except Exception:  # Unhandled exception
         exception_log()
 
 # Script starts here
 def main():
+    """Entry point"""
     nfo = dict({'version': info.__version__,
                  'prog': 'sima'})
     # StartOpt gathers options from command line call (in StartOpt().options)
