@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+"""WebServices API credentials and ressources
+"""
 
 LFM = {'apikey': 'NG4xcDlxcXJwMjk4MTZycTgwM3E3b3I5MTEzb240cG8',
        'host':'ws.audioscrobbler.com',

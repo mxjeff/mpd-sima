@@ -31,6 +31,7 @@ from requests import get, Request, Timeout, ConnectionError
 
 from sima import ECH
 from sima.lib.meta import Artist
+from sima.lib.track import Track
 from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
 from sima.utils.utils import getws, Throttle, Cache, purge_cache
 if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
@@ -78,7 +79,7 @@ class SimaEch:
                             timeout=SOCKET_TIMEOUT)
         self.__class__.ratelimit = req.headers.get('x-ratelimit-remaining', None)
         if req.status_code is not 200:
-            raise WSHTTPError(req.status_code)
+            raise WSHTTPError('{0.status_code}: {0.reason}'.format(req))
         self.current_element = req.json()
         self._controls_answer()
         if self.caching:
@@ -96,7 +97,7 @@ class SimaEch:
             raise WSNotFound('Artist not found: "{0}"'.format(self.artist))
         raise WSError(status.get('message'))
 
-    def _forge_payload(self, artist):
+    def _forge_payload(self, artist, top=False):
         """Build payload
         """
         payload = {'api_key': ECH.get('apikey')}
@@ -110,6 +111,15 @@ class SimaEch:
             payload.update(name=artist.name)
         payload.update(bucket='id:musicbrainz')
         payload.update(results=100)
+        if top:
+            if artist.mbid:
+                aid = payload.pop('id')
+                payload.update(artist_id=aid)
+            else:
+                name = payload.pop('name')
+                payload.update(artist=name)
+            payload.update(results=100)
+            payload.update(sort='song_hotttnesss-desc')
         return payload
 
     def get_similar(self, artist=None):
@@ -128,6 +138,24 @@ class SimaEch:
                         mbid = frgnid.get('foreign_id'
                                           ).lstrip('musicbrainz:artist:')
             yield Artist(mbid=mbid, name=art.get('name'))
+
+    def get_toptrack(self, artist=None):
+        """Fetch artist top tracks
+        """
+        payload = self._forge_payload(artist, top=True)
+        # Construct URL
+        self._ressource = '{0}/song/search'.format(SimaEch.root_url)
+        self._fetch(payload)
+        titles = list()
+        artist = {
+                'artist': artist.name,
+                'musicbrainz_artistid': artist.mbid,
+                }
+        for song in self.current_element.get('response').get('songs'):
+            title = song.get('title')
+            if title not in titles:
+                titles.append(title)
+                yield Track(title=title, **artist )
 
 
 # VIM MODLINE

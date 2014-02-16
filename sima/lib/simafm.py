@@ -77,7 +77,7 @@ class SimaFM:
                             timeout=SOCKET_TIMEOUT)
         #self.__class__.ratelimit = req.headers.get('x-ratelimit-remaining', None)
         if req.status_code is not 200:
-            raise WSHTTPError(req.status_code)
+            raise WSHTTPError('{0.status_code}: {0.reason}'.format(req))
         self.current_element = req.json()
         self._controls_answer()
         if self.caching:

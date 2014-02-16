@@ -117,19 +117,11 @@ class WebService(Plugin):
         artist = tracks[0].artist
         black_list = self.player.queue + self.to_add
         not_in_hist = list(set(tracks) - set(self.get_history(artist=artist)))
-        if not not_in_hist:
+        if self.plugin_conf.get('queue_mode') != 'top' and not not_in_hist:
             self.log.debug('All tracks already played for "{}"'.format(artist))
         random.shuffle(not_in_hist)
-        #candidate = [ trk for trk in not_in_hist if trk not in black_list
-                      #if not self.sdb.get_bl_track(trk, add_not=True)]
         candidate = []
         for trk in [_ for _ in not_in_hist if _ not in black_list]:
-            if self.sdb.get_bl_track(trk, add_not=True):
-                self.log.info('Blacklisted: {0}: '.format(trk))
-                continue
-            if self.sdb.get_bl_album(trk, add_not=True):
-                self.log.info('Blacklisted album: {0}: '.format(trk))
-                continue
             # Should use albumartist heuristic as well
             if self.plugin_conf.getboolean('single_album'):
                 if (trk.album == self.player.current.album or
@@ -139,10 +131,9 @@ class WebService(Plugin):
                     continue
             candidate.append(trk)
         if not candidate:
-            self.log.debug('Unable to find title to add' +
-                           ' for "%s".' % artist)
-            return None
+            return False
         self.to_add.append(random.choice(candidate))
+        return True
 
     def _get_artists_list_reorg(self, alist):
         """
@@ -160,7 +151,7 @@ class WebService(Plugin):
         art_not_in_hist = [ ar for ar in alist if ar not in art_in_hist ]
         random.shuffle(art_not_in_hist)
         art_not_in_hist.extend(art_in_hist)
-        self.log.debug('history ordered: {}'.format(
+        self.log.info('{}'.format(
                        ' / '.join(art_not_in_hist)))
         return art_not_in_hist
 
@@ -181,7 +172,7 @@ class WebService(Plugin):
             results.extend(self.player.fuzzy_find_artist(art_pop))
         return results
 
-    def lfm_similar_artists(self, artist=None):
+    def ws_similar_artists(self, artist=None):
         """
         Retrieve similar artists from WebServive.
         """
@@ -230,7 +221,7 @@ class WebService(Plugin):
             self.log.debug(
                     'Looking for artist similar to "{0.artist}" as well'.format(
                         artist))
-            similar = self.lfm_similar_artists(artist=artist)
+            similar = self.ws_similar_artists(artist=artist)
             if not similar:
                 return ret_extra
             ret_extra.extend(self.get_artists_from_player(similar))
@@ -243,7 +234,7 @@ class WebService(Plugin):
         """
         current = self.player.current
         self.log.info('Looking for artist similar to "{0.artist}"'.format(current))
-        similar = self.lfm_similar_artists()
+        similar = self.ws_similar_artists()
         if not similar:
             self.log.info('Got nothing from {0}!'.format(self.ws.name))
             return []
@@ -262,7 +253,6 @@ class WebService(Plugin):
             self.log.warning('Try running in debug mode to guess why...')
             return []
         self.log.info('Got {} artists in library'.format(len(ret)))
-        self.log.info(' / '.join(ret))
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         return self._get_artists_list_reorg(ret)
@@ -320,6 +310,32 @@ class WebService(Plugin):
             if nb_album_add == target_album_to_add:
                 return True
 
+    def find_top(self, artists):
+        """
+        find top tracks for artists in artists list.
+        """
+        self.to_add = list()
+        nbtracks_target = self.plugin_conf.getint('track_to_add')
+        webserv = self.ws()
+        for artist in artists:
+            artist = Artist(name=artist)
+            if len(self.to_add) == nbtracks_target:
+                return True
+            self.log.info('Looking for a top track for {0}'.format(artist))
+            titles = deque()
+            try:
+                titles = [t for t in webserv.get_toptrack(artist)]
+            except WSError as err:
+                self.log.warning('{0}: {1}'.format(self.ws.name, err))
+            if self.ws.ratelimit:
+                self.log.info('{0.name} ratelimit: {0.ratelimit}'.format(self.ws))
+            for trk in titles:
+                found = self.player.fuzzy_find_track(artist.name, trk.title)
+                if found:
+                    self.log.debug('{0}'.format(found[0]))
+                    if self.filter_track(found):
+                        break
+
     def _track(self):
         """Get some tracks for track queue mode
         """
@@ -349,8 +365,11 @@ class WebService(Plugin):
     def _top(self):
         """Get some tracks for top track queue mode
         """
-        #artists = self.get_local_similar_artists()
-        pass
+        artists = self.get_local_similar_artists()
+        nbtracks_target = self.plugin_conf.getint('track_to_add')
+        self.find_top(artists)
+        for track in self.to_add:
+            self.log.info('{1} candidates: {0!s}'.format(track, self.ws.name))
 
     def callback_need_track(self):
         self._cleanup_cache()

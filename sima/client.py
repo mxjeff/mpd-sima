@@ -41,6 +41,7 @@ from .lib.player import Player
 from .lib.track import Track
 from .lib.meta import Album
 from .lib.simastr import SimaStr
+from .utils.leven import levenshtein_ratio
 
 
 class PlayerError(Exception):
@@ -68,6 +69,11 @@ def blacklist(artist=False, album=False, track=False):
             results = func(*args, **kwargs)
             for elem in results:
                 if bl_getter(elem, add_not=True):
+                    cls.log.info('Blacklisted: {0}'.format(elem))
+                    results.remove(elem)
+                if track and cls.database.get_bl_album(elem, add_not=True):
+                    # filter album as well in track mode
+                    # (artist have already been)
                     cls.log.info('Blacklisted: {0}'.format(elem))
                     results.remove(elem)
             return results
@@ -148,7 +154,7 @@ class PlayerClient(Player):
             or not hasattr(old_curr, 'id')
             or not hasattr(self.current, 'id')):
             return False
-        return (self.current.id != old_curr.id)  # pylint: disable=no-member
+        return self.current.id != old_curr.id  # pylint: disable=no-member
 
     def _flush_cache(self):
         """
@@ -168,6 +174,29 @@ class PlayerClient(Player):
         if title:
             return self.find('artist', artist, 'title', title)
         return self.find('artist', artist)
+
+    @blacklist(track=True)
+    def fuzzy_find_track(self, artist, title):
+        # Retrieve all tracks from artist
+        all_tracks = self.find('artist', artist)
+        # Get all titles (filter missing titles set to 'None')
+        all_artist_titles = frozenset([tr.title for tr in all_tracks
+                                       if tr.title is not None])
+        match = get_close_matches(title, all_artist_titles, 50, 0.78)
+        if not match:
+            return []
+        for title_ in match:
+            leven = levenshtein_ratio(title.lower(), title_.lower())
+            if leven == 1:
+                pass
+            elif leven >= 0.79:  # PARAM
+                self.log.debug('title: "%s" should match "%s" (lr=%1.3f)' %
+                               (title_, title, leven))
+            else:
+                self.log.debug('title: "%s" does not match "%s" (lr=%1.3f)' %
+                               (title_, title, leven))
+                return []
+            return self.find('artist', artist, 'title', title_)
 
     @blacklist(artist=True)
     def fuzzy_find_artist(self, art):
@@ -242,7 +271,6 @@ class PlayerClient(Player):
                 albums.append(Album(name=album, **kwalbart))
         for album in self.list('album', 'artist', artist):
             album_trks = [trk for trk in self.find('album', album)]
-            # TODO: add a VA filter option
             if 'Various Artists' in [tr.albumartist for tr in album_trks]:
                 self.log.debug('Discarding {0} ("Various Artists" set)'.format(album))
                 continue
@@ -250,7 +278,7 @@ class PlayerClient(Player):
             if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
                 if album not in albums:
                     albums.append(Album(name=album, albumartist=artist))
-            elif (album and album not in albums):
+            elif album and album not in albums:
                 self.log.debug('"{0}" probably not an album of "{1}"'.format(
                                album, artist) + '({0})'.format('/'.join(arts)))
         return albums
@@ -293,7 +321,7 @@ class PlayerClient(Player):
     def queue(self):
         plst = self.playlist
         plst.reverse()
-        return [ trk for trk in plst if int(trk.pos) > int(self.current.pos)]
+        return [trk for trk in plst if int(trk.pos) > int(self.current.pos)]
 
     @property
     def playlist(self):
