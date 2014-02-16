@@ -241,8 +241,13 @@ class PlayerClient(Player):
             if album not in albums:
                 albums.append(Album(name=album, **kwalbart))
         for album in self.list('album', 'artist', artist):
-            arts = set([trk.artist for trk in self.find('album', album)])
-            if len(arts) < 2:  # TODO: better heuristic, use a ratio instead
+            album_trks = [trk for trk in self.find('album', album)]
+            # TODO: add a VA filter option
+            if 'Various Artists' in [tr.albumartist for tr in album_trks]:
+                self.log.debug('Discarding {0} ("Various Artists" set)'.format(album))
+                continue
+            arts = set([trk.artist for trk in album_trks])
+            if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
                 if album not in albums:
                     albums.append(Album(name=album, albumartist=artist))
             elif (album and album not in albums):
