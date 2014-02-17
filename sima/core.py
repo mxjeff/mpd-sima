@@ -88,13 +88,13 @@ class Sima(Daemon):
     def queue(self):
         to_add = list()
         for plugin in self.plugins:
-            pl_callback =  getattr(plugin, 'callback_need_track')()
+            pl_callback = getattr(plugin, 'callback_need_track')()
             if pl_callback:
                 to_add.extend(pl_callback)
         if not to_add:
             self.log.warning('Queue plugins returned nothing!')
             for plugin in self.plugins:
-                pl_callback =  getattr(plugin, 'callback_need_track_fb')()
+                pl_callback = getattr(plugin, 'callback_need_track_fb')()
                 if pl_callback:
                     to_add.extend(pl_callback)
         for track in to_add:
@@ -146,13 +146,13 @@ class Sima(Daemon):
             except PlayerUnHandledError as err:
                 #TODO: unhandled Player exceptions
                 self.log.warning('Unhandled player exception: {}'.format(err))
-                del(self.player)
+                del self.player
                 self.player = PlayerClient()
                 time.sleep(10)
             except PlayerError as err:
                 self.log.warning('Player error: %s' % err)
                 self.reconnect_player()
-                del(self.changed)
+                del self.changed
 
     def loop(self):
         """Dispatching callbacks to plugins

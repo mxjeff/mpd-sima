@@ -155,7 +155,7 @@ class SimaEch:
             title = song.get('title')
             if title not in titles:
                 titles.append(title)
-                yield Track(title=title, **artist )
+                yield Track(title=title, **artist)
 
 
 # VIM MODLINE

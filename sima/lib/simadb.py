@@ -606,7 +606,7 @@ class SimaDB(object):
             "SELECT artist FROM albums")] +
             [row[0] for row in connection.execute(
             "SELECT artist FROM tracks")])
-        orphans = [ (orphan,) for orphan in artists_ids - artist_2_artist_ids ]
+        orphans = [(orphan,) for orphan in artists_ids - artist_2_artist_ids]
         connection.executemany('DELETE FROM artists WHERE id = (?);', orphans)
         if not with_connection:
             connection.commit()
@@ -626,7 +626,7 @@ class SimaDB(object):
             """SELECT albums.id FROM albums
             LEFT JOIN tracks ON albums.id = tracks.album
             WHERE tracks.album IS NULL""")])
-        orphans = [ (orphan,) for orphan in orphan_black_ids & orphan_tracks_ids ]
+        orphans = [(orphan,) for orphan in orphan_black_ids & orphan_tracks_ids]
         connection.executemany('DELETE FROM albums WHERE id = (?);', orphans)
         if not with_connection:
             connection.commit()
@@ -646,7 +646,7 @@ class SimaDB(object):
             """SELECT tracks.id FROM tracks
             LEFT JOIN black_list ON tracks.id = black_list.track
             WHERE black_list.track IS NULL""")])
-        orphans = [ (orphan,) for orphan in hist_orphan_ids & black_list_orphan_ids ]
+        orphans = [(orphan,) for orphan in hist_orphan_ids & black_list_orphan_ids]
         connection.executemany('DELETE FROM tracks WHERE id = (?);', orphans)
         if not with_connection:
             connection.commit()

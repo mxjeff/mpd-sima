@@ -50,7 +50,7 @@ class RandomFallBack(Plugin):
         duration = self.daemon.config.getint('sima', 'history_duration')
         tracks_from_db = self.daemon.sdb.get_history(duration=duration)
         # Construct Track() objects list from database history
-        artists = [ tr[-1] for tr in tracks_from_db ]
+        artists = [tr[-1] for tr in tracks_from_db]
         return set(artists)
 
     def callback_need_track_fb(self):
@@ -73,7 +73,7 @@ class RandomFallBack(Plugin):
         elif self.mode == 'pure':
             art = random.choice(artists)
         self.log.debug('Random art: {}'.format(art))
-        trk  = random.choice(self.player.find_track(art))
+        trk = random.choice(self.player.find_track(art))
         self.log.info('random fallback ({}): {}'.format(self.mode, trk))
         return trk
 

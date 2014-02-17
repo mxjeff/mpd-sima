@@ -215,7 +215,7 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         elif self.startopt.get('var_dir'):
             # If var folder is provided via CLI set data_dir accordingly
             data_dir = join(self.startopt.get('var_dir'))
-        elif (homedir and isdir(homedir) and homedir not in ['/']):
+        elif homedir and isdir(homedir) and homedir not in ['/']:
             data_dir = join(homedir, '.local', 'share', DIRNAME)
         else:
             self.log.error('Can\'t find a suitable location for data folder (XDG_DATA_HOME)')
@@ -231,7 +231,7 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
             pass
         elif environ.get('XDG_CONFIG_HOME'):
             conf_dir = join(environ.get('XDG_CONFIG_HOME'), DIRNAME)
-        elif (homedir and isdir(homedir) and homedir not in ['/']):
+        elif homedir and isdir(homedir) and homedir not in ['/']:
             conf_dir = join(homedir, '.config', DIRNAME)
             # Create conf_dir if necessary
             if not isdir(conf_dir):

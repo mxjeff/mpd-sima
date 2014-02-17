@@ -169,6 +169,7 @@ class PlayerClient(Player):
                 }
         self._cache['artists'] = frozenset(self._client.list('artist'))
 
+    @blacklist(track=True)
     def find_track(self, artist, title=None):
         #return getattr(self, 'find')('artist', artist, 'title', title)
         if title:

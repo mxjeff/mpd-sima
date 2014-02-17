@@ -92,7 +92,7 @@ class WebService(Plugin):
     def _cleanup_cache(self):
         """Avoid bloated cache
         """
-        for _ , val in self._cache.items():
+        for _, val in self._cache.items():
             if isinstance(val, dict):
                 while len(val) > 150:
                     val.popitem()
@@ -148,7 +148,7 @@ class WebService(Plugin):
             if trk[0] not in art_in_hist:
                 art_in_hist.append(trk[0])
         art_in_hist.reverse()
-        art_not_in_hist = [ ar for ar in alist if ar not in art_in_hist ]
+        art_not_in_hist = [ar for ar in alist if ar not in art_in_hist]
         random.shuffle(art_not_in_hist)
         art_not_in_hist.extend(art_in_hist)
         self.log.info('{}'.format(
@@ -275,7 +275,7 @@ class WebService(Plugin):
             self.log.info('Looking for an album to add for "%s"...' % artist)
             albums = self.player.find_albums(artist)
             # str conversion while Album type is not propagated
-            albums = [ str(album) for album in albums]
+            albums = [str(album) for album in albums]
             if albums:
                 self.log.debug('Albums candidate: {0:s}'.format(
                                ' / '.join(albums)))
@@ -345,6 +345,9 @@ class WebService(Plugin):
             self.log.debug('Trying to find titles to add for "{}"'.format(
                            artist))
             found = self.player.find_track(artist)
+            if not found:
+                self.log.debug('Found nothing to queue for {0}'.format(artist))
+                continue
             # find tracks not in history for artist
             self.filter_track(found)
             if len(self.to_add) == nbtracks_target:
@@ -366,7 +369,6 @@ class WebService(Plugin):
         """Get some tracks for top track queue mode
         """
         artists = self.get_local_similar_artists()
-        nbtracks_target = self.plugin_conf.getint('track_to_add')
         self.find_top(artists)
         for track in self.to_add:
             self.log.info('{1} candidates: {0!s}'.format(track, self.ws.name))

@@ -49,7 +49,7 @@ def load_plugins(sima, source):
         sima:   sima.core.Sima instance
         source: ['internal', 'contrib']
     """
-    if not sima.config.get('sima', source ):
+    if not sima.config.get('sima', source):
         return
     logger = logging.getLogger('sima')
     for plugin in sima.config.get('sima', source).split(','):
