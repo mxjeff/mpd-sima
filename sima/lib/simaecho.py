@@ -21,19 +21,21 @@
 Consume EchoNest web service
 """
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 __author__ = 'Jack Kaliko'
 
 
 from datetime import datetime, timedelta
 
-from requests import get, Request, Timeout, ConnectionError
+from requests import Session, Request, Timeout, ConnectionError
 
 from sima import ECH
 from sima.lib.meta import Artist
 from sima.lib.track import Track
+from sima.lib.httpcli.controller import CacheController
+from sima.lib.httpcli.cache import FileCache
 from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
-from sima.utils.utils import getws, Throttle, Cache, purge_cache
+from sima.utils.utils import getws, Throttle
 if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
     getws(ECH)
 
@@ -46,26 +48,27 @@ class SimaEch:
     """EchoNest http client
     """
     root_url = 'http://{host}/api/{version}'.format(**ECH)
-    cache = {}
     timestamp = datetime.utcnow()
     ratelimit = None
     name = 'EchoNest'
+    cache = FileCache('/home/kaliko/.local/share/mpd_sima/http')
 
-    def __init__(self, cache=True):
-        self.artist = None
+    def __init__(self):
         self._ressource = None
         self.current_element = None
-        self.caching = cache
-        purge_cache(self.__class__)
+        self.controller = CacheController(self.cache)
 
     def _fetch(self, payload):
         """Use cached elements or proceed http request"""
-        url = Request('GET', self._ressource, params=payload,).prepare().url
-        if url in SimaEch.cache:
-            self.current_element = SimaEch.cache.get(url).elem
-            return
+        req = Request('GET', self._ressource, params=payload,
+                      ).prepare()
+        if self.cache:
+            cached_response = self.controller.cached_request(req.url, req.headers)
+            if cached_response:
+                return cached_response.json()
+
         try:
-            self._fetch_ws(payload)
+            return self._fetch_ws(req)
         except Timeout:
             raise WSTimeout('Failed to reach server within {0}s'.format(
                                SOCKET_TIMEOUT))
@@ -73,28 +76,28 @@ class SimaEch:
             raise WSError(err)
 
     @Throttle(WAIT_BETWEEN_REQUESTS)
-    def _fetch_ws(self, payload):
+    def _fetch_ws(self, prepreq):
         """fetch from web service"""
-        req = get(self._ressource, params=payload,
-                            timeout=SOCKET_TIMEOUT)
-        self.__class__.ratelimit = req.headers.get('x-ratelimit-remaining', None)
-        if req.status_code is not 200:
-            raise WSHTTPError('{0.status_code}: {0.reason}'.format(req))
-        self.current_element = req.json()
-        self._controls_answer()
-        if self.caching:
-            SimaEch.cache.update({req.url:
-                                 Cache(self.current_element)})
+        sess = Session()
+        resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
+        self.__class__.ratelimit = resp.headers.get('x-ratelimit-remaining', None)
+        if resp.status_code is not 200:
+            raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
+        ans = resp.json()
+        self._controls_answer(ans)
+        if self.cache:
+            self.controller.cache_response(resp.request, resp)
+        return ans
 
-    def _controls_answer(self):
+    def _controls_answer(self, ans):
         """Controls answer.
         """
-        status = self.current_element.get('response').get('status')
+        status = ans.get('response').get('status')
         code = status.get('code')
         if code is 0:
             return True
         if code is 5:
-            raise WSNotFound('Artist not found: "{0}"'.format(self.artist))
+            raise WSNotFound('Artist not found')
         raise WSError(status.get('message'))
 
     def _forge_payload(self, artist, top=False):
@@ -103,7 +106,6 @@ class SimaEch:
         payload = {'api_key': ECH.get('apikey')}
         if not isinstance(artist, Artist):
             raise TypeError('"{0!r}" not an Artist object'.format(artist))
-        self.artist = artist
         if artist.mbid:
             payload.update(
                     id='musicbrainz:artist:{0}'.format(artist.mbid))
@@ -128,8 +130,8 @@ class SimaEch:
         payload = self._forge_payload(artist)
         # Construct URL
         self._ressource = '{0}/artist/similar'.format(SimaEch.root_url)
-        self._fetch(payload)
-        for art in self.current_element.get('response').get('artists'):
+        ans = self._fetch(payload)
+        for art in ans.get('response').get('artists'):
             artist = {}
             mbid = None
             if 'foreign_ids' in art:
@@ -145,13 +147,13 @@ class SimaEch:
         payload = self._forge_payload(artist, top=True)
         # Construct URL
         self._ressource = '{0}/song/search'.format(SimaEch.root_url)
-        self._fetch(payload)
+        ans = self._fetch(payload)
         titles = list()
         artist = {
                 'artist': artist.name,
                 'musicbrainz_artistid': artist.mbid,
                 }
-        for song in self.current_element.get('response').get('songs'):
+        for song in ans.get('response').get('songs'):
             title = song.get('title')
             if title not in titles:
                 titles.append(title)
