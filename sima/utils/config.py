@@ -42,17 +42,18 @@ DEFAULT_CONF = {
         'MPD': {
             'host': "localhost",
             #'password': "",
-            'port': "6600",
+            'port': 6600,
             },
         'sima': {
             'internal': "Crop, Lastfm, RandomFallBack",
             'contrib': "",
             'user_db': "false",
-            'history_duration': "8",
-            'queue_length': "1",
+            'history_duration': 8,
+            'queue_length': 1,
+            'var_dir': 'empty',
             },
         'daemon':{
-            'daemon': "false",
+            'daemon': False,
             'pidfile': "",
             },
         'log': {
@@ -61,23 +62,23 @@ DEFAULT_CONF = {
             },
         'echonest': {
             'queue_mode': "track", #TODO control values
-            'max_art': "15",
+            'max_art': 15,
             'single_album': "false",
-            'track_to_add': "1",
-            'album_to_add': "1",
-            'depth': "1",
+            'track_to_add': 1,
+            'album_to_add': 1,
+            'depth': 1,
             },
         'lastfm': {
             'queue_mode': "track", #TODO control values
-            'max_art': "10",
+            'max_art': 10,
             'single_album': "false",
-            'track_to_add': "1",
-            'album_to_add': "1",
-            'depth': "1",
+            'track_to_add': 1,
+            'album_to_add': 1,
+            'depth': 1,
             },
         'randomfallback': {
             'flavour': "sensible", # in pure, sensible
-            'track_to_add': "1",
+            'track_to_add': 1,
             }
         }
 #
@@ -101,22 +102,19 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
     """
 
     def __init__(self, logger, options=None):
-        # options settings priority:
-        # defauts < conf. file < command line
-        self.conf_file = options.get('conf_file')
-        self.config = None
-        self.defaults = dict(DEFAULT_CONF)
-        self.startopt = options
-        ## Sima sqlite DB
-        self.db_file = None
-
         self.log = logger
-        ## INIT CALLS
+        # options settings priority:
+        # defauts < env. var. < conf. file < command line
+        self.conf_file = options.get('conf_file')
+        self.config = configparser.ConfigParser(inline_comment_prefixes='#')
+        self.config.read_dict(DEFAULT_CONF)
+        # update DEFAULT_CONF with env. var.
         self.use_envar()
+        self.startopt = options
+
+        ## INIT CALLS
         self.init_config()
-        self.control_conf()
         self.supersedes_config_with_cmd_line_options()
-        self.config['sima']['db_file'] = self.db_file
 
     def get_pw(self):
         try:
@@ -157,49 +155,13 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         mpd_host, mpd_port, passwd = utils.get_mpd_environ()
         if mpd_host:
             self.log.info('Env. variable MPD_HOST set to "%s"' % mpd_host)
-            self.defaults['MPD']['host'] = mpd_host
+            self.config['MPD'].update(host=mpd_host)
         if passwd:
             self.log.info('Env. variable MPD_HOST contains password.')
-            self.defaults['MPD']['password'] = passwd
+            self.config['MPD'].update(password=passwd)
         if mpd_port:
-            self.log.info('Env. variable MPD_PORT set to "%s".'
-                                  % mpd_port)
-            self.defaults['MPD']['port'] = mpd_port
-
-    def control_conf(self):
-        """Get through options/values and set defaults if not in conf file."""
-        # Control presence of obsolete settings
-        for option in ['history', 'history_length', 'top_tracks']:
-            if self.config.has_option('sima', option):
-                self.log.warning('Obsolete setting found in conf file: "%s"'
-                        % option)
-        # Setting default if not specified
-        for section in DEFAULT_CONF.keys():
-            if section not in self.config.sections():
-                self.log.debug('[%s] NOT in conf file' % section)
-                self.config.add_section(section)
-                for option in self.defaults[section]:
-                    self.config.set(section,
-                            option,
-                            self.defaults[section][option])
-                    self.log.debug(
-                            'Setting option with default value: %s = %s' %
-                            (option, self.defaults[section][option]))
-            elif section in self.config.sections():
-                self.log.debug('[%s] present in conf file' % section)
-                for option in self.defaults[section]:
-                    if self.config.has_option(section, option):
-                        #self.log.debug('option "%s" set to "%s" in conf. file'%
-                        #            (option, self.config.get(section, option)))
-                        pass
-                    else:
-                        self.log.debug(
-                                'Option "%s" missing in section "%s"' %
-                                (option, section))
-                        self.log.debug('=> setting default "%s" (may not suit you…)' %
-                                       self.defaults[section][option])
-                        self.config.set(section, option,
-                                        self.defaults[section][option])
+            self.log.info('Env. variable MPD_PORT set to "%s".' % mpd_port)
+            self.config['MPD'].update(port=mpd_port)
 
     def init_config(self):
         """
@@ -212,9 +174,6 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
 
         if environ.get('XDG_DATA_HOME'):
             data_dir = join(environ.get('XDG_DATA_HOME'), DIRNAME)
-        elif self.startopt.get('var_dir'):
-            # If var folder is provided via CLI set data_dir accordingly
-            data_dir = join(self.startopt.get('var_dir'))
         elif homedir and isdir(homedir) and homedir not in ['/']:
             data_dir = join(homedir, '.local', 'share', DIRNAME)
         else:
@@ -243,24 +202,22 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
             self.log.error('Please use "--config" to locate the conf file')
             sys.exit(1)
 
-        self.db_file = join(data_dir, 'sima.db')
+        ## Sima sqlite DB
+        self.config['sima']['var_dir'] = join(data_dir)
+        self.config['sima']['db_file'] = join(data_dir, 'sima.db')
 
-        config = configparser.SafeConfigParser()
         # If no conf file present, uses defaults
         if not isfile(self.conf_file):
-            self.config = config
             return
 
         self.log.info('Loading configuration from:  %s' % self.conf_file)
         self.control_mod()
 
         try:
-            config.read(self.conf_file)
+            self.config.read(self.conf_file)
         except Error as err:
             self.log.error(err)
             sys.exit(1)
-
-        self.config = config
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
