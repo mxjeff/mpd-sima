@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -20,23 +21,25 @@
 Consume Last.fm web service
 """
 
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 __author__ = 'Jack Kaliko'
 
 
 from datetime import datetime, timedelta
 
-from requests import get, Request, Timeout, ConnectionError
+from requests import Session, Request, Timeout, ConnectionError
 
 from sima import LFM
 from sima.lib.meta import Artist
+
+from sima.lib.http import CacheController
 from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
-from sima.utils.utils import getws, Throttle, Cache, purge_cache
+from sima.utils.utils import getws, Throttle
 if len(LFM.get('apikey')) == 43:  # simple hack allowing imp.reload
     getws(LFM)
 
 # Some definitions
-WAIT_BETWEEN_REQUESTS = timedelta(0, 1)
+WAIT_BETWEEN_REQUESTS = timedelta(0, 2)
 SOCKET_TIMEOUT = 6
 
 
@@ -44,26 +47,27 @@ class SimaFM:
     """Last.fm http client
     """
     root_url = 'http://{host}/{version}/'.format(**LFM)
-    cache = {}
-    timestamp = datetime.utcnow()
-    name = 'Last.fm'
     ratelimit = None
+    name = 'Last.fm'
+    cache = {}
 
     def __init__(self, cache=True):
+        self.controller = CacheController(self.cache)
         self.artist = None
-        self._url = self.__class__.root_url
-        self.current_element = None
-        self.caching = cache
-        purge_cache(self.__class__)
 
     def _fetch(self, payload):
-        """Use cached elements or proceed http request"""
-        url = Request('GET', self._url, params=payload,).prepare().url
-        if url in SimaFM.cache:
-            self.current_element = SimaFM.cache.get(url).elem
-            return
+        """
+        Prepare http request
+        Use cached elements or proceed http request
+        """
+        req = Request('GET', SimaFM.root_url, params=payload,
+                      ).prepare()
+        if self.cache:
+            cached_response = self.controller.cached_request(req.url, req.headers)
+            if cached_response:
+                return cached_response.json()
         try:
-            self._fetch_ws(payload)
+            return self._fetch_ws(req)
         except Timeout:
             raise WSTimeout('Failed to reach server within {0}s'.format(
                                SOCKET_TIMEOUT))
@@ -71,25 +75,25 @@ class SimaFM:
             raise WSError(err)
 
     @Throttle(WAIT_BETWEEN_REQUESTS)
-    def _fetch_ws(self, payload):
+    def _fetch_ws(self, prepreq):
         """fetch from web service"""
-        req = get(self._url, params=payload,
-                            timeout=SOCKET_TIMEOUT)
-        #self.__class__.ratelimit = req.headers.get('x-ratelimit-remaining', None)
-        if req.status_code is not 200:
-            raise WSHTTPError('{0.status_code}: {0.reason}'.format(req))
-        self.current_element = req.json()
-        self._controls_answer()
-        if self.caching:
-            SimaFM.cache.update({req.url:
-                                 Cache(self.current_element)})
+        sess = Session()
+        resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
+        #self.__class__.ratelimit = resp.headers.get('x-ratelimit-remaining', None)
+        if resp.status_code is not 200:
+            raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
+        ans = resp.json()
+        self._controls_answer(ans)
+        if self.cache:
+            self.controller.cache_response(resp.request, resp)
+        return ans
 
-    def _controls_answer(self):
+    def _controls_answer(self, ans):
         """Controls answer.
         """
-        if 'error' in self.current_element:
-            code = self.current_element.get('error')
-            mess = self.current_element.get('message')
+        if 'error' in ans:
+            code = ans.get('error')
+            mess = ans.get('message')
             if code == 6:
                 raise WSNotFound('{0}: "{1}"'.format(mess, self.artist))
             raise WSError(mess)
@@ -123,17 +127,17 @@ class SimaFM:
         """
         payload = self._forge_payload(artist)
         # Construct URL
-        self._fetch(payload)
+        ans = self._fetch(payload)
         # Artist might be found be return no 'artist' list…
         # cf. "Mulatu Astatqe" vs. "Mulatu Astatqé" with autocorrect=0
         # json format is broken IMHO, xml is more consistent IIRC
         # Here what we got:
         # >>> {"similarartists":{"#text":"\n","artist":"Mulatu Astatqe"}}
         # autocorrect=1 should fix it, checking anyway.
-        simarts = self.current_element.get('similarartists').get('artist')
+        simarts = ans.get('similarartists').get('artist')
         if not isinstance(simarts, list):
             raise WSError('Artist found but no similarities returned')
-        for art in self.current_element.get('similarartists').get('artist'):
+        for art in ans.get('similarartists').get('artist'):
             yield Artist(name=art.get('name'), mbid=art.get('mbid', None))
 
 

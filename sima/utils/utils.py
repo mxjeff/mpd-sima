@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, 2011, 2013 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2010, 2011, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -28,7 +28,7 @@ import sys
 from argparse import ArgumentError, Action
 from base64 import b64decode as push
 from codecs import getencoder
-from datetime import datetime, timedelta
+from datetime import datetime
 from os import environ, access, getcwd, W_OK, R_OK
 from os.path import dirname, isabs, join, normpath, exists, isdir, isfile
 from time import sleep
@@ -78,20 +78,6 @@ def exception_log():
     log.info('thanks for your help :)')
     log.info('Quiting now!')
     sys.exit(1)
-
-def purge_cache(obj, age=4):
-    """purge old entries in http client cache
-    """
-    now = datetime.utcnow()
-    if now.hour == obj.timestamp.hour:
-        return
-    obj.timestamp = datetime.utcnow()
-    cache = obj.cache
-    delta = timedelta(hours=age)
-    for url in list(cache.keys()):
-        timestamp = cache.get(url).created()
-        if now - timestamp > delta:
-            cache.pop(url)
 
 
 class SigHup(Exception):
@@ -176,21 +162,6 @@ class Throttle:
             self.last_called = datetime.now()
             return result
         return wrapper
-
-class Cache:
-    """Plain cache object"""
-    def __init__(self, elem, last=None):
-        self.elem = elem
-        self.requestdate = last
-        if not last:
-            self.requestdate = datetime.utcnow()
-
-    def created(self):
-        return self.requestdate
-
-    def get(self):
-        return self.elem
-
 
 # http client exceptions (for webservices)
 

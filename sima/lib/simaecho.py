@@ -39,33 +39,32 @@ if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
     getws(ECH)
 
 # Some definitions
-WAIT_BETWEEN_REQUESTS = timedelta(0, 1)
-SOCKET_TIMEOUT = 4
+WAIT_BETWEEN_REQUESTS = timedelta(0, 2)
+SOCKET_TIMEOUT = 6
 
 
 class SimaEch:
     """EchoNest http client
     """
     root_url = 'http://{host}/api/{version}'.format(**ECH)
-    timestamp = datetime.utcnow()
     ratelimit = None
     name = 'EchoNest'
     cache = False
 
     def __init__(self):
-        self._ressource = None
-        self.current_element = None
         self.controller = CacheController(self.cache)
 
-    def _fetch(self, payload):
-        """Use cached elements or proceed http request"""
-        req = Request('GET', self._ressource, params=payload,
+    def _fetch(self, ressource, payload):
+        """
+        Prepare http request
+        Use cached elements or proceed http request
+        """
+        req = Request('GET', ressource, params=payload,
                       ).prepare()
         if self.cache:
             cached_response = self.controller.cached_request(req.url, req.headers)
             if cached_response:
                 return cached_response.json()
-
         try:
             return self._fetch_ws(req)
         except Timeout:
@@ -128,8 +127,8 @@ class SimaEch:
         """
         payload = self._forge_payload(artist)
         # Construct URL
-        self._ressource = '{0}/artist/similar'.format(SimaEch.root_url)
-        ans = self._fetch(payload)
+        ressource = '{0}/artist/similar'.format(SimaEch.root_url)
+        ans = self._fetch(ressource, payload)
         for art in ans.get('response').get('artists'):
             artist = {}
             mbid = None
@@ -145,8 +144,8 @@ class SimaEch:
         """
         payload = self._forge_payload(artist, top=True)
         # Construct URL
-        self._ressource = '{0}/song/search'.format(SimaEch.root_url)
-        ans = self._fetch(payload)
+        ressource = '{0}/song/search'.format(SimaEch.root_url)
+        ans = self._fetch(ressource, payload)
         titles = list()
         artist = {
                 'artist': artist.name,
