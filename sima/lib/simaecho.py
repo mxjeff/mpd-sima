@@ -50,7 +50,10 @@ class SimaEch:
     ratelimit = None
     name = 'EchoNest'
     cache = False
-    stats = {'304':0, 'cached':0, 'minrl':'120'}
+    stats = {'etag':0,
+            'ccontrol':0,
+            'minrl':120,
+            'total':0}
 
     def __init__(self):
         self.controller = CacheController(self.cache)
@@ -62,10 +65,11 @@ class SimaEch:
         """
         req = Request('GET', ressource, params=payload,
                       ).prepare()
+        SimaEch.stats.update(total=SimaEch.stats.get('total')+1)
         if self.cache:
             cached_response = self.controller.cached_request(req.url, req.headers)
             if cached_response:
-                SimaEch.stat.update(cached=SimaEch.stat.get('cached')+1)
+                SimaEch.stats.update(ccontrol=SimaEch.stats.get('ccontrol')+1)
                 return cached_response.json()
         try:
             return self._fetch_ws(req)
@@ -81,14 +85,14 @@ class SimaEch:
         sess = Session()
         resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
         if resp.status_code == 304:
-            SimaEch.stats.update({'304':SimaEch.stats.get('304')+1})
+            SimaEch.stats.update(etag=SimaEch.stats.get('etag')+1)
             resp = self.controller.update_cached_response(prepreq, resp)
         elif resp.status_code != 200:
             raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
         ans = resp.json()
         self._controls_answer(ans)
         SimaEch.ratelimit = resp.headers.get('x-ratelimit-remaining', None)
-        minrl = min(SimaEch.ratelimit, SimaEch.stats.get('minrl'))
+        minrl = min(int(SimaEch.ratelimit), SimaEch.stats.get('minrl'))
         SimaEch.stats.update(minrl=minrl)
         if self.cache:
             self.controller.cache_response(resp.request, resp)
@@ -127,7 +131,9 @@ class SimaEch:
                 payload.update(artist=name)
             payload.update(results=100)
             payload.update(sort='song_hotttnesss-desc')
-        return payload
+        # > hashing the URL into a cache key
+        # return a sorted list of 2-tuple to have consistent cache
+        return sorted(payload.items(), key=lambda param: param[0])
 
     def get_similar(self, artist=None):
         """Fetch similar artists

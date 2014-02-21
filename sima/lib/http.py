@@ -58,8 +58,6 @@ class CacheController(object):
         if not path:
             path = "/"
 
-        # Order of params might changed
-        query = ''.join(sorted(query.split('&')))
         # Could do syntax based normalization of the URI before
         # computing the digest. See Section 6.2.2 of Std 66.
         request_uri = query and "?".join([path, query]) or path

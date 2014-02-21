@@ -120,7 +120,9 @@ class SimaFM:
         payload.update(results=100)
         if method == 'track':
             payload.update(track=track)
-        return payload
+        # > hashing the URL into a cache key
+        # return a sorted list of 2-tuple to have consistent cache
+        return sorted(payload.items(), key=lambda param: param[0])
 
     def get_similar(self, artist=None):
         """Fetch similar artists

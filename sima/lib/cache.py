@@ -23,7 +23,6 @@ dictionary, which in turns means it is not threadsafe for writing.
 """
 
 import os
-import base64
 import codecs
 
 from hashlib import md5
@@ -93,3 +92,9 @@ class FileCache:
     def delete(self, key):
         if not self.forever:
             os.remove(self._fn(key))
+
+    def __iter__(self):
+        for dirpath, dirnames, filenames in os.walk(self.directory):
+            for item in filenames:
+                name = os.path.join(dirpath, item)
+                yield load(codecs.open(name, 'rb'))
