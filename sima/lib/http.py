@@ -1,3 +1,22 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2012, 2013 Eric Larson <eric@ionrock.org>
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
 """
 The httplib2 algorithms ported for use with requests.
 """
@@ -5,8 +24,9 @@ import re
 import calendar
 import time
 
-from sima.lib.httpcli.cache import DictCache
 import email.utils
+
+from .cache import DictCache
 
 
 URI = re.compile(r"^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?")
@@ -30,7 +50,7 @@ class CacheController(object):
 
     def _urlnorm(self, uri):
         """Normalize the URL to create a safe key for the cache"""
-        (scheme, authority, path, query, fragment) = parse_uri(uri)
+        (scheme, authority, path, query, _) = parse_uri(uri)
         if not scheme or not authority:
             raise Exception("Only absolute URIs are allowed. uri = %s" % uri)
         authority = authority.lower()
@@ -56,10 +76,8 @@ class CacheController(object):
         """
         retval = {}
 
+        # requests provides a CaseInsensitiveDict as headers
         cc_header = 'cache-control'
-        if 'Cache-Control' in headers:
-            cc_header = 'Cache-Control'
-
         if cc_header in headers:
             parts = headers[cc_header].split(',')
             parts_with_args = [
@@ -71,6 +89,8 @@ class CacheController(object):
         return retval
 
     def cached_request(self, url, headers):
+        """Return the cached resquest if available and fresh
+        """
         cache_url = self.cache_url(url)
         cc = self.parse_cache_control(headers)
 
@@ -153,24 +173,10 @@ class CacheController(object):
             resp.from_cache = True
             return resp
 
-        # we're not fresh. If we don't have an Etag, clear it out
-        if 'etag' not in resp.headers:
-            self.cache.delete(cache_url)
-
-        if 'etag' in resp.headers:
-            headers['If-None-Match'] = resp.headers['ETag']
-
-        if 'last-modified' in resp.headers:
-            headers['If-Modified-Since'] = resp.headers['Last-Modified']
-
+        # we're not fresh.
+        self.cache.delete(cache_url)
         # return the original handler
         return False
-
-    def add_headers(self, url):
-        resp = self.cache.get(url)
-        if resp and 'etag' in resp.headers:
-            return {'If-None-Match': resp.headers['etag']}
-        return {}
 
     def cache_response(self, request, resp):
         """
@@ -184,26 +190,22 @@ class CacheController(object):
             return
 
         cc_req = self.parse_cache_control(request.headers)
-        cc = self.parse_cache_control(resp.headers)
+        cc_resp = self.parse_cache_control(resp.headers)
 
         cache_url = self.cache_url(request.url)
 
         # Delete it from the cache if we happen to have it stored there
-        no_store = cc.get('no-store') or cc_req.get('no-store')
+        no_store = cc_resp.get('no-store') or cc_req.get('no-store')
         if no_store and self.cache.get(cache_url):
             self.cache.delete(cache_url)
-
-        # If we've been given an etag, then keep the response
-        if self.cache_etags and 'etag' in resp.headers:
-            self.cache.set(cache_url, resp)
 
         # Add to the cache if the response headers demand it. If there
         # is no date header then we can't do anything about expiring
         # the cache.
-        elif 'date' in resp.headers:
+        if 'date' in resp.headers:
             # cache when there is a max-age > 0
-            if cc and cc.get('max-age'):
-                if int(cc['max-age']) > 0:
+            if cc_resp and cc_resp.get('max-age'):
+                if int(cc_resp['max-age']) > 0:
                     self.cache.set(cache_url, resp)
 
             # If the request can expire, it means we should cache it

@@ -32,8 +32,7 @@ from requests import Session, Request, Timeout, ConnectionError
 from sima import ECH
 from sima.lib.meta import Artist
 from sima.lib.track import Track
-from sima.lib.httpcli.controller import CacheController
-from sima.lib.httpcli.cache import FileCache
+from sima.lib.http import CacheController
 from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
 from sima.utils.utils import getws, Throttle
 if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
@@ -51,7 +50,7 @@ class SimaEch:
     timestamp = datetime.utcnow()
     ratelimit = None
     name = 'EchoNest'
-    cache = FileCache('/home/kaliko/.local/share/mpd_sima/http')
+    cache = False
 
     def __init__(self):
         self._ressource = None

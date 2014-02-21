@@ -22,12 +22,14 @@ Fetching similar artists from echonest web services
 """
 
 # standard library import
+from os.path import join
 
 # third parties components
 
 # local import
 from ...lib.simaecho import SimaEch
 from ...lib.webserv import WebService
+from ...lib.cache import FileCache
 
 
 class EchoNest(WebService):
@@ -36,6 +38,9 @@ class EchoNest(WebService):
 
     def __init__(self, daemon):
         WebService.__init__(self, daemon)
+        # Set persitent cache
+        vardir = daemon.config['sima']['var_dir']
+        SimaEch.cache = FileCache(join(vardir, 'http'))
         self.ws = SimaEch
 
 # VIM MODLINE
