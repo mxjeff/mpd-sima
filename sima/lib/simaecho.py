@@ -25,7 +25,7 @@ __version__ = '0.0.2'
 __author__ = 'Jack Kaliko'
 
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from requests import Session, Request, Timeout, ConnectionError
 
@@ -50,6 +50,7 @@ class SimaEch:
     ratelimit = None
     name = 'EchoNest'
     cache = False
+    stats = {'304':0, 'cached':0, 'minrl':'120'}
 
     def __init__(self):
         self.controller = CacheController(self.cache)
@@ -64,6 +65,7 @@ class SimaEch:
         if self.cache:
             cached_response = self.controller.cached_request(req.url, req.headers)
             if cached_response:
+                SimaEch.stat.update(cached=SimaEch.stat.get('cached')+1)
                 return cached_response.json()
         try:
             return self._fetch_ws(req)
@@ -78,11 +80,16 @@ class SimaEch:
         """fetch from web service"""
         sess = Session()
         resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
-        self.__class__.ratelimit = resp.headers.get('x-ratelimit-remaining', None)
-        if resp.status_code is not 200:
+        if resp.status_code == 304:
+            SimaEch.stats.update({'304':SimaEch.stats.get('304')+1})
+            resp = self.controller.update_cached_response(prepreq, resp)
+        elif resp.status_code != 200:
             raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
         ans = resp.json()
         self._controls_answer(ans)
+        SimaEch.ratelimit = resp.headers.get('x-ratelimit-remaining', None)
+        minrl = min(SimaEch.ratelimit, SimaEch.stats.get('minrl'))
+        SimaEch.stats.update(minrl=minrl)
         if self.cache:
             self.controller.cache_response(resp.request, resp)
         return ans
@@ -130,7 +137,6 @@ class SimaEch:
         ressource = '{0}/artist/similar'.format(SimaEch.root_url)
         ans = self._fetch(ressource, payload)
         for art in ans.get('response').get('artists'):
-            artist = {}
             mbid = None
             if 'foreign_ids' in art:
                 for frgnid in art.get('foreign_ids'):
@@ -147,7 +153,7 @@ class SimaEch:
         ressource = '{0}/song/search'.format(SimaEch.root_url)
         ans = self._fetch(ressource, payload)
         titles = list()
-        artist = {
+        art = {
                 'artist': artist.name,
                 'musicbrainz_artistid': artist.mbid,
                 }
@@ -155,7 +161,7 @@ class SimaEch:
             title = song.get('title')
             if title not in titles:
                 titles.append(title)
-                yield Track(title=title, **artist)
+                yield Track(title=title, **art)
 
 
 # VIM MODLINE

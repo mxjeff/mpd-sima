@@ -58,6 +58,8 @@ class CacheController(object):
         if not path:
             path = "/"
 
+        # Order of params might changed
+        query = ''.join(sorted(query.split('&')))
         # Could do syntax based normalization of the URI before
         # computing the digest. See Section 6.2.2 of Std 66.
         request_uri = query and "?".join([path, query]) or path
@@ -173,10 +175,24 @@ class CacheController(object):
             resp.from_cache = True
             return resp
 
-        # we're not fresh.
-        self.cache.delete(cache_url)
+        # we're not fresh. If we don't have an Etag, clear it out
+        if 'etag' not in resp.headers:
+            self.cache.delete(cache_url)
+
+        if 'etag' in resp.headers:
+            headers['If-None-Match'] = resp.headers['ETag']
+
+        if 'last-modified' in resp.headers:
+            headers['If-Modified-Since'] = resp.headers['Last-Modified']
+
         # return the original handler
         return False
+
+    def add_headers(self, url):
+        resp = self.cache.get(url)
+        if resp and 'etag' in resp.headers:
+            return {'If-None-Match': resp.headers['etag']}
+        return {}
 
     def cache_response(self, request, resp):
         """
@@ -199,10 +215,14 @@ class CacheController(object):
         if no_store and self.cache.get(cache_url):
             self.cache.delete(cache_url)
 
+        # If we've been given an etag, then keep the response
+        if self.cache_etags and 'etag' in resp.headers:
+            self.cache.set(cache_url, resp)
+
         # Add to the cache if the response headers demand it. If there
         # is no date header then we can't do anything about expiring
         # the cache.
-        if 'date' in resp.headers:
+        elif 'date' in resp.headers:
             # cache when there is a max-age > 0
             if cc_resp and cc_resp.get('max-age'):
                 if int(cc_resp['max-age']) > 0:
@@ -213,3 +233,37 @@ class CacheController(object):
             elif 'expires' in resp.headers:
                 if resp.headers['expires']:
                     self.cache.set(cache_url, resp)
+
+    def update_cached_response(self, request, response):
+        """On a 304 we will get a new set of headers that we want to
+        update our cached value with, assuming we have one.
+
+        This should only ever be called when we've sent an ETag and
+        gotten a 304 as the response.
+        """
+        cache_url = self.cache_url(request.url)
+
+        resp = self.cache.get(cache_url)
+
+        if not resp:
+            # we didn't have a cached response
+            return response
+
+        # did so lets update our headers
+        resp.headers.update(response.headers)
+
+        # we want a 200 b/c we have content via the cache
+        request.status_code = 200
+
+        # update the request as it has the if-none-match header + any
+        # other headers that the server might have updated (ie Date,
+        # Cache-Control, Expires, etc.)
+        resp.request = request
+
+        # update our cache
+        self.cache.set(cache_url, resp)
+
+        # Let everyone know this was from the cache.
+        resp.from_cache = True
+
+        return resp

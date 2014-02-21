@@ -25,7 +25,7 @@ __version__ = '0.5.1'
 __author__ = 'Jack Kaliko'
 
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from requests import Session, Request, Timeout, ConnectionError
 
