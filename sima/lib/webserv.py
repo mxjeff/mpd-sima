@@ -195,8 +195,6 @@ class WebService(Plugin):
             self.log.warning('{0}: {1}'.format(self.ws.name, err))
         if as_art:
             self.log.debug('Fetched {0} artist(s)'.format(len(as_art)))
-        if self.ws.ratelimit:
-            self.log.info('{0.name} ratelimit: {0.ratelimit}'.format(self.ws))
         return as_art
 
     def get_recursive_similar_artist(self):
@@ -383,6 +381,7 @@ class WebService(Plugin):
             self.log.debug(repr(self.player.current))
             return None
         self.queue_mode()
+        self.log.debug(self.ws.stats)
         candidates = self.to_add
         self.to_add = list()
         if self.plugin_conf.get('queue_mode') != 'album':

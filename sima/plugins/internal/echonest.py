@@ -40,15 +40,8 @@ class EchoNest(WebService):
         WebService.__init__(self, daemon)
         # Set persitent cache
         vardir = daemon.config['sima']['var_dir']
-        SimaEch.cache = FileCache(join(vardir, 'http'))
+        SimaEch.cache = FileCache(join(vardir, 'http', 'EchoNest'))
         self.ws = SimaEch
-
-    def callback_playlist(self):
-        if self.player.state != 'play':
-            return
-        msg = 'ETag:{etag:>3d}, Cache-Control:{ccontrol:>3d},'
-        msg += 'total:{total:>3d}, min(rate-limit):{minrl:>3d}'
-        self.log.debug(msg.format(**SimaEch.stats))
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

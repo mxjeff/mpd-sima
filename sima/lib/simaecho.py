@@ -25,11 +25,9 @@ __version__ = '0.0.2'
 __author__ = 'Jack Kaliko'
 
 
-from datetime import timedelta
-
 from requests import Session, Request, Timeout, ConnectionError
 
-from sima import ECH
+from sima import ECH, SOCKET_TIMEOUT, WAIT_BETWEEN_REQUESTS
 from sima.lib.meta import Artist
 from sima.lib.track import Track
 from sima.lib.http import CacheController
@@ -37,10 +35,6 @@ from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
 from sima.utils.utils import getws, Throttle
 if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
     getws(ECH)
-
-# Some definitions
-WAIT_BETWEEN_REQUESTS = timedelta(0, 2)
-SOCKET_TIMEOUT = 6
 
 
 class SimaEch:

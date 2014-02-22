@@ -22,12 +22,14 @@ Fetching similar artists from last.fm web services
 """
 
 # standard library import
+from os.path import join
 
 # third parties components
 
 # local import
 from ...lib.simafm import SimaFM
 from ...lib.webserv import WebService
+from ...lib.cache import FileCache
 
 
 class Lastfm(WebService):
@@ -37,6 +39,9 @@ class Lastfm(WebService):
     def __init__(self, daemon):
         WebService.__init__(self, daemon)
         self.ws = SimaFM
+        # Set persitent cache
+        vardir = daemon.config['sima']['var_dir']
+        SimaFM.cache = FileCache(join(vardir, 'http', 'LastFM'))
 
 
 # VIM MODLINE

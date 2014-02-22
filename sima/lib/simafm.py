@@ -25,11 +25,10 @@ __version__ = '0.5.1'
 __author__ = 'Jack Kaliko'
 
 
-from datetime import timedelta
 
 from requests import Session, Request, Timeout, ConnectionError
 
-from sima import LFM
+from sima import LFM, SOCKET_TIMEOUT, WAIT_BETWEEN_REQUESTS
 from sima.lib.meta import Artist
 
 from sima.lib.http import CacheController
@@ -38,10 +37,6 @@ from sima.utils.utils import getws, Throttle
 if len(LFM.get('apikey')) == 43:  # simple hack allowing imp.reload
     getws(LFM)
 
-# Some definitions
-WAIT_BETWEEN_REQUESTS = timedelta(0, 2)
-SOCKET_TIMEOUT = 6
-
 
 class SimaFM:
     """Last.fm http client
@@ -49,9 +44,12 @@ class SimaFM:
     root_url = 'http://{host}/{version}/'.format(**LFM)
     ratelimit = None
     name = 'Last.fm'
-    cache = {}
+    cache = False
+    stats = {'etag':0,
+            'ccontrol':0,
+            'total':0}
 
-    def __init__(self, cache=True):
+    def __init__(self):
         self.controller = CacheController(self.cache)
         self.artist = None
 
@@ -62,9 +60,11 @@ class SimaFM:
         """
         req = Request('GET', SimaFM.root_url, params=payload,
                       ).prepare()
+        SimaFM.stats.update(total=SimaFM.stats.get('total')+1)
         if self.cache:
             cached_response = self.controller.cached_request(req.url, req.headers)
             if cached_response:
+                SimaFM.stats.update(ccontrol=SimaFM.stats.get('ccontrol')+1)
                 return cached_response.json()
         try:
             return self._fetch_ws(req)
@@ -79,8 +79,10 @@ class SimaFM:
         """fetch from web service"""
         sess = Session()
         resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
-        #self.__class__.ratelimit = resp.headers.get('x-ratelimit-remaining', None)
-        if resp.status_code is not 200:
+        if resp.status_code == 304:
+            SimaFM.stats.update(etag=SimaFM.stats.get('etag')+1)
+            resp = self.controller.update_cached_response(prepreq, resp)
+        elif resp.status_code != 200:
             raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
         ans = resp.json()
         self._controls_answer(ans)
