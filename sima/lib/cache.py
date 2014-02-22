@@ -35,13 +35,16 @@ from ..utils.filelock import FileLock
 class BaseCache:
 
     def get(self, key):
-        raise NotImplemented()
+        """Get cache value"""
+        raise NotImplementedError
 
     def set(self, key, value):
-        raise NotImplemented()
+        """Set cache value"""
+        raise NotImplementedError
 
     def delete(self, key):
-        raise NotImplemented()
+        """Remove cache value"""
+        raise NotImplementedError
 
 
 class DictCache(BaseCache):
@@ -72,8 +75,8 @@ class FileCache:
         if not os.path.isdir(self.directory):
             os.mkdir(self.directory)
 
-    def encode(self, x):
-        return md5(x.encode('utf-8')).hexdigest()
+    def encode(self, val):
+        return md5(val.encode('utf-8')).hexdigest()
 
     def _fn(self, name):
         return os.path.join(self.directory, self.encode(name))
@@ -86,15 +89,15 @@ class FileCache:
     def set(self, key, value):
         name = self._fn(key)
         with FileLock(name):
-            with codecs.open(name, 'w+b') as fh:
-                dump(value, fh)
+            with codecs.open(name, 'w+b') as flh:
+                dump(value, flh)
 
     def delete(self, key):
         if not self.forever:
             os.remove(self._fn(key))
 
     def __iter__(self):
-        for dirpath, dirnames, filenames in os.walk(self.directory):
+        for dirpath, _, filenames in os.walk(self.directory):
             for item in filenames:
                 name = os.path.join(dirpath, item)
                 yield load(codecs.open(name, 'rb'))

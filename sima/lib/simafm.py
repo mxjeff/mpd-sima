@@ -30,6 +30,7 @@ from requests import Session, Request, Timeout, ConnectionError
 
 from sima import LFM, SOCKET_TIMEOUT, WAIT_BETWEEN_REQUESTS
 from sima.lib.meta import Artist
+from sima.lib.track import Track
 
 from sima.lib.http import CacheController
 from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
@@ -144,6 +145,26 @@ class SimaFM:
         for art in ans.get('similarartists').get('artist'):
             yield Artist(name=art.get('name'), mbid=art.get('mbid', None))
 
+    def get_toptrack(self, artist=None):
+        """Fetch artist top tracks
+        """
+        payload = self._forge_payload(artist, method='top')
+        ans = self._fetch(payload)
+        tops = ans.get('toptracks').get('track')
+        art = {
+                'artist': artist.name,
+                'musicbrainz_artistid': artist.mbid,
+                }
+        for song in tops:
+            for key in ['artist', 'streamable', 'listeners',
+                        'url', 'image', '@attr']:
+                if key in song:
+                    song.pop(key)
+            song.update(art)
+            song.update(title=song.pop('name'))
+            song.update(time=song.pop('duration'))
+            yield Track(**song)
+        #return tops
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
