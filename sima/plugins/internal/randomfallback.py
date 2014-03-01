@@ -57,24 +57,30 @@ class RandomFallBack(Plugin):
         trks = list()
         target = self.plugin_conf.getint('track_to_add')
         while len(trks) < target:
-            trks.append(self.get_trk())
+            trk = self.get_trk()
+            if trk:
+                trks.append(trk)
         return trks
 
     def get_trk(self):
         """Get a single track acording to random flavour
         """
+        trk = None
         artists = list(self.player.artists)
         if self.mode == 'sensitive':
             played_art = self.get_played_artist()
-            while 42:
+            while artists:
                 art = random.choice(artists)
                 if art not in played_art:
                     break
+                artists.pop(art)
         elif self.mode == 'pure':
             art = random.choice(artists)
         self.log.debug('Random art: {}'.format(art))
-        trk = random.choice(self.player.find_track(art))
-        self.log.info('random fallback ({}): {}'.format(self.mode, trk))
+        trks = self.player.find_track(art)
+        if trks:
+            trk = random.choice(trks)
+            self.log.info('random fallback ({}): {}'.format(self.mode, trk))
         return trk
 
 
