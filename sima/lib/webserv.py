@@ -381,7 +381,9 @@ class WebService(Plugin):
             self.log.debug(repr(self.player.current))
             return None
         self.queue_mode()
-        self.log.debug(self.ws.stats)
+        msg = ' '.join(['{0}: {1:>3d}'.format(k, v) for
+                        k, v in sorted(self.ws.stats.items())])
+        self.log.debug(msg)
         candidates = self.to_add
         self.to_add = list()
         if self.plugin_conf.get('queue_mode') != 'album':

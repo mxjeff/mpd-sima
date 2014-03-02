@@ -60,6 +60,9 @@ DEFAULT_CONF = {
             'verbosity': "info",
             'logfile': "",
             },
+        'crop': {
+            'consume': 10,
+            },
         'echonest': {
             'queue_mode': "track", #TODO control values
             'max_art': 15,
@@ -75,6 +78,7 @@ DEFAULT_CONF = {
             'track_to_add': 1,
             'album_to_add': 1,
             'depth': 1,
+            'cache': True,
             },
         'randomfallback': {
             'flavour': "sensible", # in pure, sensible

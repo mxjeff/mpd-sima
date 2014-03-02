@@ -29,7 +29,7 @@ from os.path import join
 # local import
 from ...lib.simafm import SimaFM
 from ...lib.webserv import WebService
-from ...lib.cache import FileCache
+from ...lib.cache import FileCache, DictCache
 
 
 class Lastfm(WebService):
@@ -41,7 +41,11 @@ class Lastfm(WebService):
         self.ws = SimaFM
         # Set persitent cache
         vardir = daemon.config['sima']['var_dir']
-        SimaFM.cache = FileCache(join(vardir, 'http', 'LastFM'))
+        persitent_cache = daemon.config.getboolean('lastfm', 'cache')
+        if persitent_cache:
+            SimaFM.cache = FileCache(join(vardir, 'http', 'LastFM'))
+        else:
+            SimaFM.cache = DictCache()
 
 
 # VIM MODLINE
