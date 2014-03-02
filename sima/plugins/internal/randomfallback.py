@@ -31,7 +31,10 @@ from ...lib.plugin import Plugin
 
 
 class RandomFallBack(Plugin):
-    """Add random track as fallback"""
+    """Add random track as fallback
+    TODO: refactor, this plugin does not look good to me.
+          callback_need_track_fb/get_trk articulation is not elegant at all
+    """
 
     def __init__(self, daemon):
         super().__init__(daemon)
@@ -56,18 +59,24 @@ class RandomFallBack(Plugin):
     def callback_need_track_fb(self):
         trks = list()
         target = self.plugin_conf.getint('track_to_add')
+        limit = 0
         while len(trks) < target:
             trk = self.get_trk()
             if trk:
                 trks.append(trk)
+            else:
+                limit += 1
+                if limit > 3:
+                    return trks
         return trks
 
     def get_trk(self):
         """Get a single track acording to random flavour
         """
         trk = None
+        art = None
         artists = list(self.player.artists)
-        if self.mode == 'sensitive':
+        if self.mode == 'sensible':
             played_art = self.get_played_artist()
             while artists:
                 art = random.choice(artists)
@@ -76,6 +85,8 @@ class RandomFallBack(Plugin):
                 artists.pop(art)
         elif self.mode == 'pure':
             art = random.choice(artists)
+        if art is None:
+            return None
         self.log.debug('Random art: {}'.format(art))
         trks = self.player.find_track(art)
         if trks:
