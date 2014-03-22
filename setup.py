@@ -11,7 +11,7 @@ from sima.info import __version__ as VERSION, __author__ as AUTHOR
 from sima.info import __doc__ as DESCRIPTION, __email__ as EMAIL
 
 data_files = [
-    ('share/man/man1', ['data/mpd-sima.1',]),
+    ('share/man/man1', ['data/man/mpd-sima.1',]),
     #('share/man/man1', ['data/mpd-sima.1', 'data/simadb_cli.1',]),
     #('share/man/man5', ['data/mpd-sima.cfg.5',]),
     ('share/doc/mpd-sima/examples/', glob.glob('doc/examples/*')),

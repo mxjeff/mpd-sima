@@ -164,7 +164,6 @@ class SimaFM:
             song.update(title=song.pop('name'))
             song.update(time=song.pop('duration'))
             yield Track(**song)
-        #return tops
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

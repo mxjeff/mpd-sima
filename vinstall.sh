@@ -35,7 +35,7 @@ virtualenv $VENV_OPTIONS $INSTALL_DIR/venv || { echo "something went wrong gener
 PIP_OPTIONS=""
 [ "$DEBUG" = "0" ] && PIP_OPTIONS="$PIP_OPTIONS --quiet"
 
-pip $PIP_OPTIONS install --pre python-musicpd || exit 1
+pip install -e . || exit 1
 
 echo Installing mpd-sima
 $(dirname $0)/setup.py --quiet install || exit 1
@@ -48,12 +48,12 @@ SIMA_VLAUNCHER=$INSTALL_DIR/vmpd-sima
 cat << EOF > "$SIMA_VLAUNCHER"
 #!/bin/sh
 . $INSTALL_DIR/venv/bin/activate
-$SIMA_LAUNCHER "\$@"
+$INSTALL_DIR/$SIMA_LAUNCHER "\$@"
 EOF
 chmod +x $SIMA_VLAUNCHER
 
 echo Cleaning up
-rm -rf $(dirname $0)/dist
+rm -rf $(dirnddame $0)/dist
 rm -rf $(dirname $0)/build
 rm -rf $(dirname $0)/sima.egg-info
 
