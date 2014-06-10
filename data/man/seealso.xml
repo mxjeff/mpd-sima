@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<refsect1 id="see_also">
+    <title>SEE ALSO</title>
+    <!-- In alpabetical order. -->
+    <para><citerefentry>
+            <refentrytitle>mpc</refentrytitle>
+            <manvolnum>1</manvolnum>
+            </citerefentry>, <citerefentry>
+            <refentrytitle>mpd</refentrytitle>
+            <manvolnum>1</manvolnum>
+    </citerefentry></para>
+    <para>
+        <filename>/usr/share/doc/mpd-sima/</filename>
+    </para>
+</refsect1>
+<!-- vim:filetype=docbk
+-->

@@ -17,7 +17,7 @@ OPTIONS=--nonet\
 all: man
 
 simadb_cli: simadb_cli.1.xml
-	$(XP) $(OPTIONS) $(XSL) $<
+	xmllint --xinclude --nowarning --noent $< | $(XP) $(OPTIONS) $(XSL) -
 
 mpd_sima: mpd_sima.1.xml
 	xmllint --xinclude --nowarning --noent $< | $(XP) $(OPTIONS) $(XSL) -
@@ -49,4 +49,11 @@ valid:
 clean_mpd_sima:
 	rm -rf mpd-sima.1 mpd_sima.1.html
 
-clean: clean_mpd_sima
+clean_simadb_cli:
+	rm -rf simadb_cli.1 simadb_cli.1.html
+
+clean_mpd_sima.cfg:
+	rm -rf mpd_sima.cfg.5 mpd_sima.cfg.5.html
+
+clean: clean_mpd_sima clean_simadb_cli clean_mpd_sima.cfg
+	rm -rf ./*.pdf

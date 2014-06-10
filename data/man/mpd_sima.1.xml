@@ -204,33 +204,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         </varlistentry>
     </variablelist>
   </refsect1>
-  <refsect1 id="files">
-      <title>FILES</title>
-      <variablelist>
-          <varlistentry>
-              <term><filename>${XDG_CONFIG_HOME}/mpd_sima/mpd_sima.cfg</filename></term>
-              <!--
-              <listitem>
-              </listitem>
-              <term><filename>${HOME}/.config/mpd_sima/mpd_sima.cfg</filename></term>
-              -->
-              <listitem>
-                  <para>The per-user configuration file. Usually <envar>XDG_CONFIG_HOME</envar> is set to <filename>${HOME}/.config</filename>.</para>
-              </listitem>
-          </varlistentry>
-          <varlistentry>
-              <term><filename>${XDG_DATA_HOME}/mpd_sima/sima.db</filename></term>
-              <!--
-              <listitem>
-              </listitem>
-              <term><filename>${HOME}/.local/share/mpd_sima/history.pkl</filename></term>
-              -->
-              <listitem>
-                  <para>SQLite database. Usually <envar>XDG_DATA_HOME</envar> is set to <filename>${HOME}/.local/share</filename>.</para>
-              </listitem>
-          </varlistentry>
-      </variablelist>
-  </refsect1>
+  <xi:include href="files.xml" />
   <refsect1 id="environment">
       <title>ENVIRONMENT</title>
       <variablelist>
@@ -257,7 +231,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                   <para><filename>mpd_sima.cfg</filename> is read if present.
                       Otherwise built-in defaults are used. An example should be
                       provided in the tarball within
-                      <filename>doc/examples/mpd_sima.cfg</filename>. On Debian
+                      <filename>doc/examples/</filename>. On Debian
                       system please look in
                       <filename>/usr/share/doc/&dhpackage;</filename>.</para>
               </listitem>
@@ -275,25 +249,13 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
               </listitem>
           </varlistentry>
       </variablelist>
-  </refsect1>
-  <xi:include href="feedback.xml" />
-  <refsect1 id="see_also">
-    <title>SEE ALSO</title>
-    <!-- In alpabetical order. -->
-    <para>
-        <citerefentry>
-            <refentrytitle>mpc</refentrytitle>
-            <manvolnum>1</manvolnum>
-            </citerefentry>, <citerefentry>
-            <refentrytitle>mpd</refentrytitle>
-            <manvolnum>1</manvolnum>
-            </citerefentry>, <citerefentry>
-            <refentrytitle>mpd-sima.cfg</refentrytitle>
-            <manvolnum>5</manvolnum>
-        </citerefentry>
-    </para>
-      <para>
-          <filename>/usr/share/doc/mpd-sima/</filename>
+      <para>For details about mpd_sima.cfg refer to the manual
+          <citerefentry>
+              <refentrytitle>mpd_sima.cfg</refentrytitle>
+              <manvolnum>5</manvolnum>
+          </citerefentry>
       </para>
   </refsect1>
+  <xi:include href="feedback.xml" />
+  <xi:include href="seealso.xml" />
 </refentry>

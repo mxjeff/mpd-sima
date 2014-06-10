@@ -1,0 +1,413 @@
+'\" t
+.\"     Title: mpd_sima.cfg
+.\"    Author: Jack Kaliko <kaliko@azylum.org>
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 06/10/2014
+.\"    Manual: mpd-sima 0.12.0 User Manual
+.\"    Source: mpd-sima
+.\"  Language: English
+.\"
+.TH "MPD_SIMA\&.CFG" "5" "06/10/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+mpd_sima.cfg \- mpd\-sima will try to maintain some titles ahead in your play list following different policies\&. This manual document the configuration file for mpd\-sima\&.
+.SH "DESCRIPTION"
+.PP
+This manual page documents briefly
+\fBmpd\-sima\fR
+configuration options available in user configuration file (see
+the section called \(lqFILES\(rq)\&.
+.SH "EXAMPLES"
+.SS "Album queue mode\&."
+.PP
+Here is an example of album queue configuration\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+[MPD]
+host=example\&.org
+port=8000
+
+[sima]
+history_duration=48  # 2 days
+queue_length=5
+
+[lastfm]
+queue_mode = album
+album_to_add=2
+
+[crop]
+# keep 30 played tracks in playlist
+consume = 30
+
+            
+.fi
+.if n \{\
+.RE
+.\}
+.SH "CONFIGURATION FILE"
+.PP
+The configuration file consists of sections, led by a
+\fB[section]\fR
+header and followed by
+\fBname:\ \&value\fR
+entries, with continuations in the style of RFC 822 (see section 3\&.1\&.1, \(lqLONG HEADER FIELDS\(rq);
+\fBname=value\fR
+is also accepted\&. Lines beginning with
+\fI\*(Aq#\*(Aq\fR
+or
+\fI\*(Aq;\*(Aq\fR
+are ignored and may be used to provide comments (\fINota Bene:\fR
+inline comment are possible using
+\fI\*(Aq#\*(Aq\fR)\&.
+.PP
+The default values are used in the options lists below\&.
+.SS "MPD section"
+.PP
+This section is meant to configure MPD access, MPD host address / port and password if necessary\&.
+.PP
+\fB[MPD]\fR
+.RS 4
+.RE
+.PP
+\fBhost=\fR\fIlocalhost\fR
+.RS 4
+Set MPD host\&. Use IP or FQDN\&.
+.RE
+.PP
+\fBport=\fR\fI6600\fR
+.RS 4
+Set host port to access MPD to\&.
+.RE
+.PP
+\fBpassword=\fR\fIs3cr3t\fR
+.RS 4
+Set MPD password to use\&. Do not use this option if you don\*(Aqt have enabled password protected access on your MPD server\&.
+.RE
+.SS "log section"
+.PP
+Configure logging\&.
+.PP
+\fB[log]\fR
+.RS 4
+.RE
+.PP
+\fBlogfile=\fR
+.RS 4
+File to log to, usually in d\(aemon mode\&.
+.br
+Defaut (empty or unset) is to log to stdin/stdout\&.
+.RE
+.PP
+\fBverbosity=\fR\fIinfo\fR
+.RS 4
+Logging verbosity among
+\fIdebug\fR,
+\fIinfo\fR,
+\fIwarning\fR,
+\fIerror\fR\&.
+.RE
+.SS "sima section"
+.PP
+This section allows you to tweak core mpd_sima\&.cfg configuration\&.
+.PP
+\fB[sima]\fR
+.RS 4
+.RE
+.PP
+\fBhistory_duration=\fR\fI8\fR
+.RS 4
+How far to look back in history to avoid to play twice the same track/title (duration in hours)\&.
+.RE
+.PP
+\fBqueue_length=\fR\fI1\fR
+.RS 4
+This value triggers queue process if the play list length is less than specified queue_length\&.
+.RE
+.PP
+\fBuser_db=\fR\fIfalse\fR
+.RS 4
+Temporarily removed feature
+.RE
+.PP
+mpd\-sima\*(Aqs plugin management for internal source plugin and contrib (ie\&. external plugins)\&.
+.br
+
+Plugins list is a comma separated string list\&.
+.br
+
+Optional plugin\*(Aqs configuration lays in its own section\&.
+.br
+For instance a "AwesomePlugin" declared here gets its configuration from the corresponding section "[awesomeplugin]"\&.
+.br
+internal plugins will look for a section named after the lower\-cased name of the pluglin, ie\&. RandomFallBack\ \&\(-> randomfallback\&.
+.PP
+\fBinternal=\fR\fICrop, RandomFallBack, Lastfm\fR
+.RS 4
+\fBCrop\fR
+and
+\fBRandomFallback\fR
+are utilities plugins while
+\fBLastfm\fR
+is the actual queue plugin\&.
+.br
+
+Another queue plugin is available as a "techno preview", it relies on EchoNest web services, replace
+\fBLastFm\fR
+with
+\fBEchoNest\fR
+to try\&.
+.RE
+.PP
+\fBcontrib=\fR
+.RS 4
+.RE
+.SS "Crop section"
+.PP
+crop plugin\*(Aqs configuration:
+.PP
+\fB[crop]\fR
+.RS 4
+.RE
+.PP
+\fBconsume=\fR\fI0\fR
+.RS 4
+How many played tracks to keep in the play list\&. Allow to maintain a fixed length play list\&. Set to 0 to keep all played tracks\&.
+.RE
+.SS "RandomFallback section"
+.PP
+RandomFallback plugin\*(Aqs configuration:
+.PP
+\fB[randomfallback]\fR
+.RS 4
+.RE
+.PP
+\fBflavour=\fR\fIsensible\fR
+.RS 4
+When no similar tracks are found, falling back to random queuing\&. Different mode, aka random flavour, are available:
+\fIpure\fR,
+\fIsensible\fR,
+\fIgenre\fR\&.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIpure\fR, pure random choice, even among recently played track\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIsensible\fR, use play history to filter chosen tracks\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIgenre\fR, Not implemented yet\&.
+.RE
+.sp
+.RE
+.SS "LastFm section"
+.PP
+This section allows you to tweak LastFM plugin\*(Aqs configuration\&.
+.PP
+\fB[lastfm]\fR
+.RS 4
+.RE
+.PP
+\fBqueue_mode=\fR\fItrack\fR
+.RS 4
+Queue mode to use among
+\fItrack\fR,
+\fItop\fR
+and
+\fIalbum\fR
+(see
+the section called \(lqQUEUE MODES\(rq
+for info about queue modes)\&.
+.RE
+.PP
+\fBmax_art=\fR\fI10\fR
+.RS 4
+Number of similar artist to retrieve from local media library\&.
+.br
+When set to something superior to zero, it tries to get as much similar artists from media library\&.
+.RE
+.PP
+\fBdepth=\fR\fI1\fR
+.RS 4
+How many artists to base on similar artists search\&.
+.br
+
+The first is the last played artist and so on back in the history\&. Highter depth allows to get wider suggestions, it might help to reduce looping over same artists\&.
+.RE
+.PP
+\fBsingle_album=\fR\fIfalse\fR
+.RS 4
+Prevent from queueing a track from the same album (it often happens with OST)\&.
+.br
+
+Only relevant in "track" queue mode\&.
+.RE
+.PP
+\fBtrack_to_add=\fR\fI1\fR
+.RS 4
+How many track(s) to add\&. Only relevant in
+\fBtop\fR
+and
+\fBtrack\fR
+queue modes\&.
+.RE
+.PP
+\fBalbum_to_add=\fR\fI1\fR
+.RS 4
+How many album(s) to add\&. Only relevant in
+\fBalbum\fR
+queue modes\&.
+.RE
+.PP
+\fBcache=\fR\fITrue\fR
+.RS 4
+Whether or not to use on\-disk persistent http cache\&.
+.br
+When set to "true", sima will use a persistent cache for its http client\&. The cache is written along with the dbfile in:
+.br
+$XDG_CONFIG_HOME/mpd_sima/http/WEB_SERVICE\&.
+.br
+
+If set to "false", caching is still done but in memory\&.
+.RE
+.SH "QUEUE MODES"
+.PP
+mpd\-sima offers different queue modes\&. All of them pick up tracks from artists similar to the one currently played\&.
+.PP
+mpd\-sima tries preferably to chose among unplayed artists or at least not recently played artist\&. Concerning track and album queue modes titles are chosen purely at random among unplayed tracks\&.
+.PP
+\fBtrack\fR
+.RS 4
+Queue a similar track chosen at random from a similar artist\&.
+.RE
+.PP
+\fBtop\fR
+.RS 4
+Queue a track from a similar artist, chosen among "top tracks" according to last\&.fm data mining\&.
+.RE
+.PP
+\fBalbum\fR
+.RS 4
+Queue a whole album chosen at random from a similar artist\&.
+.sp
+\fINota Bene:\fR
+.br
+
+Due to the track point of view of database build upon tracks tags an album lookup for a specific artist will return albums as soon as this artist appears in a single track of the album\&.
+.br
+
+For instance looking for album from "The Velvet Underground" will fetch "Last Days" and "Juno" OSTs because the band appears on the soundtrack of these two movies\&.
+.br
+
+A solution is for you to set AlbumArtists tag to something different than the actual artist of the track\&. For compilations, OSTs etc\&. a strong convention is to use "Various Artists" for this tag\&.
+.sp
+mpd\-sima is currently looking for AlbumArtists tags and avoid album where this tag is set with "Various Artists"\&. If a single track within an album is found with AlbumArtists:"Various Artists" the complete album is skipped and won\*(Aqt be queued\&.
+.br
+
+It is planned to allow users to set the values of AlbumArtists tag triggering this behaviour\&. cf\&. feature request #2085 on the tracker\&.
+.RE
+.SH "FILES"
+.PP
+${XDG_CONFIG_HOME}/mpd_sima/mpd_sima\&.cfg
+.RS 4
+Configuration file\&.
+.RE
+.PP
+${XDG_DATA_HOME}/mpd_sima/sima\&.db
+.RS 4
+SQLite DB file\&.
+.RE
+.PP
+${XDG_DATA_HOME}/mpd_sima/WEB_SERVICE/
+.RS 4
+Persistant http cache\&.
+.RE
+.PP
+Usually
+\fBXDG_DATA_HOME\fR
+is set to
+${HOME}/\&.local/share
+and
+\fBXDG_CONFIG_HOME\fR
+to
+${HOME}/\&.config\&.
+.br
+You may override them using command line option
+\fB\-\-var_dir\fR
+(cf\&.
+\fBmpd_sima\fR(1))
+.SH "FEEDBACK/BUGS"
+.PP
+The maintainer would be more than happy to ear from you, don\*(Aqt hesitate to send feedback,
+\m[blue]\fB\%http://kaliko.me/id/\fR\m[]\&.
+.PP
+XMPP
+users are welcome to join the dedicated chat room at
+\m[blue]\fBkaliko\&.me@conf\&.azylum\&.org\fR\m[]\&.
+.SH "SEE ALSO"
+.PP
+\fBmpc\fR(1),
+\fBmpd\fR(1)
+.PP
+/usr/share/doc/mpd\-sima/
+.SH "AUTHOR"
+.PP
+\fBJack Kaliko\fR <\&kaliko@azylum\&.org\&>
+.RS 4
+Wrote this man page and is currently leading MPD_sima project\&.
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 2009-2014 Jack Kaliko
+.br
+.PP
+This manual page was written for the Debian system (and may be used by others)\&.
+.PP
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 3 published by the Free Software Foundation\&.
+.PP
+On Debian systems, the complete text of the GNU General Public License can be found in
+/usr/share/common\-licenses/GPL\&.
+.sp

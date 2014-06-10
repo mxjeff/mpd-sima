@@ -2,12 +2,12 @@
 .\"     Title: mpd-sima
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 01/25/2014
+.\"      Date: 06/10/2014
 .\"    Manual: mpd-sima 0.12.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD\-SIMA" "1" "01/25/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
+.TH "MPD\-SIMA" "1" "06/10/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -196,19 +196,32 @@ the section called \(lqENVIRONMENT\(rq
 .PP
 ${XDG_CONFIG_HOME}/mpd_sima/mpd_sima\&.cfg
 .RS 4
-The per\-user configuration file\&. Usually
-\fBXDG_CONFIG_HOME\fR
-is set to
-${HOME}/\&.config\&.
+Configuration file\&.
 .RE
 .PP
 ${XDG_DATA_HOME}/mpd_sima/sima\&.db
 .RS 4
-SQLite database\&. Usually
+SQLite DB file\&.
+.RE
+.PP
+${XDG_DATA_HOME}/mpd_sima/WEB_SERVICE/
+.RS 4
+Persistant http cache\&.
+.RE
+.PP
+Usually
 \fBXDG_DATA_HOME\fR
 is set to
-${HOME}/\&.local/share\&.
-.RE
+${HOME}/\&.local/share
+and
+\fBXDG_CONFIG_HOME\fR
+to
+${HOME}/\&.config\&.
+.br
+You may override them using command line option
+\fB\-\-var_dir\fR
+(cf\&.
+\fBmpd_sima\fR(1))
 .SH "ENVIRONMENT"
 .PP
 \fBMPD_HOST\fR, \fBMPD_PORT\fR
@@ -233,7 +246,7 @@ mpd_sima\&.cfg
 .RS 4
 mpd_sima\&.cfg
 is read if present\&. Otherwise built\-in defaults are used\&. An example should be provided in the tarball within
-doc/examples/mpd_sima\&.cfg\&. On Debian system please look in
+doc/examples/\&. On Debian system please look in
 /usr/share/doc/mpd\-sima\&.
 .RE
 .PP
@@ -246,6 +259,9 @@ The default behavior is to add one track, this track is to be chosen among title
 To change these defaults, use the configuration file
 mpd_sima\&.cfg
 .RE
+.PP
+For details about mpd_sima\&.cfg refer to the manual
+\fBmpd_sima.cfg\fR(5)
 .SH "FEEDBACK/BUGS"
 .PP
 The maintainer would be more than happy to ear from you, don\*(Aqt hesitate to send feedback,
@@ -257,8 +273,7 @@ users are welcome to join the dedicated chat room at
 .SH "SEE ALSO"
 .PP
 \fBmpc\fR(1),
-\fBmpd\fR(1),
-\fBmpd-sima.cfg\fR(5)
+\fBmpd\fR(1)
 .PP
 /usr/share/doc/mpd\-sima/
 .SH "AUTHOR"

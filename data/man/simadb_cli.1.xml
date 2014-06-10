@@ -1,0 +1,409 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+
+`xsltproc -''-nonet \
+          -''-param man.charmap.use.subset "0" \
+          -''-param make.year.ranges "1" \
+          -''-param make.single.year.ranges "1" \
+          /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
+          manpage.xml'
+
+A manual page <package>.<section> will be generated. You may view the
+manual page with: nroff -man <package>.<section> | less'. A typical entry
+in a Makefile or Makefile.am is:
+
+DB2MAN = /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl
+XP     = xsltproc -''-nonet -''-param man.charmap.use.subset "0"
+
+manpage.1: manpage.xml
+        $(XP) $(DB2MAN) $<
+
+The xsltproc binary is found in the xsltproc package. The XSL files are in
+docbook-xsl. A description of the parameters you can use can be found in the
+docbook-xsl-doc-* packages. Please remember that if you create the nroff
+version in one of the debian/rules file targets (such as build), you will need
+to include xsltproc and docbook-xsl in your Build-Depends control field.
+Alternatively use the xmlto command/package. That will also automatically
+pull in xsltproc and docbook-xsl.
+
+Notes for using docbook2x: docbook2x-man does not automatically create the
+AUTHOR(S) and COPYRIGHT sections. In this case, please add them manually as
+<refsect1> ... </refsect1>.
+
+To disable the automatic creation of the AUTHOR(S) and COPYRIGHT sections
+read /usr/share/doc/docbook-xsl/doc/manpages/authors.html. This file can be
+found in the docbook-xsl-doc-html package.
+
+Validation can be done using: `xmllint -''-noout -''-valid manpage.xml`
+
+General documentation about man-pages and man-page-formatting:
+man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
+
+-->
+<!DOCTYPE refentry [
+
+  <!ENTITY dhsection   "1">
+  <!ENTITY dhpackage "mpd-sima">
+  <!ENTITY dhutils "simadb_cli">
+
+]>
+
+<refentry xmlns="http://docbook.org/ns/docbook"
+          xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0">
+  <xi:include href="info.xml" />
+  <refmeta>
+      <refentrytitle>&dhutils;</refentrytitle>
+      <manvolnum>&dhsection;</manvolnum>
+  </refmeta>
+    <refnamediv>
+        <refname>&dhutils;</refname>
+        <refpurpose>&dhutils; is a command line interface editor for the sima user DB.</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+        <cmdsynopsis><!-- REGULAR EDIT (ADD) OPTIONS -->
+            <command>&dhutils;</command>
+            <arg choice="plain"><option>--add_similarity=</option><replaceable class="option">similarity_string</replaceable></arg>
+            <arg choice="opt">
+                <option>--check_names</option>
+            </arg>
+            <arg choice="opt">
+                <option>--dbfile=</option><replaceable class="option">db_file</replaceable>
+            </arg>
+            <arg choice="opt">
+                <option>--reciprocal</option>
+            </arg>
+            <arg choice="opt">
+                <option>--host=</option><replaceable class="option">mpd_host</replaceable>
+            </arg>
+            <arg choice="opt">
+                <option>--port=</option><replaceable class="option">mpd_port</replaceable>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- EDIT (RM ARTIST) OPTIONS -->
+            <command>&dhutils;</command>
+            <arg choice="plain"><option>--remove_artist=</option><replaceable class="parameter">artist</replaceable></arg>
+            <arg choice="opt">
+                <option>--dbfile=</option><replaceable class="option">db_file</replaceable>
+            </arg>
+            <arg choice="opt">
+                <option>--reciprocal</option>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- EDIT (RM SIM) OPTIONS -->
+            <command>&dhutils;</command>
+            <arg choice="plain"><option>--remove_similarity=</option><replaceable class="parameter">"main artist,similar artist"</replaceable></arg>
+            <arg choice="opt">
+                <option>--dbfile=</option><replaceable class="option">db_file</replaceable>
+            </arg>
+            <arg choice="opt">
+                <option>--reciprocal</option>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- EDIT (PURGE HIST) OPTIONS -->
+            <command>&dhutils;</command>
+            <arg choice="plain"><option>--purge_hist</option></arg>
+            <arg choice="opt">
+                <option>--dbfile=</option><replaceable class="option">db_file</replaceable>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- REGULAR VIEW OPTIONS -->
+            <command>&dhutils;</command>
+            <arg choice="plain"><option>--view_artist=<replaceable class="parameter">"artist name"</replaceable></option></arg>
+            <arg choice="opt">
+                <option>--dbfile=</option><replaceable class="option">db_file</replaceable>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- VIEW ALL ENTRIES OPTIONS -->
+            <command>&dhutils;</command>
+            <arg choice="plain"><option>--view_all</option></arg>
+            <arg choice="opt">
+                <option>--dbfile=</option><replaceable class="option">db_file</replaceable>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- EDIT (BLACK LIST) OPTIONS -->
+            <command>&dhutils;</command>
+            <group choice="req">
+                <arg choice="plain"><option>--bl_curr_trk</option></arg>
+                <arg choice="plain"><option>--bl_curr_art</option></arg>
+                <arg choice="plain"><option>--bl_curr_alb</option></arg>
+                <arg choice="plain"><option>--bl_art=</option><replaceable class="parameter">artist_name</replaceable></arg>
+            </group>
+            <arg choice="opt">
+                <arg choice="plain"><option>--dbfile=</option><replaceable class="parameter">db_file</replaceable></arg>
+            </arg>
+            <arg choice="opt">
+                <arg choice="plain"><option>--host=</option><replaceable class="option">mpd_host</replaceable></arg>
+            </arg>
+            <arg choice="opt">
+                <arg choice="plain"><option>--port=</option><replaceable class="option">mpd_port</replaceable></arg>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- EDIT (RM BL) OPTIONS -->
+            <command>&dhutils;</command>
+            <arg choice="plain"><option>--remove_bl=</option><replaceable class="parameter">row_id</replaceable></arg>
+            <arg choice="opt">
+                <option>--dbfile=</option><replaceable class="option">db_file</replaceable>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- VIEW BL OPTIONS -->
+            <command>&dhutils;</command>
+            <arg choice="plain"><option>--view_bl</option></arg>
+            <arg choice="opt">
+                <option>--dbfile=</option><replaceable class="option">db_file</replaceable>
+            </arg>
+        </cmdsynopsis>
+        <cmdsynopsis><!-- HELP/VERSION -->
+            <command>&dhutils;</command>
+            <!-- Normally the help and version options make the programs stop
+            right after outputting the requested information. -->
+            <group choice="req">
+                <arg choice="plain">
+                    <group choice="req">
+                        <arg choice="plain"><option>-h</option></arg>
+                        <arg choice="plain"><option>--help</option></arg>
+                    </group>
+                </arg>
+                <arg choice="plain"><option>--version</option></arg>
+            </group>
+        </cmdsynopsis>
+    </refsynopsisdiv>
+    <refsect1 id="description">
+        <title>DESCRIPTION</title>
+        <para>This manual page documents briefly the
+            <command>&dhutils;</command> commands.</para>
+        <para>simadb_cli is a command line interface to get and edit users
+            similarities and blacklist database used with MPD_sima. The default
+            database file (see <xref linkend="files"/>) can be overridden if
+            you want.</para>
+        <para>Consider reading <xref linkend="simadb" /> to understand the
+            structure and relation of similarities within the database.</para>
+    </refsect1>
+    <refsect1 id="example">
+        <title>EXAMPLE</title>
+        <refsect2 id="similarity">
+            <title>Similarity edition</title>
+            <para>Here follows some simple examples on how to deal with similarity database.</para>
+            <para>Pay attention, the following examples set one-way similarities in the DB! Read more about it in <xref linkend="simadb" />.</para>
+            <para><emphasis>Adding a similarity between two artists.</emphasis> In the following example "Pelican" will point 
+                to "Russian Circles" with a match score of 88% (ie. "Russian Circles"
+                88% similar to Pelican, not reciprocal), it will also check against MPD
+                the presence of both artists in the music library.</para>
+            <para><command>&dhutils; --add "Pelican,Russian Circles:80" --check_names</command></para>
+            <para>Similarity string use comma "," as artists separator and semi colon ":" for
+                artist/similarity score separator, cf. <xref linkend="simiformat"/>.</para>
+            <para><emphasis>Adding a similarity between multiple artists.</emphasis> In the following example "Rage
+                Against The Machine" will point to "Tool" and "Audioslave" as similar
+                artists and controls artists names are actually in MPD music library.</para>
+            <para><command>&dhutils; --add "Rage Against The Machine,Tool:70,Audiosalve:80" --check_names</command></para>
+            <para><emphasis>Viewing similarit(y|ies) for an artist.</emphasis> In the
+                following example we are looking for entries for "Rage Against The Machine"</para>
+            <para><command>&dhutils; --view_artist "Rage Against The Machine"</command></para>
+        </refsect2>
+        <refsect2 id="blacklist">
+            <title>Black list edition</title>
+            <para><emphasis>Adding to black list.</emphasis> You can add a single
+                track, an album or an artist to the black list. The element to
+                black list is chosen from the currently playing track. Use
+                <option>--bl_curr_trk</option> to prevent &dhutils; to queue this
+                track, <option>--bl_curr_alb</option> or <option>--bl_curr_art</option> respectively for the album and the
+                artist.
+            </para>
+            <para>Remember you need access to your MPD server to retrieve
+                information to black list. Defaults are localhost:6600 or found in
+                environment variables but you may set it up from command
+                line:
+            </para>
+            <para><command>&dhutils; --bl_curr_art -S mympd.example.org</command></para>
+            <para>
+                <emphasis>To black list a specific artist</emphasis> (not
+                currently playing) you can use <option>--bl_ar="Artist name to black list"</option>.
+            </para>
+        </refsect2>
+    </refsect1>
+    <refsect1 id="options">
+        <title>OPTIONS</title>
+        <para>The program follows the usual GNU command line syntax,
+            with long options starting with two dashes ("-").  A summary of
+            options is included below.</para>
+        <variablelist>
+            <!-- Use the variablelist.term.separator and the
+            variablelist.term.break.after parameters to
+            control the term elements. -->
+            <varlistentry> <!-- help -->
+                <term><option>-h</option></term>
+                <term><option>--help</option></term>
+                <listitem>
+                    <para>Print help and exit.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- version -->
+                <term><option>--version</option></term>
+                <listitem>
+                    <para>Print version and exit.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- add similarity -->
+                <term><option>-a <replaceable class="parameter">similarity_string</replaceable></option></term>
+                <term><option>--add_similarity=<replaceable class="parameter">similarity_string</replaceable></option></term>
+                <listitem>
+                    <para>Add similarity to the database.<sbr />For more details about the <replaceable class="option">similarity_string</replaceable> see <xref linkend="simiformat"/>.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- check_names -->
+                <term><option>-c</option></term>
+                <term><option>--check_names</option></term>
+                <listitem>
+                    <para>Use with <option>--add_similarity</option> in order to check artists names used in <replaceable class="parameter">similarity_string</replaceable>. &dhutils; will control presence of artists names in MPD library. Default is to look for MPD server on localhost:6600 or environment variables <envar>MPD_HOST</envar> and <envar>MPD_PORT</envar> if set.<sbr />You can as well give &dhutils; host/port on the command line using respectively <option>-S</option> and <option>-P</option>.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- black list artist -->
+                <term><option>--bl_art=<replaceable class="parameter">artist_name</replaceable></option></term>
+                <listitem>
+                    <para>Use to black list <replaceable class="parameter">artist_name</replaceable>. &dhutils; is checking <replaceable class="parameter">artist_name</replaceable> is actually in MPD music library (cf <option>-S</option> and <option>-P</option> options to set MPD host/address if necessary).</para>
+                    <para>If <replaceable class="parameter">artist_name</replaceable> is not found the script print out a list of matching artists.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- black list -->
+                <term><option>--bl_curr_trk</option> | <option>--bl_curr_art</option> | <option>--bl_curr_alb</option></term>
+                <listitem>
+                    <para>Use to black list the currently playing track|artist|album. You need access to your MPD server, use <option>-S</option> and <option>-P</option> to set MPD host/address if necessary.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- dbfile -->
+                <term><option>-d <replaceable class="parameter">db_file</replaceable></option></term>
+                <term><option>--dbfile=<replaceable class="parameter">db_file</replaceable></option></term>
+                <listitem>
+                    <para>Use the specific file <replaceable>db_file</replaceable> as database.<sbr />Default is too use <envar>XDG_DATA_HOME</envar> (see <xref linkend="files"/>).</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- purge history -->
+                <term><option>--purge_hist</option></term>
+                <listitem>
+                    <para>Purge history, you may supply an alternative DB file with --dbfile option.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- reciprocal -->
+                <term><option>-r</option></term>
+                <term><option>--reciprocal</option></term>
+                <listitem>
+                    <para>Use with an editing options in order to edit reciprocal similarity as well. <option>--add_similarity</option> and <option>--remove_{artist|similarity}</option> are supporting reciprocal edition.</para>
+                    <para><emphasis>N.B</emphasis>: this option has to appear after the editing option on the command line.</para>
+                    <para>See <xref linkend="simadb"/> for further information about reciprocity notion.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- remove artist -->
+                <term><option>--remove_artist=<replaceable class="parameter">artist</replaceable></option></term>
+                <listitem>
+                    <para>Use to remove an artist entry (as main artist) with its associated similarities. To remove artist where it appears as a similar artist use the <option>--reciprocal</option> option.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- remove bl id -->
+                <term><option>--remove_bl=<replaceable class="parameter">row_id</replaceable></option></term>
+                <listitem>
+                    <para>Use to remove a black list entry. To get the row_id to suppress use <option>--view_bl</option> option.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- remove similarity -->
+                <term><option>--remove_similarity=<replaceable class="parameter">"main artist,similar artist"</replaceable></option></term>
+                <listitem>
+                    <para>Use to remove a single similarity between a main artist and an associated similarity. Give the main artist first, use comma (",") to separate it from similar artist.<sbr />Use of <option>--reciprocal</option> is possible here, see <xref linkend="simadb" />.</para>
+                    <para>This option is useful in case you want to remove only a specific similarity between two artists, to remove completely an artist use <option>--remove_artist</option> instead.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- view artist -->
+                <term><option>-v <replaceable class="parameter">"artist name"</replaceable></option></term>
+                <term><option>--view_artist=<replaceable class="parameter">"artist name"</replaceable></option></term>
+                <listitem>
+                    <para>Get entries for <replaceable class="parameter">"artist name"</replaceable> in the data base (print to stdout).</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- view bl -->
+                <term><option>--view_bl</option></term>
+                <listitem>
+                    <para>Get all entries in the black list.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry> <!-- view all -->
+                <term><option>--view_all</option></term>
+                <listitem>
+                    <para>Get all entries in the data base (print to stdout).</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><option>-P <replaceable class="parameter">mpd_port</replaceable></option></term>
+                <term><option>--port=<replaceable class="parameter">mpd_port</replaceable></option></term>
+                <listitem>
+                    <para>Use the specific port number <replaceable>mpd_port</replaceable> on MPD server. This overrides <envar>MPD_PORT</envar> environment variable.<sbr />Default is <emphasis>6600</emphasis>.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><option>-S <replaceable class="parameter">mpd_host</replaceable></option></term>
+                <term><option>--host=<replaceable class="parameter">mpd_host</replaceable></option></term>
+                <listitem>
+                    <para>Use the specific host <replaceable>mpd_host</replaceable> as MPD server.<sbr /><replaceable>mpd_host</replaceable> can be an <acronym>IP</acronym> or a fully qualified domain name as long as your system can resolve it. This overrides <envar>MPD_HOST</envar> environment variable.<sbr />Default is <emphasis>localhost</emphasis>.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsect1>
+    <refsect1 id="files">
+        <title>FILES</title>
+        <variablelist>
+            <varlistentry>
+                <term><filename>${XDG_DATA_HOME}/mpd_sima/sima.db</filename></term>
+                <listitem>
+                    <para>SQLite DB file. Usually <envar>XDG_DATA_HOME</envar> is set to <filename>${HOME}/.local/share</filename>.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsect1>
+    <refsect1 id="simiformat">
+        <title>SIMILARITY FORMAT</title>
+        <para>The <replaceable class="parameter">similarity_string</replaceable> has to be formatted following a special pattern in order for simadb_cli to extract similarity relations between artists names. Usually a similarity entry is defined as a main artist, lets say <emphasis>main_art</emphasis>, followed by a list of similar artists which you want to be related to that <emphasis>main_art</emphasis>, each artist of that list with a specific similarity value, a match score, quantifying the similarity relation with the <emphasis>main_art</emphasis>. The match score value is an integer in [0 ,100] with 100 corresponding to a perfect match.</para>
+        <para><replaceable class="parameter">similarity_string</replaceable> is then to be formatted as follow:</para>
+        <para><command>main_art,first artist:&lt;score&gt;,second artist:&lt;score&gt;</command></para>
+        <para>Each artist group are separated with commas (",") and inside each group the artist name and the match score is colon (":") separated. Obviously the first artist group, as the main artist, does not have a match score.</para>
+        <para>Lets see how it works with an example. I consider "Led Zeppelin" to be similar to "Tool" with a match score of 25, I also want to have "Audioslave" related to "Led Zeppelin" with a score of 20. Then the <replaceable class="parameter">similarity_string</replaceable> will be the following:</para>
+        <para><command>Led Zeppelin,Tool:25,Audiosalve:20</command></para>
+        <para>See <xref linkend="simadb" /> for more details about how similarities are handled</para>
+    </refsect1>
+    <refsect1 id="simadb">
+        <title>A WORD ABOUT SIMA DATA BASE</title>
+        <para>The similarity database is defined from the point of view of a <emphasis>main artist</emphasis> which is declared related to a list of <emphasis>similar artists</emphasis>. That means when you define <emphasis>main_art</emphasis> to be similar to <emphasis>sim_art A</emphasis> and <emphasis>sim_art B</emphasis> the reciprocal won't be true, <emphasis>sim_art A</emphasis> and <emphasis>sim_art B</emphasis> are not similar to <emphasis>main_art</emphasis>. At least this is the default behavior when you edit entries with simadb_cli, this is also the way last.fm is working concerning similar artists. This documentation is using that particular terminology to specify which kind of artist we are dealing with : "main artist" or "similar artist".<sbr />The <option>--reciprocal</option> option allows one to add reciprocal relation where <emphasis>sim_art A</emphasis> and <emphasis>sim_art B</emphasis> become respectively the <emphasis>main_art</emphasis>. Using <option>--reciprocal</option> you will then edit two more entries in the database. To summarize here is what you'll end up with in your data base adding similarity with this string <command>main_art,sim_art A:34,sim_art B:45</command>.</para>
+        <para><command>simadb_cli --reciprocal --add_similarity=main_art,sim_art A:34,sim_art B:45</command></para>
+        <para>main_art similar to sim_art A:34 and sim_art B:45<sbr />sim_art A  similar to main_art:34<sbr />sim_art B  similar to main_art:45</para>
+        <para>Without the reciprocal option you would have add only the first similarity. Usually using the reciprocal option is the desired behavior, at least what users have in mind when thinking of similarity relation between to artists but keep in mind that it may lead to have MPD_sima more sensible to loop over the same two artist (ASSERTION TO BE CONFIRMED).</para>
+    </refsect1>
+    <!--
+    <refsect1 id="diagnostics">
+        <title>DIAGNOSTICS</title>
+        <para>The following diagnostics may be issued
+            on <filename class="devicefile">stderr</filename>:</para>
+        <variablelist>
+            <varlistentry>
+                <term><errortext>Bad configuration file. Exiting.</errortext></term>
+                <listitem>
+                    <para>The configuration file seems to contain a broken configuration
+                        line. Use the <option>-''-verbose</option> option, to get more info.
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <para><command>&dhpackage;</command> provides some return codes, that can
+            be used in scripts:</para>
+        <segmentedlist>
+            <segtitle>Code</segtitle>
+            <segtitle>Diagnostic</segtitle>
+            <seglistitem>
+                <seg><errorcode>0</errorcode></seg>
+                <seg>Program exited successfully.</seg>
+            </seglistitem>
+            <seglistitem>
+                <seg><errorcode>1</errorcode></seg>
+                <seg>The configuration file seems to be broken.</seg>
+            </seglistitem>
+        </segmentedlist>
+    </refsect1>
+    -->
+  <xi:include href="feedback.xml" />
+  <xi:include href="seealso.xml" />
+</refentry>
