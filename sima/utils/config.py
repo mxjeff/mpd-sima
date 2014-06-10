@@ -119,6 +119,8 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         ## INIT CALLS
         self.init_config()
         self.supersedes_config_with_cmd_line_options()
+        # generate dbfile
+        self.config['sima']['db_file'] = join(self.config['sima']['var_dir'], 'sima.db')
 
     def get_pw(self):
         try:
@@ -208,7 +210,6 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
 
         ## Sima sqlite DB
         self.config['sima']['var_dir'] = join(data_dir)
-        self.config['sima']['db_file'] = join(data_dir, 'sima.db')
 
         # If no conf file present, uses defaults
         if not isfile(self.conf_file):
