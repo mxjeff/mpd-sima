@@ -1,11 +1,13 @@
 sima v0.12.0
 
  * Major refactoring
+ * Add a setup.py, got rid of the Makefile.
  * Switched to Python3 (>=3.2)
  * Depends on requests (http client)
  * Depends on python-musicpd (py3k port of python-mpd)
-   configuration file changed
+   configuration file change
    internal database remains the same
+ * Temporarily removed userdb feature
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 
