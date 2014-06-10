@@ -44,7 +44,7 @@ setup(name='sima',
       packages=find_packages(),
       include_package_data=True,
       data_files=data_files,
-      #scripts=['mpd-sima'],
+      scripts=['simadb_cli'],
       entry_points={
           'console_scripts': ['mpd-sima = sima.launch:main',]
           },
