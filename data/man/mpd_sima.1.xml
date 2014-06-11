@@ -57,7 +57,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
   </refmeta>
   <refnamediv>
     <refname>&dhpackage;</refname>
-    <refpurpose>&dhpackage; will try to maintain some titles ahead in your play list following different policies.</refpurpose>
+    <refpurpose>&dhpackage; will try to maintain some titles ahead in the queue following different policies.</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <cmdsynopsis>
@@ -100,7 +100,9 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         command lines options are honored. For instance you can override
         default MPD_HOST set in defaults (localhost) or in your configuration
         file with <command>-S my_mpd_server</command> option. For default
-        configuration see <xref linkend="configuration"/>.</para>
+        configuration see <xref linkend="configuration"/>. See also environment
+        variables special case for MPD host and port in <xref linkend="environment"/>.
+    </para>
   </refsect1>
     <refsect1 id="example">
         <title>EXAMPLE</title>
@@ -167,11 +169,19 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <para>Verbosity in [debug,info,warning,error].<sbr />Default is to log info messages.</para>
             </listitem>
         </varlistentry>
-        <varlistentry>
+        <varlistentry><!-- config -->
             <term><option>-c <replaceable class="parameter">conf_file</replaceable></option></term>
             <term><option>--config=<replaceable class="parameter">conf_file</replaceable></option></term>
             <listitem>
-                <para>Use the specific file <replaceable>conf_file</replaceable> to set up configuration instead of looking for the default user configuration file.<sbr />Default is to look for <envar>$XDG_CONFIG_HOME/mpd_sima/mpd_sima.cfg</envar>.  Concerning this file see also <xref linkend="files"/>.<sbr />Pay attention: Because you load a specific configuration file from command line interface <emphasis>does not mean</emphasis> it will override others options pass to mpd_sima. In other words launching with <option>-P 6666</option> will override port setting whatever the configuration file your using, default or command line specified.</para>
+                <para>Use the specific file <replaceable>conf_file</replaceable> to set up
+                    configuration instead of looking for the default user
+                    configuration file.<sbr />Default is to look for
+                    <envar>$XDG_CONFIG_HOME/mpd_sima/mpd_sima.cfg</envar>.<sbr />
+                    CLI option overrides any equivalent mentioned in configuration file, ie. launching &dhutils; with '<option>--port</option>' CLI option will ignore port setting in configuration file.<sbr />
+                    For more details on configuration file cf.
+                    <citerefentry><refentrytitle>mpd_sima.cfg</refentrytitle>
+                <manvolnum>5</manvolnum></citerefentry>, see also <xref linkend="files"/>.<sbr />
+                   </para>
             </listitem>
         </varlistentry>
         <varlistentry> <!-- var_dir -->
@@ -244,7 +254,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                             this track is to be chosen among titles from
                             artists similar to the artist of the currently
                             played track. MPD_sima will add one track when the
-                            play list is one track long.</para>
+                            unplayed queue is one track long.</para>
                   <para>To change these defaults, use the configuration file <filename>mpd_sima.cfg</filename></para>
               </listitem>
           </varlistentry>

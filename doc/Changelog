@@ -8,6 +8,7 @@ sima v0.12.0
    configuration file change
    internal database remains the same
  * Temporarily removed userdb feature
+ * Base artist for similarity is the last track queued
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 

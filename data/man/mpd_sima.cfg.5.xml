@@ -57,8 +57,8 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
   </refmeta>
     <refnamediv>
         <refname>&dhutils;</refname>
-        <refpurpose>&dhpackage; will try to maintain some titles ahead in your play
-            list following different policies. This manual document the
+        <refpurpose>&dhpackage; will try to maintain some titles ahead in the queue
+            following different policies. This manual document the
             configuration file for &dhpackage;.</refpurpose>
     </refnamediv>
     <refsect1 id="description">
@@ -174,8 +174,8 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <varlistentry> <!-- sima.queue_length -->
                     <term><option>queue_length=</option><replaceable>1</replaceable></term>
                     <listitem>
-                        <para>This value triggers queue process if the play
-                            list length is less than specified
+                        <para>This value triggers queue process if the queue
+                            length is less than specified
                             queue_length.</para>
                     </listitem>
                 </varlistentry>
@@ -224,8 +224,8 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <varlistentry> <!-- crop.consume -->
                     <term><option>consume=</option><replaceable>0</replaceable></term>
                     <listitem>
-                        <para>How many played tracks to keep in the play list.
-                            Allow to maintain a fixed length play list.
+                        <para>How many played tracks to keep in the queue.
+                            Allow to maintain a fixed length queue.
                             Set to 0 to keep all played tracks.
                         </para>
                     </listitem>
@@ -341,7 +341,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
     <refsect1 id="queue_mode">
         <title>QUEUE MODES</title>
         <para>&dhpackage; offers different queue modes. All of them pick up
-            tracks from artists similar to the one currently played.</para>
+            tracks from artists similar to the last track in the queue.</para>
         <para>&dhpackage; tries preferably to chose among unplayed artists or
             at least not recently played artist. Concerning track and album
             queue modes titles are chosen purely at random among unplayed

@@ -2,12 +2,12 @@
 .\"     Title: mpd-sima
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 06/10/2014
+.\"      Date: 06/11/2014
 .\"    Manual: mpd-sima 0.12.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD\-SIMA" "1" "06/10/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
+.TH "MPD\-SIMA" "1" "06/11/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,7 +28,7 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-mpd-sima \- mpd\-sima will try to maintain some titles ahead in your play list following different policies\&.
+mpd-sima \- mpd\-sima will try to maintain some titles ahead in the queue following different policies\&.
 .SH "SYNOPSIS"
 .HP \w'\fBmpd\-sima\fR\ 'u
 \fBmpd\-sima\fR [\fB\-\-daemon\fR] [\fB\-\-config=\fR\fIconf_file\fR] [\fB\-\-var_dir=\fR\fIvar_directory\fR] [\fB\-\-pid=\fR\fIpid_file\fR] [\fB\-\-log=\fR\fIlog_file\fR] [\fB\-\-log\-level=\fR\fIlog_level\fR] [\fB\-\-host=\fR\fImpd_host\fR] [\fB\-\-mpd_port=\fR\fImpd_port\fR]
@@ -46,7 +46,8 @@ At start up default configuration is first overridden by user configuration in m
 the section called \(lqFILES\(rq) and finally command lines options are honored\&. For instance you can override default MPD_HOST set in defaults (localhost) or in your configuration file with
 \fB\-S\ \&my_mpd_server\fR
 option\&. For default configuration see
-the section called \(lqCONFIGURATION\(rq\&.
+the section called \(lqCONFIGURATION\(rq\&. See also environment variables special case for MPD host and port in
+the section called \(lqENVIRONMENT\(rq\&.
 .SH "EXAMPLE"
 .SS "Launch as a system service (d\(aemon)\&."
 .PP
@@ -122,14 +123,17 @@ Use the specific file
 to set up configuration instead of looking for the default user configuration file\&.
 .br
 Default is to look for
-\fB$XDG_CONFIG_HOME/mpd_sima/mpd_sima\&.cfg\fR\&. Concerning this file see also
+\fB$XDG_CONFIG_HOME/mpd_sima/mpd_sima\&.cfg\fR\&.
+.br
+
+CLI option overrides any equivalent mentioned in configuration file, ie\&. launching mpd\-sima with \*(Aq\fB\-\-port\fR\*(Aq CLI option will ignore port setting in configuration file\&.
+.br
+
+For more details on configuration file cf\&.
+\fBmpd_sima.cfg\fR(5), see also
 the section called \(lqFILES\(rq\&.
 .br
-Pay attention: Because you load a specific configuration file from command line interface
-\fIdoes not mean\fR
-it will override others options pass to mpd_sima\&. In other words launching with
-\fB\-P 6666\fR
-will override port setting whatever the configuration file your using, default or command line specified\&.
+
 .RE
 .PP
 \fB\-\-var_dir=\fR\fB\fIvar_directory\fR\fR
@@ -254,7 +258,7 @@ DEFAULTS
 .RS 4
 Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env\&. var\&. if set)\&.
 .sp
-The default behavior is to add one track, this track is to be chosen among titles from artists similar to the artist of the currently played track\&. MPD_sima will add one track when the play list is one track long\&.
+The default behavior is to add one track, this track is to be chosen among titles from artists similar to the artist of the currently played track\&. MPD_sima will add one track when the unplayed queue is one track long\&.
 .sp
 To change these defaults, use the configuration file
 mpd_sima\&.cfg

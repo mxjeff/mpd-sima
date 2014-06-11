@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 06/10/2014
+.\"      Date: 06/11/2014
 .\"    Manual: mpd-sima 0.12.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "06/10/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "06/11/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,7 +28,7 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-mpd_sima.cfg \- mpd\-sima will try to maintain some titles ahead in your play list following different policies\&. This manual document the configuration file for mpd\-sima\&.
+mpd_sima.cfg \- mpd\-sima will try to maintain some titles ahead in the queue following different policies\&. This manual document the configuration file for mpd\-sima\&.
 .SH "DESCRIPTION"
 .PP
 This manual page documents briefly
@@ -142,7 +142,7 @@ How far to look back in history to avoid to play twice the same track/title (dur
 .PP
 \fBqueue_length=\fR\fI1\fR
 .RS 4
-This value triggers queue process if the play list length is less than specified queue_length\&.
+This value triggers queue process if the queue length is less than specified queue_length\&.
 .RE
 .PP
 \fBuser_db=\fR\fIfalse\fR
@@ -192,7 +192,7 @@ crop plugin\*(Aqs configuration:
 .PP
 \fBconsume=\fR\fI0\fR
 .RS 4
-How many played tracks to keep in the play list\&. Allow to maintain a fixed length play list\&. Set to 0 to keep all played tracks\&.
+How many played tracks to keep in the queue\&. Allow to maintain a fixed length queue\&. Set to 0 to keep all played tracks\&.
 .RE
 .SS "RandomFallback section"
 .PP
@@ -315,7 +315,7 @@ If set to "false", caching is still done but in memory\&.
 .RE
 .SH "QUEUE MODES"
 .PP
-mpd\-sima offers different queue modes\&. All of them pick up tracks from artists similar to the one currently played\&.
+mpd\-sima offers different queue modes\&. All of them pick up tracks from artists similar to the last track in the queue\&.
 .PP
 mpd\-sima tries preferably to chose among unplayed artists or at least not recently played artist\&. Concerning track and album queue modes titles are chosen purely at random among unplayed tracks\&.
 .PP

@@ -176,18 +176,11 @@ class WebService(Plugin):
         """
         Retrieve similar artists from WebServive.
         """
-        if artist is None:
-            curr = self.player.current.__dict__
-            name = curr.get('artist')
-            mbid = curr.get('musicbrainz_artistid', None)
-            current = Artist(name=name, mbid=mbid)
-        else:
-            current = artist
         # initialize artists deque list to construct from DB
         as_art = deque()
-        as_artists = self.ws().get_similar(artist=current)
-        self.log.debug('Requesting {1} for "{0}"'.format(current,
-                        self.ws.name))
+        as_artists = self.ws().get_similar(artist=artist)
+        self.log.debug('Requesting {1} for "{0}"'.format(artist,
+                                                         self.ws.name))
         try:
             # TODO: let's propagate Artist type
             [as_art.append(str(art)) for art in as_artists]
@@ -202,14 +195,14 @@ class WebService(Plugin):
         history = deque(self.history)
         history.popleft()
         depth = 0
-        current = self.player.current
+        last_trk = self.player.playlist[-1]
         extra_arts = list()
         while depth < self.plugin_conf.getint('depth'):
             if len(history) == 0:
                 break
             trk = history.popleft()
             if (trk.get_artist() in extra_arts
-                or trk.get_artist() == current.get_artist()):
+                or trk.get_artist() == last_trk.get_artist()):
                 continue
             extra_arts.append(trk.get_artist())
             depth += 1
@@ -222,16 +215,17 @@ class WebService(Plugin):
             if not similar:
                 return ret_extra
             ret_extra.extend(self.get_artists_from_player(similar))
-            if current.artist in ret_extra:
-                ret_extra.remove(current.artist)
+            if last_trk.artist in ret_extra:
+                ret_extra.remove(last_trk.artist)
         return ret_extra
 
     def get_local_similar_artists(self):
         """Check against local player for similar artists
         """
-        current = self.player.current
-        self.log.info('Looking for artist similar to "{0.artist}"'.format(current))
-        similar = self.ws_similar_artists()
+        tolookfor = self.player.playlist[-1].get_artist()
+        self.log.info('Looking for artist similar '
+                      'to "{0.artist}"'.format(self.player.playlist[-1]))
+        similar = self.ws_similar_artists(tolookfor)
         if not similar:
             self.log.info('Got nothing from {0}!'.format(self.ws.name))
             return []
@@ -372,11 +366,11 @@ class WebService(Plugin):
 
     def callback_need_track(self):
         self._cleanup_cache()
-        if not self.player.current:
-            self.log.info('No current track, cannot queue')
+        if len(self.player.playlist) == 0:
+            self.log.info('No last track, cannot queue')
             return None
-        if not self.player.current.artist:
-            self.log.warning('No artist set for the current track')
+        if not self.player.playlist[-1].artist:
+            self.log.warning('No artist set for the last track in queue')
             self.log.debug(repr(self.player.current))
             return None
         self.queue_mode()
