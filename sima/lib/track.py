@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009, 2010, 2011, 2013 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
 # Copyright (c) 2009 J. Alexander Treuman (Tag collapse method)
 # Copyright (c) 2008 Rick van Hattem
 #
@@ -23,6 +23,7 @@
 
 import time
 
+from .meta import Artist
 
 class Track:
     """
@@ -32,6 +33,7 @@ class Track:
 
     def __init__(self, file=None, time=0, pos=-1, **kwargs):
         self.title = self.artist = self.album = self.albumartist = ''
+        self.musicbrainz_artistid = None
         self.pos = int(pos)
         self._empty = False
         self._file = file
@@ -123,6 +125,10 @@ class Track:
         else:
             fmt = '%M:%S'
         return time.strftime(fmt, temps)
+
+    def get_artist(self):
+       """Get artist object from track"""
+       return Artist(name=self.artist, mbid=self.musicbrainz_artistid)
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

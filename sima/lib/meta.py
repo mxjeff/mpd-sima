@@ -22,7 +22,6 @@ Defines some object to handle audio file metadata
 """
 
 from .simastr import SimaStr
-from .track import Track
 
 class MetaException(Exception):
     """Generic Meta Exception"""
@@ -108,15 +107,6 @@ class Artist(Meta):
                 return res
             else:
                 raise NotSameArtist('different mbids: {0} and {1}'.format(self, other))
-
-
-class TrackMB(Track):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if hasattr(self, 'musicbrainz_artistid'):
-            self.artist = Artist(mbid=self.musicbrainz_artistid,
-                                 name=self.artist)
 
 # vim: ai ts=4 sw=4 sts=4 expandtab
 

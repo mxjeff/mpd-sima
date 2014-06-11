@@ -208,17 +208,16 @@ class WebService(Plugin):
             if len(history) == 0:
                 break
             trk = history.popleft()
-            if (trk.artist in [trk.artist for trk in extra_arts]
-                or trk.artist == current.artist):
+            if (trk.get_artist() in extra_arts
+                or trk.get_artist() == current.get_artist()):
                 continue
-            extra_arts.append(trk)
+            extra_arts.append(trk.get_artist())
             depth += 1
         self.log.info('EXTRA ARTS: {}'.format(
-            '/'.join([trk.artist for trk in extra_arts])))
+            '/'.join([art.name for art in extra_arts])))
         for artist in extra_arts:
-            self.log.debug(
-                    'Looking for artist similar to "{0.artist}" as well'.format(
-                        artist))
+            self.log.debug('Looking for artist similar '
+                           'to "{}" as well'.format(artist))
             similar = self.ws_similar_artists(artist=artist)
             if not similar:
                 return ret_extra
