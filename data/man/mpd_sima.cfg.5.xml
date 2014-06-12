@@ -157,7 +157,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         </refsect2>
         <refsect2 id="sima">
             <title>sima section</title>
-            <para>This section allows you to tweak core &dhutils; configuration.</para>
+            <para>Core &dhutils; configuration.</para>
             <variablelist>
                 <varlistentry> <!-- SIMA -->
                     <term><option>[sima]</option></term>
@@ -266,7 +266,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         </refsect2>
         <refsect2 id="lastfm">
             <title>LastFm section</title>
-            <para>This section allows you to tweak LastFM plugin's configuration.</para>
+            <para>LastFM plugin's configuration.</para>
             <variablelist>
                 <varlistentry> <!-- lastfm -->
                     <term><option>[lastfm]</option></term>

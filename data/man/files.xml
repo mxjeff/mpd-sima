@@ -17,7 +17,7 @@
             <varlistentry>
                 <term><filename>${XDG_DATA_HOME}/mpd_sima/WEB_SERVICE/</filename></term>
                 <listitem>
-                    <para>Persistant http cache.</para>
+                    <para>Persistent http cache.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
