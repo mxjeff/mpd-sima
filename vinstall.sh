@@ -53,7 +53,7 @@ EOF
 chmod +x $SIMA_VLAUNCHER
 
 echo Cleaning up
-rm -rf $(dirnddame $0)/dist
+rm -rf $(dirname $0)/dist
 rm -rf $(dirname $0)/build
 rm -rf $(dirname $0)/sima.egg-info
 

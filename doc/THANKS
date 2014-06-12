@@ -1,0 +1,24 @@
+THANKS
+
+ * Mathieu (a.k.a. MuLiMa), for the projet mpd_dynamic_playlister, initial
+   inspiration of MPD_sima.
+   http://forum.ubuntu-fr.org/viewtopic.php?id=146141
+
+ * MsieurHappy for Arch GNU/Linux AUR packaging
+
+ * Debian and Music Player Daemon projects, vim and you all FLOSS lovers ;)
+
+ * Black Stripes for ideas, suggestions and tests
+
+ * My little Twisted Witch
+
+ * People from programmation@chat.jabberfr.org for help and advices.
+   Jabber community for getting me into python, thanks elghinn ;).
+
+ * Tool, Peach, Red Snapper, EZ3kiel […], well Music I was listening to coding mpd_sima
+
+ * Thanks for reviews and patch
+	MsieurHappy, YDB and Paco for help provided to debug the unicode issue #742
+	Artur Frysiak (patch for #2796)
+
+ * People i forgot :)

@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+DESCRIPTION:
+    List expired entries of sima's internal http cache.
+
+    Use SIMA_VARDIR env. var to override default location.
+
+    SIMA_VARDIR="/var/lib/mpd-sima/http/LastFM/" ./list_expired_cache
+
+    Default location: $XDG_DATA_HOME/http/LastFM/
+    $XDG_DATA_HOME usually expands to $HOME/.local/share/
+
+HELP:
+    Run  script with "-h" CLI option for info on defaults.
+"""
+
+import email.utils
+import calendar
+import time
+import sys
+
+from hashlib import md5
+from os import environ
+from os.path import join as pjoin
+
+import sima.lib.cache
+
+SERVICE = ('EchoNest', 'LastFM')
+
+def parse_cache_control(headers):
+    """
+    Parse the cache control headers returning a dictionary with values
+    for the different directives.
+    """
+    retval = {}
+    # requests provides a CaseInsensitiveDict as headers
+    cc_header = 'cache-control'
+    if cc_header in headers:
+        parts = headers[cc_header].split(',')
+        parts_with_args = [
+            tuple([x.strip().lower() for x in part.split("=", 1)])
+            for part in parts if -1 != part.find("=")]
+        parts_wo_args = [(name.strip().lower(), 1)
+                         for name in parts if -1 == name.find("=")]
+        retval = dict(parts_with_args + parts_wo_args)
+    return retval
+
+def encode(val):
+    """encode url to hash table key"""
+    return md5(val.encode('utf-8')).hexdigest()
+
+
+homedir = environ.get('HOME')
+xdh = environ.get('XDG_DATA_HOME', pjoin(homedir, '.local/share/'))
+default_cache = pjoin(xdh, 'mpd_sima/http/', SERVICE[1])
+cache = environ.get('SIMA_VARDIR', default_cache)
+
+if len(sys.argv) > 1:
+    local_var = 'DEFAULTS\n\tXDG_DATA_HOME={0}\n\n\tWill use: {1}\n'.format(xdh, cache)
+    print(__doc__.split('HELP')[0]+local_var)
+    sys.exit(0)
+
+# use SIMA_VARDIR to override default XDG_DATA_HOME
+cache_obj = sima.lib.cache.FileCache(environ.get('SIMA_VARDIR', cache))
+
+for elem in cache_obj:
+    now = time.time()
+    date = calendar.timegm(email.utils.parsedate_tz(elem.headers.get('Date')))
+    current_age = max(0, now - date)
+    cc = parse_cache_control(elem.headers)
+    # determine freshness
+    freshness_lifetime = 0
+    if 'max-age' in cc and cc['max-age'].isdigit():
+        freshness_lifetime = int(cc['max-age'])
+    elif 'expires' in elem.headers:
+        expires = email.utils.parsedate_tz(elem.headers['expires'])
+        if expires is not None:
+            expire_time = calendar.timegm(expires) - date
+            freshness_lifetime = max(0, expire_time)
+
+    # see how fresh we actually are
+    fresh = (freshness_lifetime > current_age)
+
+    if fresh:
+        continue
+    else:
+        #print(elem.url)
+        pass
+    # we're not fresh. If we don't have an Etag, clear it out
+    if 'etag' not in elem.headers:
+        #print('no etag and expired')
+        print(pjoin(cache, encode(elem.url)))
+
+
+# VIM MODLINE
+# vim: ai ts=4 sw=4 sts=4 expandtab

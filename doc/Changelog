@@ -9,6 +9,7 @@ sima v0.12.0
    internal database remains the same
  * Temporarily removed userdb feature
  * Base artist for similarity is the last track queued
+ * Persistent http caching
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 
