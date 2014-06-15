@@ -79,15 +79,13 @@ def start(sopt, restart=False):
     # set logger
     verbosity = sopt.options.get('verbosity', 'warning')
     logfile = sopt.options.get('logfile', None)
-    cli_loglevel = getattr(logging, verbosity.upper())
-    set_logger(level=verbosity, logfile=logfile)
-    logger = logging.getLogger('sima')
-    logger.setLevel(cli_loglevel)
+    set_logger(verbosity, logfile)
     # loads configuration
-    config = ConfMan(logger, sopt.options).config
-    logger.setLevel(getattr(logging,
-                    config.get('log', 'verbosity').upper()))  # pylint: disable=E1103
-
+    config = ConfMan(sopt.options).config
+    logfile = config.get('log', 'logfile')
+    verbosity = config.get('log', 'verbosity')
+    set_logger(verbosity, logfile)
+    logger = logging.getLogger('sima')
     logger.debug('Command line say: {0}'.format(sopt.options))
     # Create Database
     db_file = config.get('sima', 'db_file')

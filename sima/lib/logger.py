@@ -50,13 +50,14 @@ class LevelFilter(logging.Filter):# Logging facility
         return record.levelno <= self.level
 
 
-def set_logger(level='info', logfile=None, name='sima'):
+def set_logger(level='info', logfile=None):
     """
     logger:
         level: in debug, info, warning,…
-        file: provides to log to file
+        logfile: file to log to
 
     """
+    name = 'sima'
     user_log_level = getattr(logging, level.upper())
     if user_log_level > logging.DEBUG:
         log_format = LOG_FORMATS.get(logging.INFO)
@@ -65,22 +66,34 @@ def set_logger(level='info', logfile=None, name='sima'):
     logg = logging.getLogger(name)
     formatter = logging.Formatter(log_format, DATE_FMT, '{')
     logg.setLevel(user_log_level)
+    filehdl = False
+    if logg.handlers:
+        for hdl in logg.handlers:
+            hdl.setFormatter(formatter)
+            if isinstance(hdl, logging.FileHandler):
+                filehdl = True
+            else:
+                logg.removeHandler(hdl)
+
     if logfile:
+        if filehdl:
+            logg.handlers = []
         # create file handler
         fileh = logging.FileHandler(logfile)
         #fileh.setLevel(user_log_level)
         fileh.setFormatter(formatter)
-        if not logg.hasHandlers():
-            logg.addHandler(fileh)
+        logg.addHandler(fileh)
     else:
-        if not logg.hasHandlers():
-            # create console handler with a specified log level (STDOUT)
-            couth = logging.StreamHandler(sys.stdout)
-            #couth.setLevel(user_log_level)
-            couth.addFilter(LevelFilter(logging.WARNING))
+        if filehdl:
+            logg.info('Not changing logging handlers, only updating formatter')
+            return
+        # create console handler with a specified log level (STDOUT)
+        couth = logging.StreamHandler(sys.stdout)
+        #couth.setLevel(user_log_level)
+        couth.addFilter(LevelFilter(logging.WARNING))
 
-            # create console handler with warning log level (STDERR)
-            cerrh = logging.StreamHandler(sys.stderr)
+        # create console handler with warning log level (STDERR)
+        cerrh = logging.StreamHandler(sys.stderr)
         #cerrh.setLevel(logging.WARNING)
         cerrh.setLevel(logging.ERROR)
 

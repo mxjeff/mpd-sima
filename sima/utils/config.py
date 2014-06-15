@@ -25,6 +25,7 @@ Parse configuration file and set defaults for missing options.
 
 # IMPORTS
 import configparser
+import logging
 import sys
 
 from configparser import Error
@@ -105,8 +106,8 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         * command line options (overrides previous)
     """
 
-    def __init__(self, logger, options=None):
-        self.log = logger
+    def __init__(self, options=None):
+        self.log = logging.getLogger('sima')
         # options settings priority:
         # defauts < env. var. < conf. file < command line
         self.conf_file = options.get('conf_file')
@@ -121,20 +122,6 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         self.supersedes_config_with_cmd_line_options()
         # generate dbfile
         self.config['sima']['db_file'] = join(self.config['sima']['var_dir'], 'sima.db')
-
-    def get_pw(self):
-        try:
-            self.config.getboolean('MPD', 'password')
-            self.log.debug('No password set, proceeding without ' +
-                           'authentication...')
-            return None
-        except ValueError:
-            # ValueError if password not a boolean, hence an actual password.
-            pwd = self.config.get('MPD', 'password')
-            if not pwd:
-                self.log.debug('Password set as an empty string.')
-                return None
-            return pwd
 
     def control_mod(self):
         """
