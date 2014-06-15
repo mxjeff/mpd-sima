@@ -129,8 +129,8 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
             </variablelist>
         </refsect2>
         <refsect2 id="log">
-            <para>Configure logging.</para>
             <title>log section</title>
+            <para>Configure logging.</para>
             <variablelist>
                 <varlistentry> <!-- LOG -->
                     <term><option>[log]</option></term>
@@ -151,6 +151,28 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                             <replaceable>info</replaceable>,
                             <replaceable>warning</replaceable>,
                             <replaceable>error</replaceable>.</para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </refsect2>
+        <refsect2 id="daemon">
+            <title>Process daemonization</title>
+            <para>Configure process daemon.</para>
+            <variablelist>
+                <varlistentry> <!-- DAEMON -->
+                    <term><option>[daemon]</option></term>
+                    <listitem><para></para></listitem>
+                </varlistentry>
+                <varlistentry> <!-- daemon.daemon -->
+                    <term><option>daemon=false</option></term>
+                    <listitem>
+                        <para>whether to daemonize process or not.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry> <!-- daemon.pidfile -->
+                    <term><option>pidfile=</option></term>
+                    <listitem>
+                        <para>Where to store process ID.</para>
                     </listitem>
                 </varlistentry>
             </variablelist>

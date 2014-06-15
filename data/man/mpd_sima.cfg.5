@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 06/12/2014
+.\"      Date: 06/16/2014
 .\"    Manual: mpd-sima 0.12.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "06/12/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "06/16/2014" "mpd-sima" "mpd-sima 0.12.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -126,6 +126,23 @@ Logging verbosity among
 \fIinfo\fR,
 \fIwarning\fR,
 \fIerror\fR\&.
+.RE
+.SS "Process daemonization"
+.PP
+Configure process daemon\&.
+.PP
+\fB[daemon]\fR
+.RS 4
+.RE
+.PP
+\fBdaemon=false\fR
+.RS 4
+whether to daemonize process or not\&.
+.RE
+.PP
+\fBpidfile=\fR
+.RS 4
+Where to store process ID\&.
 .RE
 .SS "sima section"
 .PP
