@@ -71,7 +71,7 @@ class RandomFallBack(Plugin):
         return trks
 
     def get_trk(self):
-        """Get a single track acording to random flavour
+        """Get a single track according to random flavour
         """
         trk = None
         art = None
