@@ -29,10 +29,10 @@ mpd_sima_html:
 	xmllint --xinclude --nowarning --noent mpd_sima.1.xml | $(XP) $(HXSL) - > ./mpd_sima.1.html
 
 simadb_cli_html:
-	$(XP) $(HXSL) simadb_cli.1.xml > ./simadb_cli.1.html
+	xmllint --xinclude --nowarning --noent simadb_cli.1.xml | $(XP) $(HXSL) - > ./simadb_cli.1.html
 
 mpd_sima.cfg_html:
-	$(XP) $(HXSL) mpd_sima.cfg.5.xml > ./mpd_sima.cfg.5.html
+	xmllint --xinclude --nowarning --noent mpd_sima.cfg.5.xml | $(XP) $(HXSL) - > ./mpd_sima.cfg.5.html
 
 man: simadb_cli mpd_sima mpd_sima.cfg
 
