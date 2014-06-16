@@ -1,9 +1,9 @@
-Design for python >= 3.3
+MPD_sima Automagically add titles to MPD playlist.
 
-Requires: python-musicpd >= 0.4.0 [0],
-          requests >= 2.2.0 [1]
+MPD_Sima is a Python script meant to feed your MPD's queue with tracks from
+artists similar to your currently playing track, provided that these artists
+are found in MPD library. Similar artists are fetched from last.fm.  MPD_sima
+can queue track, top track or whole album for similar artists.
 
-	[0] http://media.kaliko.me/src/musicpd/
-	[1] http://docs.python-requests.org/
-
-
+This client allows you to never run out of music when your playlist queue is
+getting short.

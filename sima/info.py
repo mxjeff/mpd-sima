@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-sima is a Python application meant to feed your MPD playlist with tracks
+MPD_sima is a Python application meant to feed your MPD playlist with tracks
 from artists similar to your currently playing track, provided that these
 artists are found in MPD library. Similar artists are fetched from last.fm.
 
-sima can queue track, top track or whole album for similar artists.
+MPD_sima can queue track, top track or whole album for similar artists.
 
 This client allows you to never run out of music when your playlist
 queue is getting short.
