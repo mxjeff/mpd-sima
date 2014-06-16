@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+#
+#  This file is part of sima
+#
+#  sima is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  sima is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with sima.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+"""
+    Deal with MPD options ‑ idle and repeat mode
+"""
+
+# standard library import
+from os import  getpid
+from socket import getfqdn
+
+# third parties components
+
+# local import
+from ...lib.plugin import Plugin
+
+
+class Uniq(Plugin):
+    """
+    Publish presence on the MPD host message bus
+    """
+
+    def __init__(self, daemon):
+        Plugin.__init__(self, daemon)
+        self.capable = False
+        self.chan = 'mpd_sima:{0}.{1}'.format(getfqdn(), getpid())
+        self.channels = []
+        self.uniq = True
+        self.is_capable()
+        if not self.capable:
+            return
+        self.is_uniq()
+        self.sub_chan()
+
+    def is_capable(self):
+        if 'channels' in self.player.commands():
+            self.capable = True
+            return
+        self.log.warning('MPD does not provide client to client')
+
+    def get_channels(self):
+        return [chan for chan in self.player.channels() if
+                chan.startswith('mpd_sima') and chan != self.chan]
+
+    def is_uniq(self):
+        channels = self.get_channels()
+        if channels:
+            self.log.warning('Another instance is queueing on this MPD host')
+            self.log.warning(' '.join(channels))
+            self.uniq = False
+
+    def sub_chan(self):
+        self.log.debug('Registering as {}'.format(self.chan))
+        self.player.subscribe(self.chan)
+
+    def callback_need_track(self):
+        if self.capable:
+            self.is_uniq()
+
+
+# VIM MODLINE
+# vim: ai ts=4 sw=4 sts=4 expandtab

@@ -26,8 +26,8 @@ class Plugin:
     First non-empty line of the docstring is used as description
     Rest of the docstring at your convenience.
 
-    The plugin Name MUST be the same as the module (file name), case
-    insensitive: for instance plugin.py → Plugin
+    The lowercased plugin Name MUST be the same as the module (file name),
+    for instance Plugin → plugin.py
     It eases plugins discovery and simplifies the code to handle them,
     IMHO, it's a fair trade-off.
     """

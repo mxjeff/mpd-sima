@@ -41,6 +41,7 @@ from .utils.utils import exception_log, SigHup
  # core plugins
 from .plugins.core.history import History
 from .plugins.core.mpdoptions import MpdOptions
+from .plugins.core.uniq import Uniq
 ##
 
 
@@ -102,8 +103,10 @@ def start(sopt, restart=False):
     sima = core.Sima(config)
 
     # required core plugins
-    sima.register_plugin(History)
-    sima.register_plugin(MpdOptions)
+    core_plugins = [History, MpdOptions, Uniq]
+    for cplgn in core_plugins:
+        logger.debug('Register core {name} ({doc})'.format(**cplgn.info()))
+        sima.register_plugin(cplgn)
 
     #  Loading internal plugins
     load_plugins(sima, 'internal')

@@ -46,6 +46,7 @@ class Sima(Daemon):
         self.plugins = list()
         self.player = self.__get_player()  # Player client
         try:
+            self.log.info('Connecting MPD: {0}:{1}'.format(*self.player._mpd))
             self.player.connect()
         except (PlayerError, PlayerUnHandledError) as err:
             self.log.warning('Player: {}'.format(err))
@@ -63,7 +64,7 @@ class Sima(Daemon):
         self.short_history.appendleft(self.player.current)
 
     def register_plugin(self, plugin_class):
-        """Registers plubin in Sima instance..."""
+        """Registers plugin in Sima instance..."""
         self.plugins.append(plugin_class(self))
 
     def foreach_plugin(self, method, *args, **kwds):
@@ -130,8 +131,8 @@ class Sima(Daemon):
         """General shutdown method
         """
         self.log.warning('Starting shutdown.')
-        self.player.disconnect()
         self.foreach_plugin('shutdown')
+        self.player.disconnect()
 
         self.log.info('The way is shut, it was made by those who are dead. '
                       'And the dead keep it…')
