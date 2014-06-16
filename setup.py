@@ -28,7 +28,7 @@ classifiers = [
         "Programming Language :: Python :: 3",
         ]
 
-setup(name='sima',
+setup(name='MPD_sima',
       version=VERSION,
       download_url='http://kaliko.me/media/src/sima/releases/',
       url='http://kaliko.me/code/mpd-sima',
