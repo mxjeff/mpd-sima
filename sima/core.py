@@ -123,14 +123,18 @@ class Sima(Daemon):
 
     def hup_handler(self, signum, frame):
         self.log.warning('Caught a sighup!')
-        self.player.disconnect()
+        # Cleaning pending command
+        self.player.clean()
         self.foreach_plugin('shutdown')
+        self.player.disconnect()
         raise SigHup('SIGHUP caught!')
 
     def shutdown(self):
         """General shutdown method
         """
         self.log.warning('Starting shutdown.')
+        # Cleaning pending command
+        self.player.clean()
         self.foreach_plugin('shutdown')
         self.player.disconnect()
 

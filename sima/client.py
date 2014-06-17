@@ -288,9 +288,9 @@ class PlayerClient(Player):
     def monitor(self):
         curr = self.current
         try:
-            self._client.send_idle('database', 'playlist', 'player', 'options')
+            self.send_idle('database', 'playlist', 'player', 'options')
             select([self._client], [], [], 60)
-            ret = self._client.fetch_idle()
+            ret = self.fetch_idle()
             if self.__skipped_track(curr):
                 ret.append('skipped')
             if 'database' in ret:
@@ -298,6 +298,14 @@ class PlayerClient(Player):
             return ret
         except (MPDError, IOError) as err:
             raise PlayerError("Couldn't init idle: %s" % err)
+
+    def clean(self):
+        """Clean blocking event (idle) and pending commands
+        """
+        if 'idle' in self._client._pending:
+            self._client.noidle()
+        elif self._client._pending:
+            self.log.warning('pending commands: {}'.format(self._client._pending))
 
     def remove(self, position=0):
         self._client.delete(position)

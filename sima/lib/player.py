@@ -57,6 +57,10 @@ class Player(object):
         """
         raise NotImplementedError
 
+    def clean(self):
+        """Any cleanup necessary"""
+        pass
+
     def remove(self, position=0):
         """Removes the oldest element of the playlist (index 0)
         """
