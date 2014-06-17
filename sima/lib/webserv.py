@@ -195,6 +195,8 @@ class WebService(Plugin):
         history = deque(self.history)
         history.popleft()
         depth = 0
+        if not self.player.playlist:
+            return ret_extra
         last_trk = self.player.playlist[-1]
         extra_arts = list()
         while depth < self.plugin_conf.getint('depth'):
@@ -222,6 +224,8 @@ class WebService(Plugin):
     def get_local_similar_artists(self):
         """Check against local player for similar artists
         """
+        if not self.player.playlist:
+            return []
         tolookfor = self.player.playlist[-1].get_artist()
         self.log.info('Looking for artist similar '
                       'to "{0.artist}"'.format(self.player.playlist[-1]))
