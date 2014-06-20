@@ -28,8 +28,8 @@ import sys
 
 
 LOG_FORMATS = {
-        logging.DEBUG: '{asctime} {filename: >11}:{lineno: <3} {levelname: <7}: {message}',
-        logging.INFO:  '{asctime} {levelname: <7}: {message}',
+        logging.DEBUG: '[{process}]{filename: >11}:{lineno: <3} {levelname: <7}: {message}',
+        logging.INFO:  '{levelname: <7}: {message}',
         #logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) '
                                  #'{levelname}: {message}',
         }
@@ -78,6 +78,9 @@ def set_logger(level='info', logfile=None):
     if logfile:
         if filehdl:
             logg.handlers = []
+        # Add timestamp for file handler
+        log_format = '{0} {1}'.format('{asctime}', log_format)
+        formatter = logging.Formatter(log_format, DATE_FMT, '{')
         # create file handler
         fileh = logging.FileHandler(logfile)
         #fileh.setLevel(user_log_level)

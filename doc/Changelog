@@ -2,7 +2,8 @@ MPD_sima v0.12.1
 
  * Fixed SIGHUP error, need python-musicpd >= 0.4.1
  * Add core plugin to detect multiple MPD_sima instance on the same MPD host
- * fixed startup robustness
+ * Fixed startup robustness
+ * Removed timestamp in console logging
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 
