@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2014 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -18,7 +18,9 @@
 #
 #
 """
-    Deal with MPD options ‑ idle and repeat mode
+    Publish presence on the MPD host message bus
+
+    Notifies when concurrent instance run on the same host.
 """
 
 # standard library import
@@ -38,21 +40,20 @@ class Uniq(Plugin):
 
     def __init__(self, daemon):
         Plugin.__init__(self, daemon)
-        self.capable = False
         self.chan = 'mpd_sima:{0}.{1}'.format(getfqdn(), getpid())
         self.channels = []
         self.uniq = True
-        self.is_capable()
-        if not self.capable:
+
+    def start(self):
+        if not self.is_capable():
+            self.log.warning('MPD does not provide client to client')
             return
         self.is_uniq()
         self.sub_chan()
 
     def is_capable(self):
         if 'channels' in self.player.commands():
-            self.capable = True
-            return
-        self.log.warning('MPD does not provide client to client')
+            return True
 
     def get_channels(self):
         return [chan for chan in self.player.channels() if
@@ -70,7 +71,7 @@ class Uniq(Plugin):
         self.player.subscribe(self.chan)
 
     def callback_need_track(self):
-        if self.capable:
+        if self.is_capable():
             self.is_uniq()
 
 

@@ -113,6 +113,7 @@ def start(sopt, restart=False):
 
     #  Loading contrib plugins
     load_plugins(sima, 'contrib')
+
     # Run as a daemon
     if config.getboolean('daemon', 'daemon'):
         if restart:

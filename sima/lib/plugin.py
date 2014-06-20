@@ -64,6 +64,13 @@ class Plugin:
         #    self.log.debug('Got config for {0}: {1}'.format(self,
         #                                                    self.plugin_conf))
 
+    def start(self):
+        """
+        Called when the daemon().run() is called.
+        ie. right after the player has connected successfully.
+        """
+        pass
+
     def callback_player(self):
         """
         Called on player changes, stopped, paused, skipped

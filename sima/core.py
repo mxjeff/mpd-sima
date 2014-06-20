@@ -45,11 +45,6 @@ class Sima(Daemon):
         self.log = getLogger('sima')
         self.plugins = list()
         self.player = self.__get_player()  # Player client
-        try:
-            self.log.info('Connecting MPD: {0}:{1}'.format(*self.player._mpd))
-            self.player.connect()
-        except (PlayerError, PlayerUnHandledError) as err:
-            self.log.warning('Player: {}'.format(err))
         self.short_history = deque(maxlen=60)
 
     def __get_player(self):
@@ -113,13 +108,15 @@ class Sima(Daemon):
             time.sleep(tmp)
             try:
                 self.player.connect()
-            except PlayerError:
+            except PlayerError as err:
+                self.log.debug(err)
                 continue
             except PlayerUnHandledError as err:
                 #TODO: unhandled Player exceptions
                 self.log.warning('Unhandled player exception: %s' % err)
             self.log.info('Got reconnected')
             break
+        self.foreach_plugin('start')
 
     def hup_handler(self, signum, frame):
         self.log.warning('Caught a sighup!')
@@ -145,6 +142,13 @@ class Sima(Daemon):
     def run(self):
         """
         """
+        try:
+            self.log.info('Connecting MPD: {0}:{1}'.format(*self.player._mpd))
+            self.player.connect()
+        except (PlayerError, PlayerUnHandledError) as err:
+            self.log.warning('Player: {}'.format(err))
+            self.reconnect_player()
+        self.foreach_plugin('start')
         while 42:
             try:
                 self.loop()

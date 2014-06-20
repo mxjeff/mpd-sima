@@ -96,7 +96,7 @@ class PlayerClient(Player):
     TODO: handle exception in command not going through _client_wrapper() (ie.
           remove…)
     """
-    database = None  # sima database (history, blaclist)
+    database = None  # sima database (history, blacklist)
 
     def __init__(self, host="localhost", port="6600", password=None):
         super().__init__()
@@ -308,7 +308,7 @@ class PlayerClient(Player):
             self.log.warning('pending commands: {}'.format(self._client._pending))
 
     def remove(self, position=0):
-        self._client.delete(position)
+        self.delete(position)
 
     def add(self, track):
         """Overriding MPD's add method to accept add signature with a Track
@@ -321,7 +321,7 @@ class PlayerClient(Player):
 
     @property
     def state(self):
-        return str(self._client.status().get('state'))
+        return str(self.status().get('state'))
 
     @property
     def current(self):
