@@ -66,8 +66,8 @@ class Plugin:
 
     def start(self):
         """
-        Called when the daemon().run() is called.
-        ie. right after the player has connected successfully.
+        Called when the daemon().run() is called and
+        right after the player has connected successfully.
         """
         pass
 
