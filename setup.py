@@ -47,6 +47,7 @@ setup(name='MPD_sima',
       entry_points={
           'console_scripts': ['mpd-sima = sima.launch:main',]
           },
+       test_suite="tests",
 )
 
 # VIM MODLINE

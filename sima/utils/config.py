@@ -29,8 +29,8 @@ import logging
 import sys
 
 from configparser import Error
-from os import (makedirs, environ, stat, chmod)
-from os.path import (join, isdir, isfile)
+from os import (access, makedirs, environ, stat, chmod, W_OK, R_OK)
+from os.path import (join, isdir, isfile, dirname, exists)
 from stat import (S_IMODE, ST_MODE, S_IRWXO, S_IRWXG)
 
 from . import utils
@@ -120,8 +120,30 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         ## INIT CALLS
         self.init_config()
         self.supersedes_config_with_cmd_line_options()
+        # Controls files access
+        self.control_facc()
         # generate dbfile
         self.config['sima']['db_file'] = join(self.config['sima']['var_dir'], 'sima.db')
+
+    def control_facc(self):
+        """TODO: redundant with startopt cli args controls
+        """
+        ok = True
+        for ftochk in [self.config['log']['logfile'],
+                self.config['daemon']['pidfile'],]:
+            if not exists(ftochk):
+                # Is parent directory writable then
+                filedir = dirname(ftochk)
+                if not access(filedir, W_OK):
+                    self.log.critical('no write access to "{0}"'.format(filedir))
+                    ok = False
+            else:
+                if not access(ftochk, W_OK):
+                    self.log.critical('no write access to "{0}"'.format(ftochk))
+                    ok = False
+        if not ok:
+            sys.exit(2)
+
 
     def control_mod(self):
         """
