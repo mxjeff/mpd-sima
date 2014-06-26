@@ -1,7 +1,9 @@
 MPD_sima v0.12.2
 
  * Add some randomness to track selection
+ * Do not queue artist already queued (regression)
  * …
+
 -- kaliko jack <kaliko@azylum.org>  UNRELEASED
 
 

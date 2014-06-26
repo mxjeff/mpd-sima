@@ -236,18 +236,22 @@ class WebService(Plugin):
         self.log.info('First five similar artist(s): {}...'.format(
                       ' / '.join([a for a in list(similar)[0:5]])))
         self.log.info('Looking availability in music library')
-        ret = self.get_artists_from_player(similar)
+        ret = set(self.get_artists_from_player(similar))
         ret_extra = None
         if len(self.history) >= 2:
             if self.plugin_conf.getint('depth') > 1:
                 ret_extra = self.get_recursive_similar_artist()
         if ret_extra:
-            ret = list(set(ret) | set(ret_extra))
+            ret = set(ret) | set(ret_extra)
         if not ret:
             self.log.warning('Got nothing from music library.')
             self.log.warning('Try running in debug mode to guess why...')
             return []
         self.log.info('Got {} artists in library'.format(len(ret)))
+        queued_artists = { trk.artist for trk in self.player.queue }
+        if ret & queued_artists:
+            self.log.debug('Removing already queued artist: {0}'.format(ret & queued_artists))
+            ret = list(ret - queued_artists)
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         return self._get_artists_list_reorg(ret)
