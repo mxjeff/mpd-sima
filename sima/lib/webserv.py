@@ -326,6 +326,7 @@ class WebService(Plugin):
                 self.log.info('{0.name} ratelimit: {0.ratelimit}'.format(self.ws))
             for trk in titles:
                 found = self.player.fuzzy_find_track(artist.name, trk.title)
+                random.shuffle(found)
                 if found:
                     self.log.debug('{0}'.format(found[0]))
                     if self.filter_track(found):
@@ -340,6 +341,7 @@ class WebService(Plugin):
             self.log.debug('Trying to find titles to add for "{}"'.format(
                            artist))
             found = self.player.find_track(artist)
+            random.shuffle(found)
             if not found:
                 self.log.debug('Found nothing to queue for {0}'.format(artist))
                 continue
