@@ -1,3 +1,10 @@
+MPD_sima v0.12.2
+
+ * Add some randomness to track selection
+ * …
+-- kaliko jack <kaliko@azylum.org>  UNRELEASED
+
+
 MPD_sima v0.12.1
 
  * Fixed SIGHUP error, need python-musicpd >= 0.4.1
@@ -6,6 +13,7 @@ MPD_sima v0.12.1
  * Removed timestamp in console logging
 
 -- kaliko jack <kaliko@azylum.org>  Sat, 21 Jun 2014 14:02:17 +0200
+
 
 MPD_sima v0.12.0
 
