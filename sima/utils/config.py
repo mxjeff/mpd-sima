@@ -129,21 +129,22 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         """TODO: redundant with startopt cli args controls
         """
         ok = True
-        for ftochk in [self.config['log']['logfile'],
-                self.config['daemon']['pidfile'],]:
+        for op, ftochk in [('log', self.config['log']['logfile']),
+                           ('pidfile', self.config['daemon']['pidfile']),]:
+            if not ftochk:
+                continue
             if not exists(ftochk):
                 # Is parent directory writable then
                 filedir = dirname(ftochk)
                 if not access(filedir, W_OK):
-                    self.log.critical('no write access to "{0}"'.format(filedir))
+                    self.log.critical('no write access to "{0}" ({1})'.format(filedir, op))
                     ok = False
             else:
                 if not access(ftochk, W_OK):
-                    self.log.critical('no write access to "{0}"'.format(ftochk))
+                    self.log.critical('no write access to "{0}" ({1}))'.format(ftochk, op))
                     ok = False
         if not ok:
             sys.exit(2)
-
 
     def control_mod(self):
         """
