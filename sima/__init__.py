@@ -13,7 +13,7 @@ ECH = {'apikey': 'WlRKQkhTS0JHWFVDUEZZRFA',
        'version': 'v4',
        }
 
-WAIT_BETWEEN_REQUESTS = timedelta(0, 2)
+WAIT_BETWEEN_REQUESTS = timedelta(days=0, seconds=2)
 SOCKET_TIMEOUT = 6
 
 # vim: ai ts=4 sw=4 sts=4 expandtab

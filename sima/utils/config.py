@@ -214,8 +214,8 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
                 chmod(conf_dir, 0o700)
             self.conf_file = join(conf_dir, CONF_FILE)
         else:
-            self.log.error('Can\'t find a suitable location for config folder (XDG_CONFIG_HOME)')
-            self.log.error('Please use "--config" to locate the conf file')
+            self.log.critical('Can\'t find a suitable location for config folder (XDG_CONFIG_HOME)')
+            self.log.critical('Please use "--config" to locate the conf file')
             sys.exit(1)
 
         ## Sima sqlite DB
