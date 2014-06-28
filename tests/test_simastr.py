@@ -25,6 +25,10 @@ class TestSequenceFunctions(unittest.TestCase):
                     'Desert Sessions And PJ Harvey',
                     self.assertTrue
                     ),
+                (   'Smells like teen spirit',
+                    'Smells Like Teen Spirits (live)',
+                    self.assertTrue
+                    ),
                 ]
         sima.lib.simastr.SimaStr.diafilter = True
         for sta, stb, assertfunc in tests:
