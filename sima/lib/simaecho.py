@@ -21,18 +21,17 @@
 Consume EchoNest web service
 """
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 __author__ = 'Jack Kaliko'
 
 
-from requests import Session, Request, Timeout, ConnectionError
 
-from sima import ECH, SOCKET_TIMEOUT, WAIT_BETWEEN_REQUESTS
+from sima import ECH
 from sima.lib.meta import Artist
 from sima.lib.track import Track
-from sima.lib.http import CacheController
-from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
-from sima.utils.utils import getws, Throttle
+from sima.lib.http import HttpClient
+from sima.utils.utils import WSError, WSNotFound
+from sima.utils.utils import getws
 if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
     getws(ECH)
 
@@ -45,52 +44,12 @@ class SimaEch:
     name = 'EchoNest'
     cache = False
     stats = {'etag':0,
-            'ccontrol':0,
-            'minrl':120,
-            'total':0}
+             'ccontrol':0,
+             'minrl':120,
+             'total':0}
 
     def __init__(self):
-        self.controller = CacheController(self.cache)
-
-    def _fetch(self, ressource, payload):
-        """
-        Prepare http request
-        Use cached elements or proceed http request
-        """
-        req = Request('GET', ressource, params=payload,
-                      ).prepare()
-        SimaEch.stats.update(total=SimaEch.stats.get('total')+1)
-        if self.cache:
-            cached_response = self.controller.cached_request(req.url, req.headers)
-            if cached_response:
-                SimaEch.stats.update(ccontrol=SimaEch.stats.get('ccontrol')+1)
-                return cached_response.json()
-        try:
-            return self._fetch_ws(req)
-        except Timeout:
-            raise WSTimeout('Failed to reach server within {0}s'.format(
-                               SOCKET_TIMEOUT))
-        except ConnectionError as err:
-            raise WSError(err)
-
-    @Throttle(WAIT_BETWEEN_REQUESTS)
-    def _fetch_ws(self, prepreq):
-        """fetch from web service"""
-        sess = Session()
-        resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
-        if resp.status_code == 304:
-            SimaEch.stats.update(etag=SimaEch.stats.get('etag')+1)
-            resp = self.controller.update_cached_response(prepreq, resp)
-        elif resp.status_code != 200:
-            raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
-        ans = resp.json()
-        self._controls_answer(ans)
-        SimaEch.ratelimit = resp.headers.get('x-ratelimit-remaining', None)
-        minrl = min(int(SimaEch.ratelimit), SimaEch.stats.get('minrl'))
-        SimaEch.stats.update(minrl=minrl)
-        if self.cache:
-            self.controller.cache_response(resp.request, resp)
-        return ans
+        self.http = HttpClient(cache=self.cache, stats=self.stats)
 
     def _controls_answer(self, ans):
         """Controls answer.
@@ -135,8 +94,9 @@ class SimaEch:
         payload = self._forge_payload(artist)
         # Construct URL
         ressource = '{0}/artist/similar'.format(SimaEch.root_url)
-        ans = self._fetch(ressource, payload)
-        for art in ans.get('response').get('artists'):
+        ans = self.http(ressource, payload)
+        self._controls_answer(ans.json())
+        for art in ans.json().get('response').get('artists'):
             mbid = None
             if 'foreign_ids' in art:
                 for frgnid in art.get('foreign_ids'):
@@ -151,13 +111,14 @@ class SimaEch:
         payload = self._forge_payload(artist, top=True)
         # Construct URL
         ressource = '{0}/song/search'.format(SimaEch.root_url)
-        ans = self._fetch(ressource, payload)
+        ans = self.http(ressource, payload)
+        self._controls_answer(ans.json())
         titles = list()
         art = {
                 'artist': artist.name,
                 'musicbrainz_artistid': artist.mbid,
                 }
-        for song in ans.get('response').get('songs'):
+        for song in ans.json().get('response').get('songs'):
             title = song.get('title')
             if title not in titles:
                 titles.append(title)

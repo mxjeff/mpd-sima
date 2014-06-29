@@ -26,15 +26,13 @@ __author__ = 'Jack Kaliko'
 
 
 
-from requests import Session, Request, Timeout, ConnectionError
-
-from sima import LFM, SOCKET_TIMEOUT, WAIT_BETWEEN_REQUESTS
+from sima import LFM
 from sima.lib.meta import Artist
 from sima.lib.track import Track
 
-from sima.lib.http import CacheController
-from sima.utils.utils import WSError, WSNotFound, WSTimeout, WSHTTPError
-from sima.utils.utils import getws, Throttle
+from sima.lib.http import HttpClient
+from sima.utils.utils import WSError, WSNotFound
+from sima.utils.utils import getws
 if len(LFM.get('apikey')) == 43:  # simple hack allowing imp.reload
     getws(LFM)
 
@@ -51,45 +49,8 @@ class SimaFM:
             'total':0}
 
     def __init__(self):
-        self.controller = CacheController(self.cache)
+        self.http = HttpClient(cache=self.cache, stats=self.stats)
         self.artist = None
-
-    def _fetch(self, payload):
-        """
-        Prepare http request
-        Use cached elements or proceed http request
-        """
-        req = Request('GET', SimaFM.root_url, params=payload,
-                      ).prepare()
-        SimaFM.stats.update(total=SimaFM.stats.get('total')+1)
-        if self.cache:
-            cached_response = self.controller.cached_request(req.url, req.headers)
-            if cached_response:
-                SimaFM.stats.update(ccontrol=SimaFM.stats.get('ccontrol')+1)
-                return cached_response.json()
-        try:
-            return self._fetch_ws(req)
-        except Timeout:
-            raise WSTimeout('Failed to reach server within {0}s'.format(
-                               SOCKET_TIMEOUT))
-        except ConnectionError as err:
-            raise WSError(err)
-
-    @Throttle(WAIT_BETWEEN_REQUESTS)
-    def _fetch_ws(self, prepreq):
-        """fetch from web service"""
-        sess = Session()
-        resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
-        if resp.status_code == 304:
-            SimaFM.stats.update(etag=SimaFM.stats.get('etag')+1)
-            resp = self.controller.update_cached_response(prepreq, resp)
-        elif resp.status_code != 200:
-            raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
-        ans = resp.json()
-        self._controls_answer(ans)
-        if self.cache:
-            self.controller.cache_response(resp.request, resp)
-        return ans
 
     def _controls_answer(self, ans):
         """Controls answer.
@@ -132,25 +93,27 @@ class SimaFM:
         """
         payload = self._forge_payload(artist)
         # Construct URL
-        ans = self._fetch(payload)
+        ans = self.http(self.root_url, payload)
+        self._controls_answer(ans.json())
         # Artist might be found be return no 'artist' list…
         # cf. "Mulatu Astatqe" vs. "Mulatu Astatqé" with autocorrect=0
         # json format is broken IMHO, xml is more consistent IIRC
         # Here what we got:
         # >>> {"similarartists":{"#text":"\n","artist":"Mulatu Astatqe"}}
         # autocorrect=1 should fix it, checking anyway.
-        simarts = ans.get('similarartists').get('artist')
+        simarts = ans.json().get('similarartists').get('artist')
         if not isinstance(simarts, list):
             raise WSError('Artist found but no similarities returned')
-        for art in ans.get('similarartists').get('artist'):
+        for art in ans.json().get('similarartists').get('artist'):
             yield Artist(name=art.get('name'), mbid=art.get('mbid', None))
 
     def get_toptrack(self, artist=None):
         """Fetch artist top tracks
         """
         payload = self._forge_payload(artist, method='top')
-        ans = self._fetch(payload)
-        tops = ans.get('toptracks').get('track')
+        ans = self.http(self.root_url, payload)
+        self._controls_answer(ans.json())
+        tops = ans.json().get('toptracks').get('track')
         art = {
                 'artist': artist.name,
                 'musicbrainz_artistid': artist.mbid,

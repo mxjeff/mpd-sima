@@ -26,6 +26,10 @@ import time
 
 import email.utils
 
+from requests import Session, Request, Timeout, ConnectionError
+
+from sima import SOCKET_TIMEOUT, WAIT_BETWEEN_REQUESTS
+from sima.utils.utils import WSError, WSTimeout, WSHTTPError, Throttle
 from .cache import DictCache
 
 
@@ -88,11 +92,11 @@ class CacheController(object):
             retval = dict(parts_with_args + parts_wo_args)
         return retval
 
-    def cached_request(self, url, headers):
+    def cached_request(self, request):
         """Return the cached resquest if available and fresh
         """
-        cache_url = self.cache_url(url)
-        cc = self.parse_cache_control(headers)
+        cache_url = self.cache_url(request.url)
+        cc = self.parse_cache_control(request.headers)
 
         # non-caching states
         no_cache = True if 'no-cache' in cc else False
@@ -125,7 +129,7 @@ class CacheController(object):
             for header in varied_headers:
                 # If our headers don't match for the headers listed in
                 # the vary header, then don't use the cached response
-                if headers.get(header, None) != original_headers.get(header):
+                if request.headers.get(header, None) != original_headers.get(header):
                     return False
 
         now = time.time()
@@ -178,10 +182,10 @@ class CacheController(object):
             self.cache.delete(cache_url)
 
         if 'etag' in resp.headers:
-            headers['If-None-Match'] = resp.headers['ETag']
+            request.headers['If-None-Match'] = resp.headers['ETag']
 
         if 'last-modified' in resp.headers:
-            headers['If-Modified-Since'] = resp.headers['Last-Modified']
+            request.headers['If-Modified-Since'] = resp.headers['Last-Modified']
 
         # return the original handler
         return False
@@ -265,3 +269,50 @@ class CacheController(object):
         resp.from_cache = True
 
         return resp
+
+
+class HttpClient:
+    def __init__(self, cache=None, stats=None):
+        """
+        Prepare http request
+        Use cached elements or proceed http request
+        """
+        self.stats = stats
+        self.controller = CacheController(cache)
+
+    def __call__(self, ress, payload):
+        req = Request('GET', ress, params=payload,).prepare()
+        if self.stats:
+            self.stats.update(total=self.stats.get('total')+1)
+        cached_response = self.controller.cached_request(req)
+        if cached_response:
+            if self.stats:
+                self.stats.update(ccontrol=self.stats.get('ccontrol')+1)
+            return cached_response
+        try:
+            return self.fetch_ws(req)
+        except Timeout:
+            raise WSTimeout('Failed to reach server within {0}s'.format(
+                SOCKET_TIMEOUT))
+        except ConnectionError as err:
+            raise WSError(err)
+
+    @Throttle(WAIT_BETWEEN_REQUESTS)
+    def fetch_ws(self, prepreq):
+        """fetch from web service"""
+        sess = Session()
+        resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
+        if resp.status_code == 304:
+            self.stats.update(etag=self.stats.get('etag')+1)
+            resp = self.controller.update_cached_response(prepreq, resp)
+        elif resp.status_code != 200:
+            raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
+        ratelimit = resp.headers.get('x-ratelimit-remaining', None)
+        if ratelimit and self.stats:
+            minrl = min(int(ratelimit), self.stats.get('minrl'))
+            self.stats.update(minrl=minrl)
+        self.controller.cache_response(resp.request, resp)
+        return resp
+
+# VIM MODLINE
+# vim: ai ts=4 sw=4 sts=4 expandtab
