@@ -64,6 +64,8 @@ class Meta:
         else:
             return id(self)
 
+    def __bool__(self):  # empty name not possible for a valid obj
+        return bool(self.name)
 
 class Album(Meta):
     __hash__ = Meta.__hash__
@@ -89,15 +91,15 @@ class Album(Meta):
 class Artist(Meta):
 
     def __init__(self, **kwargs):
-        self._aliases = []
+        self._aliases = set()
         super().__init__(**kwargs)
 
     def append(self, name):
-        self._aliases.append(name)
+        self._aliases.update({name,})
 
     @property
     def names(self):
-        return self._aliases + [self.name]
+        return self._aliases | {self.name,}
 
     def __add__(self, other):
         if isinstance(other, Artist):
@@ -109,4 +111,3 @@ class Artist(Meta):
                 raise NotSameArtist('different mbids: {0} and {1}'.format(self, other))
 
 # vim: ai ts=4 sw=4 sts=4 expandtab
-
