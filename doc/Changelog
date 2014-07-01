@@ -1,11 +1,10 @@
 MPD_sima v0.12.2
 
  * Add some randomness to track selection
- * Do not queue artist already queued (regression)
+ * Do not queue artists already queued (regression)
  * Some refactoring in http client
- * …
 
--- kaliko jack <kaliko@azylum.org>  UNRELEASED
+-- kaliko jack <kaliko@azylum.org>  Tue, 01 Jul 2014 21:47:56 +0200
 
 
 MPD_sima v0.12.1
