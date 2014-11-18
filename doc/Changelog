@@ -1,3 +1,10 @@
+MPD_sima v0.12.3 UNRELEASED
+
+ * Use albumartist to fetch similar artists
+
+-- kaliko jack <kaliko@azylum.org>  UNRELEASED
+
+
 MPD_sima v0.12.2
 
  * Add some randomness to track selection
