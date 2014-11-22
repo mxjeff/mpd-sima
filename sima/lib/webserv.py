@@ -143,8 +143,7 @@ class WebService(Plugin):
         # TODO: move to utils as a decorator
         duration = self.daemon_conf.getint('sima', 'history_duration')
         art_in_hist = list()
-        for trk in self.sdb.get_history(duration=duration,
-                                        artists=alist):
+        for trk in self.sdb.get_history(duration=duration, artists=alist):
             if trk[0] not in art_in_hist:
                 art_in_hist.append(trk[0])
         art_in_hist.reverse()
@@ -179,8 +178,7 @@ class WebService(Plugin):
         # initialize artists deque list to construct from DB
         as_art = deque()
         as_artists = self.ws().get_similar(artist=artist)
-        self.log.debug('Requesting {1} for "{0}"'.format(artist,
-                                                         self.ws.name))
+        self.log.debug('Requesting {} for {!r}'.format(self.ws.name,artist))
         try:
             # TODO: let's propagate Artist type
             [as_art.append(str(art)) for art in as_artists]
@@ -251,6 +249,9 @@ class WebService(Plugin):
         if ret & queued_artists:
             self.log.debug('Removing already queued artist: {0}'.format(ret & queued_artists))
             ret = list(ret - queued_artists)
+        if self.player.current.artist in ret:
+            self.log.debug('Removing current artist: {0}'.format(self.player.current.artist))
+            ret = list(ret - {self.player.current.artist})
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         return self._get_artists_list_reorg(ret)

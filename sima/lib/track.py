@@ -128,8 +128,10 @@ class Track:
 
     def get_artist(self):
        """Get artist object from track"""
-       return Artist(name=self.albumartist or self.artist,
-               mbid=self.musicbrainz_artistid)
+       name = self.artist
+       if self.albumartist and self.albumartist != 'Various Artists':
+           name = self.albumartist
+       return Artist(name=name, mbid=self.musicbrainz_artistid)
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

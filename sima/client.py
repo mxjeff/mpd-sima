@@ -217,7 +217,7 @@ class PlayerClient(Player):
         # Check against the actual string in artist list
         if artist.orig in self.artists:
             self.log.debug('found exact match for "%s"' % artist)
-            return [artist]
+            return [artist.orig]
         # Then proceed with fuzzy matching if got nothing
         match = get_close_matches(artist.orig, self.artists, 50, 0.73)
         if not match:
