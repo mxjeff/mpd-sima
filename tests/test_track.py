@@ -34,8 +34,8 @@ class TestTrackObject(unittest.TestCase):
 
     def test_albumartist(self):
         trk = Track(albumartist='album_artist', artist='track_artist')
-        self.assertEqual(trk.artist.name, 'album_artist')
+        self.assertEqual(trk.get_artist().name, 'album_artist')
         trk = Track(artist='track_artist')
-        self.assertEqual(trk.artist.name, 'track_artist')
+        self.assertEqual(trk.get_artist().name, 'track_artist')
 
 # vim: ai ts=4 sw=4 sts=4 expandtab
