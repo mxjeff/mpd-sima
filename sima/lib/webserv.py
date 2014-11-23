@@ -244,17 +244,17 @@ class WebService(Plugin):
             self.log.warning('Got nothing from music library.')
             self.log.warning('Try running in debug mode to guess why...')
             return []
-        self.log.info('Got {} artists in library'.format(len(ret)))
         queued_artists = { trk.artist for trk in self.player.queue }
         if ret & queued_artists:
             self.log.debug('Removing already queued artist: {0}'.format(ret & queued_artists))
-            ret = list(ret - queued_artists)
+            ret = ret - queued_artists
         if self.player.current.artist in ret:
             self.log.debug('Removing current artist: {0}'.format(self.player.current.artist))
-            ret = list(ret - {self.player.current.artist})
+            ret = ret - {self.player.current.artist}
         # Move around similars items to get in unplayed|not recently played
         # artist first.
-        return self._get_artists_list_reorg(ret)
+        self.log.info('Got {} artists in library'.format(len(ret)))
+        return self._get_artists_list_reorg(list(ret))
 
     def _get_album_history(self, artist=None):
         """Retrieve album history"""
