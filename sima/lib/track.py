@@ -129,14 +129,15 @@ class Track:
         return time.strftime(fmt, temps)
 
     def get_artist(self):
-       """Get artist object from track"""
-       name = self.artist
-       mbid = self.musicbrainz_artistid
-       if self.albumartist != 'Various Artists':
-           name = self.albumartist
-       if self.musicbrainz_albumartistid != '89ad4ac3-39f7-470e-963a-56509c546377':
-           mbid = self.musicbrainz_albumartistid
-       return Artist(name=name, mbid=mbid)
+        """Get artist object from track"""
+        name = self.artist
+        mbid = self.musicbrainz_artistid
+        if self.albumartist and self.albumartist != 'Various Artists':
+            name = self.albumartist
+        if (self.musicbrainz_albumartistid and
+            self.musicbrainz_albumartistid != '89ad4ac3-39f7-470e-963a-56509c546377'):
+            mbid = self.musicbrainz_albumartistid
+        return Artist(name=name, mbid=mbid)
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
