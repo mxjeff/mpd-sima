@@ -42,7 +42,9 @@ class Track:
         self._time = time
         self.__dict__.update(**kwargs)
         self.tags_to_collapse = ['artist', 'album', 'title', 'date',
-                                 'genre', 'albumartist']
+                                 'genre', 'albumartist',
+                                 'musicbrainz_artistid',
+                                 'musicbrainz_albumartistid']
         #  have tags been collapsed?
         self.collapse_tags_bool = False
         self.collapsed_tags = list()
