@@ -1,8 +1,9 @@
-MPD_sima v0.12.3 UNRELEASED
+MPD_sima v0.12.3
 
  * Use albumartist to fetch similar artists
+ * Fixed some bugs managing tags
 
--- kaliko jack <kaliko@azylum.org>  UNRELEASED
+-- kaliko jack <kaliko@azylum.org>  Sat, 06 Dec 2014 16:42:15 +0100
 
 
 MPD_sima v0.12.2

@@ -24,9 +24,6 @@
 # standard library import
 import logging
 
-# local import
-#from sima.lib.track import Track
-
 
 class Player(object):
     """Player interface to inherit from.
