@@ -11,7 +11,7 @@ DEVOLT = {
   'artist': 'Devolt',
   'date': '2011-12-01',
   'disc': '1/1',
-  'file': 'gberret.music/Devolt/2011-Grey/03-Devolt - Crazy.mp3',
+  'file': 'music/Devolt/2011-Grey/03-Devolt - Crazy.mp3',
   'last-modified': '2012-04-02T20:48:59Z',
   'musicbrainz_albumartistid': 'd8e7e3e2-49ab-4f7c-b148-fc946d521f99',
   'musicbrainz_albumid': 'ea2ef2cf-59e1-443a-817e-9066e3e0be4b',
@@ -26,8 +26,10 @@ class TestTrackObject(unittest.TestCase):
 
     def test_tagcollapse(self):
         trk = Track(**DEVOLT)
-        self.assertTrue(trk.collapse_tags_bool, 'Should have collapsed a tag')
+        self.assertTrue(trk.collapsed_tags, 'Should have collapsed a tag')
         self.assertFalse(isinstance(trk.albumartist, list), 'Failed to collapse albumartist tag')
+        self.assertTrue(trk.get_artist().name in DEVOLT.get('albumartist'),
+                        'Failed to split multiple tag?')
 
     def test_boolean_type(self):
         self.assertFalse(bool(Track()))

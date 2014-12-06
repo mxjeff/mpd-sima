@@ -68,6 +68,11 @@ class Meta:
         return bool(self.name)
 
 class Album(Meta):
+    """Info:
+    If a class that overrides __eq__() needs to retain the implementation of
+    __hash__() from a parent class, the interpreter must be told this explicitly
+    by setting __hash__ = <ParentClass>.__hash__.
+    """
     __hash__ = Meta.__hash__
 
     def __init__(self, **kwargs):

@@ -46,7 +46,6 @@ class Track:
                                  'musicbrainz_artistid',
                                  'musicbrainz_albumartistid']
         #  have tags been collapsed?
-        self.collapse_tags_bool = False
         self.collapsed_tags = list()
         # Needed for multiple tags which returns a list instead of a string
         self.collapse_tags()
@@ -60,7 +59,6 @@ class Track:
             if tag not in self.tags_to_collapse:
                 continue
             if isinstance(value, list):
-                self.collapse_tags_bool = True
                 self.collapsed_tags.append(tag)
                 self.__dict__.update({tag: ', '.join(set(value))})
 
@@ -133,10 +131,10 @@ class Track:
         name = self.artist
         mbid = self.musicbrainz_artistid
         if self.albumartist and self.albumartist != 'Various Artists':
-            name = self.albumartist
+            name = self.albumartist.split(', ')[0]
         if (self.musicbrainz_albumartistid and
             self.musicbrainz_albumartistid != '89ad4ac3-39f7-470e-963a-56509c546377'):
-            mbid = self.musicbrainz_albumartistid
+            mbid = self.musicbrainz_albumartistid.split(', ')[0]
         return Artist(name=name, mbid=mbid)
 
 # VIM MODLINE
