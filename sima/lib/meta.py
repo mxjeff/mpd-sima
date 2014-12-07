@@ -21,98 +21,111 @@
 Defines some object to handle audio file metadata
 """
 
-from .simastr import SimaStr
+import re
+
+UUID_RE = r'^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$'
+
+def is_uuid4(uuid):
+    regexp = re.compile(UUID_RE, re.IGNORECASE)
+    if regexp.match(uuid):
+        return True
+    raise WrongUUID4(uuid)
 
 class MetaException(Exception):
     """Generic Meta Exception"""
     pass
 
-class NotSameArtist(MetaException):
+class WrongUUID4(MetaException):
     pass
 
 
 class Meta:
-    """Generic Class for Meta object"""
+    """Generic Class for Meta object
+    Meta(name=<str>[, mbid=UUID4])
+    """
 
     def __init__(self, **kwargs):
         self.name = None
-        self.mbid = None
-        if 'name' not in kwargs:
-            raise MetaException('need at least a "name" argument')
-        self.__dict__.update(kwargs)
+        self.__mbid = None
+        if 'name' not in kwargs or not kwargs.get('name'):
+            raise MetaException('Need a "name" argument')
+        if 'mbid' in kwargs and kwargs.get('mbid'):
+            is_uuid4(kwargs.get('mbid'))
+            # mbid immutable as hash rests on
+            self.__mbid = kwargs.pop('mbid')
+        self.__dict__.update(**kwargs)
 
     def __repr__(self):
-        fmt = '{0}(name="{1.name}", mbid="{1.mbid}")'
+        fmt = '{0}(name={1.name!r}, mbid={1.mbid!r})'
         return fmt.format(self.__class__.__name__, self)
 
     def __str__(self):
-        return str(self.name)
+        return self.name.__str__()
 
     def __eq__(self, other):
         """
-        Perform mbid equality test if present,
-        else fallback on fuzzy equality
+        Perform mbid equality test
         """
-        if hasattr(other, 'mbid'):
-            if other.mbid and self.mbid:
+        #if hasattr(other, 'mbid'):  # better isinstance?
+        if isinstance(other, Meta) and self.mbid and other.mbid:
+            if self.mbid and other.mbid:
                 return self.mbid == other.mbid
-        return SimaStr(str(self)) == SimaStr(str(other))
+        else:
+            return other.__str__() == self.__str__()
+        return False
 
     def __hash__(self):
-        if self.mbid is not None:
+        if self.mbid:
             return hash(self.mbid)
-        else:
-            return id(self)
+        return id(self)
 
-    def __bool__(self):  # empty name not possible for a valid obj
-        return bool(self.name)
+    @property
+    def mbid(self):
+        return self.__mbid
+
 
 class Album(Meta):
-    """Info:
-    If a class that overrides __eq__() needs to retain the implementation of
-    __hash__() from a parent class, the interpreter must be told this explicitly
-    by setting __hash__ = <ParentClass>.__hash__.
-    """
-    __hash__ = Meta.__hash__
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def __eq__(self, other):
-        """
-        Perform mbid equality test if present,
-        else fallback on self.name equality
-        """
-        if hasattr(other, 'mbid'):
-            if other.mbid and self.mbid:
-                return self.mbid == other.mbid
-        return str(self) == str(other)
 
     @property
     def album(self):
         return self.name
 
-
 class Artist(Meta):
 
-    def __init__(self, **kwargs):
-        self._aliases = set()
-        super().__init__(**kwargs)
+    def __init__(self, name=None, **kwargs):
+        """Artist object built from a mapping dict containing at least an
+        "artist" entry:
+            >>> trk = {'artist':'Art Name',
+            >>>        'albumartist': 'Alb Art Name',           # optional
+            >>>        'musicbrainz_artistid': '<UUID4>'    ,   # optional
+            >>>        'musicbrainz_albumartistid': '<UUID4>',  # optional
+            >>>       }
+            >>> artobj0 = Artist(**trk)
+            >>> artobj1 = Artist(name='Tool')
+        """
+        self.__aliases = set()
+        name = kwargs.get('artist', name)
+        mbid = kwargs.get('musicbrainz_artistid', None)
+        if (kwargs.get('albumartist', False) and
+                kwargs.get('albumartist') != 'Various Artists'):
+            name = kwargs.get('albumartist').split(', ')[0]
+        if (kwargs.get('musicbrainz_albumartistid', False) and
+                kwargs.get('musicbrainz_albumartistid') != '89ad4ac3-39f7-470e-963a-56509c546377'):
+            mbid = kwargs.get('musicbrainz_albumartistid').split(', ')[0]
+        super().__init__(name=name, mbid=mbid)
 
-    def append(self, name):
-        self._aliases.update({name,})
+    def add_alias(self, other):
+        if getattr(other, '__str__', None):
+            if callable(other.__str__):
+                self.__aliases |= {other.__str__()}
+        elif isinstance(other, Artist):
+            self.__aliases |= other._Artist__aliases
+        else:
+            raise MetaException('No __str__ method found in {!r}'.format(other))
 
     @property
     def names(self):
-        return self._aliases | {self.name,}
+        return self.__aliases | {self.name,}
 
-    def __add__(self, other):
-        if isinstance(other, Artist):
-            if self.mbid == other.mbid:
-                res = Artist(**self.__dict__)
-                res._aliases.extend(other.names)
-                return res
-            else:
-                raise NotSameArtist('different mbids: {0} and {1}'.format(self, other))
-
+# VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

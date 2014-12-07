@@ -188,7 +188,7 @@ class SimaDB(object):
         get album information from the database.
         if not in database insert new entry.
         Attention: use Track() object!!
-        Use AlbumArtist tag is provided, fallback to Album tag
+        Use AlbumArtist tag if provided, fallback to Album tag
         """
         if with_connection:
             connection = with_connection

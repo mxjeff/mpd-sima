@@ -58,6 +58,8 @@ def blacklist(artist=False, album=False, track=False):
     field = (artist, album, track)
     def decorated(func):
         def wrapper(*args, **kwargs):
+            if not args[0].database:
+                return func(*args, **kwargs)
             cls = args[0]
             boolgen = (bl for bl in field)
             bl_fun = (cls.database.get_bl_artist,

@@ -156,40 +156,5 @@ class SimaStr(str):
         return hash(self) != hash(other)
 
 
-# Script starts here
-if __name__ == "__main__":
-    import time
-    print(SimaStr('Kétanoue'))
-    #from leven import levenshtein_ratio
-    CASES_LIST = list([
-        dict({
-                    'got': 'Guns N\' Roses (live)!! !',
-                'look for': 'Guns And Roses'}),
-        dict({
-                     'got': 'Jesus & Mary Chains',
-                'look for': 'The Jesus and Mary Chains - live'}),
-        dict({
-                         'got': 'Desert sessions',
-                    'look for': 'The Desert Sessions'}),
-        dict({
-                         'got': 'Têtes Raides',
-                    'look for': 'Les Têtes Raides'}),
-        dict({
-                         'got': 'Noir Désir',
-                    'look for': 'Noir Désir'}),
-        dict({
-                         'got': 'No Future',
-                    'look for': 'Future'})])
-
-    for case in CASES_LIST[:]:
-        str0 = case.get('got')
-        str1 = case.get('look for')
-        fz_str0 = SimaStr(str0)
-        fz_str1 = SimaStr(str1)
-        print(fz_str0, '\n', fz_str1)
-        print(fz_str0.stripped == fz_str1.stripped)
-        #print levenshtein_ratio(fz_str0.lower(), fz_str1.lower())
-        time.sleep(1)
-
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

@@ -23,7 +23,11 @@
 
 # standard library import
 import logging
+from difflib import get_close_matches
 
+# local import
+from .simastr import SimaStr
+from ..utils.leven import levenshtein_ratio
 
 class Player(object):
     """Player interface to inherit from.
@@ -37,7 +41,6 @@ class Player(object):
         * current
         * queue
         * playlist
-        *
     """
 
     def __init__(self):

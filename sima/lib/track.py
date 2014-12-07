@@ -35,11 +35,11 @@ class Track:
         self.title = self.artist = self.album = self.albumartist = ''
         self.musicbrainz_artistid = self.musicbrainz_albumartistid = None
         self.pos = int(pos)
-        self._empty = False
         self._file = file
+        self._empty = False
+        self._time = time
         if not kwargs:
             self._empty = True
-        self._time = time
         self.__dict__.update(**kwargs)
         self.tags_to_collapse = ['artist', 'album', 'title', 'date',
                                  'genre', 'albumartist',
@@ -126,16 +126,10 @@ class Track:
             fmt = '%M:%S'
         return time.strftime(fmt, temps)
 
-    def get_artist(self):
+    @property
+    def Artist(self):
         """Get artist object from track"""
-        name = self.artist
-        mbid = self.musicbrainz_artistid
-        if self.albumartist and self.albumartist != 'Various Artists':
-            name = self.albumartist.split(', ')[0]
-        if (self.musicbrainz_albumartistid and
-            self.musicbrainz_albumartistid != '89ad4ac3-39f7-470e-963a-56509c546377'):
-            mbid = self.musicbrainz_albumartistid.split(', ')[0]
-        return Artist(name=name, mbid=mbid)
+        return Artist(**self.__dict__)
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

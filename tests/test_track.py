@@ -28,7 +28,7 @@ class TestTrackObject(unittest.TestCase):
         trk = Track(**DEVOLT)
         self.assertTrue(trk.collapsed_tags, 'Should have collapsed a tag')
         self.assertFalse(isinstance(trk.albumartist, list), 'Failed to collapse albumartist tag')
-        self.assertTrue(trk.get_artist().name in DEVOLT.get('albumartist'),
+        self.assertTrue(trk.Artist.name in DEVOLT.get('albumartist'),
                         'Failed to split multiple tag?')
 
     def test_boolean_type(self):
@@ -36,8 +36,8 @@ class TestTrackObject(unittest.TestCase):
 
     def test_albumartist(self):
         trk = Track(albumartist='album_artist', artist='track_artist')
-        self.assertEqual(trk.get_artist().name, 'album_artist')
+        self.assertEqual(trk.Artist.name, 'album_artist')
         trk = Track(artist='track_artist')
-        self.assertEqual(trk.get_artist().name, 'track_artist')
+        self.assertEqual(trk.Artist.name, 'track_artist')
 
 # vim: ai ts=4 sw=4 sts=4 expandtab
