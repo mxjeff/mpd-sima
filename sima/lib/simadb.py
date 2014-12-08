@@ -187,7 +187,7 @@ class SimaDB(object):
         """
         get album information from the database.
         if not in database insert new entry.
-        Attention: use Track() object!!
+        Attention: use Track|Album object!!
         Use AlbumArtist tag if provided, fallback to Album tag
         """
         if with_connection:
@@ -345,6 +345,24 @@ class SimaDB(object):
         if not with_connection:
             self.close_database_connection(connection)
         return False
+
+    def get_artists_history(self, artists, duration=__HIST_DURATION__):
+        """
+        """
+        date = datetime.utcnow() - timedelta(hours=duration)
+        connection = self.get_database_connection()
+        rows = connection.execute(
+            "SELECT arts.name, albs.name, trs.name, trs.file"
+            " FROM artists AS arts, tracks AS trs, history AS hist, albums AS albs"
+            " WHERE trs.id = hist.track AND trs.artist = arts.id AND trs.album = albs.id"
+            " AND hist.last_play > ? ORDER BY hist.last_play DESC", (date.isoformat(' '),))
+        for row in rows:
+            if artists and row[0] not in artists:
+                continue
+            for art in artists:
+                if row[0] == art:
+                    yield art
+        self.close_database_connection(connection)
 
     def get_history(self, artist=None, artists=None, duration=__HIST_DURATION__):
         """Retrieve complete play history, most recent tracks first

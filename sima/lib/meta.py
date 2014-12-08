@@ -45,10 +45,13 @@ class Meta:
     """
 
     def __init__(self, **kwargs):
-        self.name = None
+        self.__name = None #TODO: should be immutable
         self.__mbid = None
+        self.__aliases = set()
         if 'name' not in kwargs or not kwargs.get('name'):
             raise MetaException('Need a "name" argument')
+        else:
+            self.__name = kwargs.pop('name')
         if 'mbid' in kwargs and kwargs.get('mbid'):
             is_uuid4(kwargs.get('mbid'))
             # mbid immutable as hash rests on
@@ -60,7 +63,7 @@ class Meta:
         return fmt.format(self.__class__.__name__, self)
 
     def __str__(self):
-        return self.name.__str__()
+        return self.__name.__str__()
 
     def __eq__(self, other):
         """
@@ -71,17 +74,39 @@ class Meta:
             if self.mbid and other.mbid:
                 return self.mbid == other.mbid
         else:
-            return other.__str__() == self.__str__()
+            return (other.__str__() == self.__str__() or
+                    other.__str__() in self.__aliases)
         return False
 
     def __hash__(self):
         if self.mbid:
             return hash(self.mbid)
-        return id(self)
+        return hash(self.__name)
+
+    def add_alias(self, other):
+        if getattr(other, '__str__', None):
+            if callable(other.__str__):
+                self.__aliases |= {other.__str__()}
+        elif isinstance(other, Meta):
+            self.__aliases |= other.__aliases
+        else:
+            raise MetaException('No __str__ method found in {!r}'.format(other))
+
+    @property
+    def name(self):
+        return self.__name
 
     @property
     def mbid(self):
         return self.__mbid
+
+    @property
+    def aliases(self):
+        return self.__aliases
+
+    @property
+    def names(self):
+        return self.__aliases | {self.__name,}
 
 
 class Album(Meta):
@@ -92,7 +117,7 @@ class Album(Meta):
 
 class Artist(Meta):
 
-    def __init__(self, name=None, **kwargs):
+    def __init__(self, name=None, mbid=None, **kwargs):
         """Artist object built from a mapping dict containing at least an
         "artist" entry:
             >>> trk = {'artist':'Art Name',
@@ -103,9 +128,8 @@ class Artist(Meta):
             >>> artobj0 = Artist(**trk)
             >>> artobj1 = Artist(name='Tool')
         """
-        self.__aliases = set()
         name = kwargs.get('artist', name)
-        mbid = kwargs.get('musicbrainz_artistid', None)
+        mbid = kwargs.get('musicbrainz_artistid', mbid)
         if (kwargs.get('albumartist', False) and
                 kwargs.get('albumartist') != 'Various Artists'):
             name = kwargs.get('albumartist').split(', ')[0]
@@ -113,19 +137,6 @@ class Artist(Meta):
                 kwargs.get('musicbrainz_albumartistid') != '89ad4ac3-39f7-470e-963a-56509c546377'):
             mbid = kwargs.get('musicbrainz_albumartistid').split(', ')[0]
         super().__init__(name=name, mbid=mbid)
-
-    def add_alias(self, other):
-        if getattr(other, '__str__', None):
-            if callable(other.__str__):
-                self.__aliases |= {other.__str__()}
-        elif isinstance(other, Artist):
-            self.__aliases |= other._Artist__aliases
-        else:
-            raise MetaException('No __str__ method found in {!r}'.format(other))
-
-    @property
-    def names(self):
-        return self.__aliases | {self.name,}
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

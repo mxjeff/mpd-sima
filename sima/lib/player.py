@@ -24,10 +24,64 @@
 # standard library import
 import logging
 from difflib import get_close_matches
+from itertools import dropwhile
 
 # local import
+from .meta import Artist
 from .simastr import SimaStr
 from ..utils.leven import levenshtein_ratio
+
+def blacklist(artist=False, album=False, track=False):
+    #pylint: disable=C0111,W0212
+    field = (album, track)
+    def decorated(func):
+        def wrapper(*args, **kwargs):
+            if not args[0].database:
+                return func(*args, **kwargs)
+            cls = args[0]
+            boolgen = (bl for bl in field)
+            bl_fun = (cls.database.get_bl_album,
+                      cls.database.get_bl_track,)
+            #bl_getter = next(fn for fn, bl in zip(bl_fun, boolgen) if bl is True)
+            bl_getter = next(dropwhile(lambda _: not next(boolgen), bl_fun))
+            #cls.log.debug('using {0} as bl filter'.format(bl_getter.__name__))
+            results = list()
+            for elem in func(*args, **kwargs):
+                if bl_getter(elem, add_not=True):
+                    cls.log.debug('Blacklisted "{0}"'.format(elem))
+                    continue
+                if track and cls.database.get_bl_album(elem, add_not=True):
+                    # filter album as well in track mode
+                    # (artist have already been)
+                    cls.log.debug('Blacklisted alb. "{0.album}"'.format(elem))
+                    continue
+                results.append(elem)
+            return results
+        return wrapper
+    return decorated
+
+def bl_artist(func):
+    def wrapper(*args, **kwargs):
+        cls = args[0]
+        if not args[0].database:
+            return func(*args, **kwargs)
+        result = func(*args, **kwargs)
+        if not result:
+            return
+        names = list()
+        for art in result.names:
+            if cls.database.get_bl_artist(art, add_not=True):
+                cls.log.debug('Blacklisted "{0}"'.format(art))
+                continue
+            names.append(art)
+        if not names:
+            return
+        resp = Artist(name=names.pop(), mbid=result.mbid)
+        for name in names:
+            resp.add_alias(name)
+        return resp
+    return wrapper
+
 
 class Player(object):
     """Player interface to inherit from.
@@ -85,25 +139,65 @@ class Player(object):
         """
         raise NotImplementedError
 
-    def find_albums(self, artist):
+    def search_albums(self, artist):
         """
         Find albums by artist's name
-            >>> player.find_alums('Nirvana')
+            >>> art = Artist(name='Nirvana')
+            >>> player.search_albums(art)
 
         Returns a list of string objects
         """
         raise NotImplementedError
 
-    def fuzzy_find_artist(self, artist):
+    @bl_artist
+    def search_artist(self, artist):
         """
-        Find artists based on a fuzzy search in the media library
-            >>> bea = player.fuzzy_find_artist('beatles')
-            >>> print(bea)
-            >>> ['The Beatles']
+        Search artists based on a fuzzy search in the media library
+            >>> bea = player.search_artist('The beatles')
+            >>> print(bea.names)
+            >>> ['The Beatles', 'Beatles', 'the beatles']
 
         Returns a list of strings (artist names)
         """
-        raise NotImplementedError
+        found = False
+        # Then proceed with fuzzy matching if got nothing
+        match = get_close_matches(artist.name, self.artists, 50, 0.73)
+        if not match:
+            return
+        if len(match) > 1:
+            self.log.debug('found close match for "%s": %s' %
+                           (artist, '/'.join(match)))
+        # Does not perform fuzzy matching on short and single word strings
+        # Only lowercased comparison
+        if ' ' not in artist.name and len(artist.name) < 8:
+            for fuzz_art in match:
+                # Regular lowered string comparison
+                if artist.name.lower() == fuzz_art.lower():
+                    artist.add_alias(fuzz_art)
+                    return artist
+        fzartist = SimaStr(artist.name)
+        for fuzz_art in match:
+            # Regular lowered string comparison
+            if artist.name.lower() == fuzz_art.lower():
+                found = True
+                if artist.name != fuzz_art:
+                    artist.add_alias(fuzz_art)
+                    self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
+                continue
+            # SimaStr string __eq__ (not regular string comparison here)
+            if fzartist == fuzz_art:
+                found = True
+                artist.add_alias(fuzz_art)
+                self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
+                              (fuzz_art, artist))
+            #else:
+                #self.log.debug('FZZZ: "%s" does not match "%s"' %
+                               #(fuzz_art, artist))
+        if found:
+            if artist.aliases:
+                self.log.debug('Found: {}'.format('/'.join(artist.names)))
+            return artist
+        return
 
     def disconnect(self):
         """Closing client connection with the Player
@@ -113,6 +207,26 @@ class Player(object):
     def connect(self):
         """Connect client to the Player
         """
+        raise NotImplementedError
+
+    @property
+    def artists(self):
+        raise NotImplementedError
+
+    @property
+    def state(self):
+        raise NotImplementedError
+
+    @property
+    def current(self):
+        raise NotImplementedError
+
+    @property
+    def queue(self):
+        raise NotImplementedError
+
+    @property
+    def playlist(self):
         raise NotImplementedError
 
 # VIM MODLINE

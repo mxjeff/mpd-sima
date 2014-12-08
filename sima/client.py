@@ -25,7 +25,6 @@ This client is built above python-musicpd a fork of python-mpd
 
 # standard library import
 from difflib import get_close_matches
-from itertools import dropwhile
 from select import select
 
 # third parties components
@@ -37,10 +36,9 @@ except ImportError as err:
     sexit(1)
 
 # local import
-from .lib.player import Player
+from .lib.player import Player, blacklist
 from .lib.track import Track
-from .lib.meta import Album
-from .lib.simastr import SimaStr
+from .lib.meta import Album, Artist
 from .utils.leven import levenshtein_ratio
 
 
@@ -52,36 +50,6 @@ class PlayerCommandError(PlayerError):
 
 PlayerUnHandledError = MPDError  # pylint: disable=C0103
 
-
-def blacklist(artist=False, album=False, track=False):
-    #pylint: disable=C0111,W0212
-    field = (artist, album, track)
-    def decorated(func):
-        def wrapper(*args, **kwargs):
-            if not args[0].database:
-                return func(*args, **kwargs)
-            cls = args[0]
-            boolgen = (bl for bl in field)
-            bl_fun = (cls.database.get_bl_artist,
-                      cls.database.get_bl_album,
-                      cls.database.get_bl_track,)
-            #bl_getter = next(fn for fn, bl in zip(bl_fun, boolgen) if bl is True)
-            bl_getter = next(dropwhile(lambda _: not next(boolgen), bl_fun))
-            #cls.log.debug('using {0} as bl filter'.format(bl_getter.__name__))
-            results = list()
-            for elem in func(*args, **kwargs):
-                if bl_getter(elem, add_not=True):
-                    cls.log.debug('Blacklisted "{0}"'.format(elem))
-                    continue
-                if track and cls.database.get_bl_album(elem, add_not=True):
-                    # filter album as well in track mode
-                    # (artist have already been)
-                    cls.log.debug('Blacklisted alb. "{0.album}"'.format(elem))
-                    continue
-                results.append(elem)
-            return results
-        return wrapper
-    return decorated
 
 class PlayerClient(Player):
     """MPD Client
@@ -173,11 +141,20 @@ class PlayerClient(Player):
         self._cache['artists'] = frozenset(self._client.list('artist'))
 
     @blacklist(track=True)
-    def find_track(self, artist, title=None):
+    def _find_track(self, artist, title):
         #return getattr(self, 'find')('artist', artist, 'title', title)
         if title:
             return self.find('artist', artist, 'title', title)
         return self.find('artist', artist)
+
+    def find_track(self, artist, title=None):
+        tracks = list()
+        if isinstance(artist, Artist):
+            for name in artist.names:
+                tracks.extend(self._find_track(name, title=title))
+        else:
+            tracks.extend(self._find_track(artist,title=title))
+        return tracks
 
     @blacklist(track=True)
     def fuzzy_find_track(self, artist, title):
@@ -202,55 +179,6 @@ class PlayerClient(Player):
                 return []
             return self.find('artist', artist, 'title', title_)
 
-    @blacklist(artist=True)
-    def fuzzy_find_artist(self, art):
-        """
-        Controls presence of artist in music library.
-        Crosschecking artist names with SimaStr objects / difflib / levenshtein
-
-        TODO: proceed crosschecking even when an artist matched !!!
-              Not because we found "The Doors" as "The Doors" that there is no
-              remaining entries as "Doors" :/
-              not straight forward, need probably heavy refactoring.
-        """
-        matching_artists = list()
-        artist = SimaStr(art)
-
-        # Check against the actual string in artist list
-        if artist.orig in self.artists:
-            self.log.debug('found exact match for "%s"' % artist)
-            return [artist.orig]
-        # Then proceed with fuzzy matching if got nothing
-        match = get_close_matches(artist.orig, self.artists, 50, 0.73)
-        if not match:
-            return []
-        self.log.debug('found close match for "%s": %s' %
-                       (artist, '/'.join(match)))
-        # Does not perform fuzzy matching on short and single word strings
-        # Only lowercased comparison
-        if ' ' not in artist.orig and len(artist) < 8:
-            for fuzz_art in match:
-                # Regular string comparison SimaStr().lower is regular string
-                if artist.lower() == fuzz_art.lower():
-                    matching_artists.append(fuzz_art)
-                    self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
-            return matching_artists
-        for fuzz_art in match:
-            # Regular string comparison SimaStr().lower is regular string
-            if artist.lower() == fuzz_art.lower():
-                matching_artists.append(fuzz_art)
-                self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
-                return matching_artists
-            # SimaStr string __eq__ (not regular string comparison here)
-            if artist == fuzz_art:
-                matching_artists.append(fuzz_art)
-                self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
-                              (fuzz_art, artist))
-            else:
-                self.log.debug('FZZZ: "%s" does not match "%s"' %
-                               (fuzz_art, artist))
-        return matching_artists
-
     def find_album(self, artist, album):
         """
         Special wrapper around album search:
@@ -262,29 +190,31 @@ class PlayerClient(Player):
         return self.find('artist', artist, 'album', album)
 
     @blacklist(album=True)
-    def find_albums(self, artist):
+    def search_albums(self, artist):
         """
         Fetch all albums for "AlbumArtist"  == artist
         Filter albums returned for "artist" == artist since MPD returns any
                album containing at least a single track for artist
         """
         albums = []
-        kwalbart = {'albumartist':artist, 'artist':artist}
-        for album in self.list('album', 'albumartist', artist):
-            if album not in albums:
-                albums.append(Album(name=album, **kwalbart))
-        for album in self.list('album', 'artist', artist):
-            album_trks = [trk for trk in self.find('album', album)]
-            if 'Various Artists' in [tr.albumartist for tr in album_trks]:
-                self.log.debug('Discarding {0} ("Various Artists" set)'.format(album))
-                continue
-            arts = set([trk.artist for trk in album_trks])
-            if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
-                if album not in albums:
-                    albums.append(Album(name=album, albumartist=artist))
-            elif album and album not in albums:
-                self.log.debug('"{0}" probably not an album of "{1}"'.format(
-                               album, artist) + '({0})'.format('/'.join(arts)))
+        for name in artist.aliases:
+            self.log.debug('Searching album for {}'.format(name))
+            kwalbart = {'albumartist':name, 'artist':name}
+            for album in self.list('album', 'albumartist', artist):
+                if album and album not in albums:
+                    albums.append(Album(name=album, **kwalbart))
+            for album in self.list('album', 'artist', artist):
+                album_trks = [trk for trk in self.find('album', album)]
+                if 'Various Artists' in [tr.albumartist for tr in album_trks]:
+                    self.log.debug('Discarding {0} ("Various Artists" set)'.format(album))
+                    continue
+                arts = set([trk.artist for trk in album_trks])
+                if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
+                    if album not in albums:
+                        albums.append(Album(name=album, albumartist=artist))
+                elif album and album not in albums:
+                    self.log.debug('"{0}" probably not an album of "{1}"'.format(
+                                   album, artist) + '({0})'.format('/'.join(arts)))
         return albums
 
     def monitor(self):

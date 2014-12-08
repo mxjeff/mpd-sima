@@ -21,7 +21,7 @@
 Consume EchoNest web service
 """
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 __author__ = 'Jack Kaliko'
 
 
@@ -102,7 +102,7 @@ class SimaEch:
                 for frgnid in art.get('foreign_ids'):
                     if frgnid.get('catalog') == 'musicbrainz':
                         mbid = frgnid.get('foreign_id'
-                                          ).lstrip('musicbrainz:artist:')
+                                ).split(':')[2]
             yield Artist(mbid=mbid, name=art.get('name'))
 
     def get_toptrack(self, artist=None):

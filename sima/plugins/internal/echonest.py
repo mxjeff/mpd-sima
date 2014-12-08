@@ -41,7 +41,7 @@ class EchoNest(WebService):
         # Set persitent cache
         vardir = daemon.config['sima']['var_dir']
         SimaEch.cache = FileCache(join(vardir, 'http', 'EchoNest'))
-        self.ws = SimaEch
+        self.ws = SimaEch()
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

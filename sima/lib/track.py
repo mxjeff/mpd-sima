@@ -63,7 +63,7 @@ class Track:
                 self.__dict__.update({tag: ', '.join(set(value))})
 
     def __repr__(self):
-        return '%s(artist="%s", album="%s", title="%s", filename="%s")' % (
+        return '%s(artist="%s", album="%s", title="%s", file="%s")' % (
             self.__class__.__name__,
             self.artist,
             self.album,

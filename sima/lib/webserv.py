@@ -40,7 +40,7 @@ def cache(func):
     def wrapper(*args, **kwargs):
         #pylint: disable=W0212,C0111
         cls = args[0]
-        similarities = [art for art in args[1]]
+        similarities = [art.name for art in args[1]]
         hashedlst = md5(''.join(similarities).encode('utf-8')).hexdigest()
         if hashedlst in cls._cache.get('asearch'):
             cls.log.debug('cached request')
@@ -140,19 +140,15 @@ class WebService(Plugin):
         Move around items in artists_list in order to play first not recently
         played artists
         """
-        # TODO: move to utils as a decorator
+        hist = list()
         duration = self.daemon_conf.getint('sima', 'history_duration')
-        art_in_hist = list()
-        for trk in self.sdb.get_history(duration=duration, artists=alist):
-            if trk[0] not in art_in_hist:
-                art_in_hist.append(trk[0])
-        art_in_hist.reverse()
-        art_not_in_hist = [ar for ar in alist if ar not in art_in_hist]
-        random.shuffle(art_not_in_hist)
-        art_not_in_hist.extend(art_in_hist)
-        self.log.info('{}'.format(
-                       ' / '.join(art_not_in_hist)))
-        return art_not_in_hist
+        for art in self.sdb.get_artists_history(alist, duration=duration):
+            if art not in hist:
+                hist.insert(0, art)
+        reorg = [art for art in alist if art not in hist]
+        reorg.extend(hist)
+        self.log.info('{}'.format(' / '.join([a.name for a in reorg])))
+        return reorg
 
     @cache
     def get_artists_from_player(self, similarities):
@@ -166,9 +162,11 @@ class WebService(Plugin):
         results = list()
         similarities.reverse()
         while (len(results) < dynamic
-            and len(similarities) > 0):
+               and len(similarities) > 0):
             art_pop = similarities.pop()
-            results.extend(self.player.fuzzy_find_artist(art_pop))
+            res = self.player.search_artist(art_pop)
+            if res:
+                results.append(res)
         return results
 
     def ws_similar_artists(self, artist=None):
@@ -177,24 +175,22 @@ class WebService(Plugin):
         """
         # initialize artists deque list to construct from DB
         as_art = deque()
-        as_artists = self.ws().get_similar(artist=artist)
-        self.log.debug('Requesting {} for {!r}'.format(self.ws.name,artist))
+        as_artists = self.ws.get_similar(artist=artist)
+        self.log.debug('Requesting {} for {!r}'.format(self.ws.name, artist))
         try:
-            # TODO: let's propagate Artist type
-            [as_art.append(str(art)) for art in as_artists]
+            [as_art.append(art) for art in as_artists]
         except WSError as err:
-            self.log.warning('{0}: {1}'.format(self.ws.name, err))
+            self.log.warning('{}: {}'.format(self.ws.name, err))
         if as_art:
-            self.log.debug('Fetched {0} artist(s)'.format(len(as_art)))
+            self.log.debug('Fetched {} artist(s)'.format(len(as_art)))
         return as_art
 
     def get_recursive_similar_artist(self):
-        ret_extra = list()
         history = deque(self.history)
         history.popleft()
         depth = 0
         if not self.player.playlist:
-            return ret_extra
+            return
         last_trk = self.player.playlist[-1]
         extra_arts = list()
         while depth < self.plugin_conf.getint('depth'):
@@ -213,10 +209,10 @@ class WebService(Plugin):
                            'to "{}" as well'.format(artist))
             similar = self.ws_similar_artists(artist=artist)
             if not similar:
-                return ret_extra
-            ret_extra.extend(self.get_artists_from_player(similar))
-            if last_trk.artist in ret_extra:
-                ret_extra.remove(last_trk.artist)
+                return []
+            ret_extra = set(self.get_artists_from_player(similar))
+            if last_trk.Artist in ret_extra:
+                ret_extra.remove(last_trk.Artist)
         return ret_extra
 
     def get_local_similar_artists(self):
@@ -231,7 +227,7 @@ class WebService(Plugin):
             self.log.info('Got nothing from {0}!'.format(self.ws.name))
             return []
         self.log.info('First five similar artist(s): {}...'.format(
-                      ' / '.join([a for a in list(similar)[0:5]])))
+                      ' / '.join([a.name for a in list(similar)[0:5]])))
         self.log.info('Looking availability in music library')
         ret = set(self.get_artists_from_player(similar))
         ret_extra = None
@@ -244,13 +240,17 @@ class WebService(Plugin):
             self.log.warning('Got nothing from music library.')
             self.log.warning('Try running in debug mode to guess why...')
             return []
-        queued_artists = { trk.artist for trk in self.player.queue }
+        queued_artists = { trk.Artist for trk in self.player.queue }
+        for art in queued_artists:
+            if art in ret:
+                self.log.debug('Removing already queued artist: {0}'.format(art))
+        ret = ret - queued_artists
         if ret & queued_artists:
             self.log.debug('Removing already queued artist: {0}'.format(ret & queued_artists))
             ret = ret - queued_artists
-        if self.player.current.artist in ret:
-            self.log.debug('Removing current artist: {0}'.format(self.player.current.artist))
-            ret = ret - {self.player.current.artist}
+        if self.player.current.Artist in ret:
+            self.log.debug('Removing current artist: {0}'.format(self.player.current.Artist))
+            ret = ret - {self.player.current.Artist}
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         self.log.info('Got {} artists in library'.format(len(ret)))
@@ -260,7 +260,7 @@ class WebService(Plugin):
         """Retrieve album history"""
         duration = self.daemon_conf.getint('sima', 'history_duration')
         albums_list = set()
-        for trk in self.sdb.get_history(artist=artist, duration=duration):
+        for trk in self.sdb.get_history(artist=artist.name, duration=duration):
             albums_list.add(trk[1])
         return albums_list
 
@@ -272,7 +272,7 @@ class WebService(Plugin):
         target_album_to_add = self.plugin_conf.getint('album_to_add')
         for artist in artists:
             self.log.info('Looking for an album to add for "%s"...' % artist)
-            albums = self.player.find_albums(artist)
+            albums = self.player.search_albums(artist)
             # str conversion while Album type is not propagated
             albums = [str(album) for album in albums]
             if albums:
@@ -315,7 +315,6 @@ class WebService(Plugin):
         """
         self.to_add = list()
         nbtracks_target = self.plugin_conf.getint('track_to_add')
-        webserv = self.ws()
         for artist in artists:
             artist = Artist(name=artist)
             if len(self.to_add) == nbtracks_target:
@@ -323,7 +322,7 @@ class WebService(Plugin):
             self.log.info('Looking for a top track for {0}'.format(artist))
             titles = deque()
             try:
-                titles = [t for t in webserv.get_toptrack(artist)]
+                titles = [t for t in self.ws.get_toptrack(artist)]
             except WSError as err:
                 self.log.warning('{0}: {1}'.format(self.ws.name, err))
             if self.ws.ratelimit:
@@ -354,8 +353,7 @@ class WebService(Plugin):
             if len(self.to_add) == nbtracks_target:
                 break
         if not self.to_add:
-            self.log.debug('Found no tracks to queue, is your ' +
-                            'history getting too large?')
+            self.log.debug('Found no tracks to queue!')
             return None
         for track in self.to_add:
             self.log.info('{1} candidates: {0!s}'.format(track, self.ws.name))

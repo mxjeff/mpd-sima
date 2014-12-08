@@ -38,7 +38,7 @@ class Lastfm(WebService):
 
     def __init__(self, daemon):
         WebService.__init__(self, daemon)
-        self.ws = SimaFM
+        self.ws = SimaFM()
         # Set persitent cache
         vardir = daemon.config['sima']['var_dir']
         persitent_cache = daemon.config.getboolean('lastfm', 'cache')
