@@ -33,7 +33,7 @@ from hashlib import md5
 from .plugin import Plugin
 from .track import Track
 from .meta import Artist
-from ..utils.utils import WSError
+from ..utils.utils import WSError, WSNotFound
 
 def cache(func):
     """Caching decorator"""
@@ -179,6 +179,10 @@ class WebService(Plugin):
         self.log.debug('Requesting {} for {!r}'.format(self.ws.name, artist))
         try:
             [as_art.append(art) for art in as_artists]
+        except WSNotFound as err:
+            if artist.mbid:
+                return self.ws_similar_artists(Artist(name=artist.name))
+            self.log.warning('{}: {}'.format(self.ws.name, err))
         except WSError as err:
             self.log.warning('{}: {}'.format(self.ws.name, err))
         if as_art:
@@ -248,7 +252,7 @@ class WebService(Plugin):
         if ret & queued_artists:
             self.log.debug('Removing already queued artist: {0}'.format(ret & queued_artists))
             ret = ret - queued_artists
-        if self.player.current.Artist in ret:
+        if self.player.current and self.player.current.Artist in ret:
             self.log.debug('Removing current artist: {0}'.format(self.player.current.Artist))
             ret = ret - {self.player.current.Artist}
         # Move around similars items to get in unplayed|not recently played
