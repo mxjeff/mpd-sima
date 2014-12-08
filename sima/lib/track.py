@@ -129,6 +129,11 @@ class Track:
     @property
     def Artist(self):
         """Get artist object from track"""
+        if not self.artist:
+            if not self.musicbrainz_artistid:
+                return Artist(name='[unknown]',
+                              mbid='125ec42a-7229-4250-afc5-e057484327fe')
+            return Artist(name='[unknown]', **self.__dict__)
         return Artist(**self.__dict__)
 
 # VIM MODLINE
