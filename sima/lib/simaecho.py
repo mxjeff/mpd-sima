@@ -21,7 +21,7 @@
 Consume EchoNest web service
 """
 
-__version__ = '0.0.4'
+__version__ = '0.0.5'
 __author__ = 'Jack Kaliko'
 
 
@@ -34,6 +34,14 @@ from sima.utils.utils import WSError, WSNotFound
 from sima.utils.utils import getws
 if len(ECH.get('apikey')) == 23:  # simple hack allowing imp.reload
     getws(ECH)
+
+
+def get_mbid(obj, foreign='foreign_ids'):
+    if foreign in obj:
+        for frgnid in obj.get(foreign):
+            if frgnid.get('catalog') == 'musicbrainz':
+                mbid = frgnid.get('foreign_id').split(':')[2]
+    return None
 
 
 class SimaEch:
@@ -97,12 +105,7 @@ class SimaEch:
         ans = self.http(ressource, payload)
         self._controls_answer(ans.json())
         for art in ans.json().get('response').get('artists'):
-            mbid = None
-            if 'foreign_ids' in art:
-                for frgnid in art.get('foreign_ids'):
-                    if frgnid.get('catalog') == 'musicbrainz':
-                        mbid = frgnid.get('foreign_id'
-                                ).split(':')[2]
+            mbid = get_mbid(art)
             yield Artist(mbid=mbid, name=art.get('name'))
 
     def get_toptrack(self, artist=None):
@@ -120,6 +123,8 @@ class SimaEch:
                 }
         for song in ans.json().get('response').get('songs'):
             title = song.get('title')
+            if not art.get('musicbrainz_artistid'):
+                art['musicbrainz_artistid'] = get_mbid(song, 'artist_foreign_ids')
             if title not in titles:
                 titles.append(title)
                 yield Track(title=title, **art)

@@ -21,6 +21,7 @@
 Defines some object to handle audio file metadata
 """
 
+import logging
 import re
 
 UUID_RE = r'^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$'
@@ -59,14 +60,19 @@ class Meta:
         self.__name = None #TODO: should be immutable
         self.__mbid = None
         self.__aliases = set()
+        self.log = logging.getLogger(__name__)
         if 'name' not in kwargs or not kwargs.get('name'):
             raise MetaException('Need a "name" argument')
         else:
             self.__name = kwargs.pop('name')
         if 'mbid' in kwargs and kwargs.get('mbid'):
-            is_uuid4(kwargs.get('mbid'))
+            try:
+                is_uuid4(kwargs.get('mbid'))
+                self.__mbid = kwargs.pop('mbid')
+            except WrongUUID4:
+                self.log.warning('Wrong mbid {}:{}'.format(self.__name,
+                                                         kwargs.get('mbid')))
             # mbid immutable as hash rests on
-            self.__mbid = kwargs.pop('mbid')
         self.__dict__.update(**kwargs)
 
     def __repr__(self):
