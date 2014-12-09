@@ -40,7 +40,7 @@ def get_mbid(obj, foreign='foreign_ids'):
     if foreign in obj:
         for frgnid in obj.get(foreign):
             if frgnid.get('catalog') == 'musicbrainz':
-                mbid = frgnid.get('foreign_id').split(':')[2]
+                return frgnid.get('foreign_id').split(':')[2]
     return None
 
 
