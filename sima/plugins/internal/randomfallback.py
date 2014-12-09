@@ -28,6 +28,7 @@ import random
 
 # local import
 from ...lib.plugin import Plugin
+from ...lib.meta import Artist
 
 
 class RandomFallBack(Plugin):
@@ -88,7 +89,7 @@ class RandomFallBack(Plugin):
         if art is None:
             return None
         self.log.debug('Random art: {}'.format(art))
-        trks = self.player.find_track(art)
+        trks = self.player.find_track(Artist(art))
         if trks:
             trk = random.choice(trks)
             self.log.info('random fallback ({}): {}'.format(self.mode, trk))

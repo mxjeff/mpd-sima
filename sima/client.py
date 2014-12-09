@@ -141,25 +141,24 @@ class PlayerClient(Player):
         self._cache['artists'] = frozenset(self._client.list('artist'))
 
     @blacklist(track=True)
-    def _find_track(self, artist, title):
-        #return getattr(self, 'find')('artist', artist, 'title', title)
-        if title:
-            return self.find('artist', artist, 'title', title)
-        return self.find('artist', artist)
-
     def find_track(self, artist, title=None):
-        tracks = list()
-        if isinstance(artist, Artist):
-            for name in artist.names:
-                tracks.extend(self._find_track(name, title=title))
-        else:
-            tracks.extend(self._find_track(artist,title=title))
-        return tracks
+        tracks = set()
+        for name in artist.names:
+            if title:
+                tracks |= set(self.find('artist', name, 'title', title))
+            else:
+                tracks |= set(self.find('artist', name))
+        if artist.mbid:
+            if title:
+                tracks |= set(self.find('musicbrainz_artistid', artist.mbid))
+            else:
+                tracks |= set(self.find('musicbrainz_artistid', artist.mbid,
+                                        'title', title))
+        return list(tracks)
 
-    @blacklist(track=True)
     def fuzzy_find_track(self, artist, title):
         # Retrieve all tracks from artist
-        all_tracks = self.find('artist', artist)
+        all_tracks = self.find_track(artist, title)
         # Get all titles (filter missing titles set to 'None')
         all_artist_titles = frozenset([tr.title for tr in all_tracks
                                        if tr.title is not None])
@@ -324,6 +323,8 @@ class PlayerClient(Player):
                 self.log.warning('Use of MusicBrainzIdentifier is set but MPD is '
                         'not providing related metadata')
                 self.log.info(self._client.tagtypes())
+                self.log.warning('Disabling MusicBrainzIdentifier')
+                Artist.use_mbid = False
         else:
             self.log.warning('Use of MusicBrainzIdentifier disabled!')
             self.log.info('Consider using MusicBrainzIdentifier for your music library')

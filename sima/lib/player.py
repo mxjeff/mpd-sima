@@ -123,8 +123,8 @@ class Player(object):
     def find_track(self, artist, title=None):
         """
         Find tracks for a specific artist or filtering with a track title
-            >>> player.find_track('The Beatles')
-            >>> player.find_track('Nirvana', title='Smells Like Teen Spirit')
+            >>> player.find_track(Artist('The Beatles'))
+            >>> player.find_track(Artist('Nirvana'), title='Smells Like Teen Spirit')
 
         Returns a list of Track objects
         """
