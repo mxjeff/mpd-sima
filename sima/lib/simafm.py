@@ -41,7 +41,6 @@ class SimaFM:
     """Last.fm http client
     """
     root_url = 'http://{host}/{version}/'.format(**LFM)
-    ratelimit = None
     name = 'Last.fm'
     cache = False
     stats = {'etag':0,

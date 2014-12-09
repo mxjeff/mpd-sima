@@ -330,8 +330,6 @@ class WebService(Plugin):
                 titles = [t for t in self.ws.get_toptrack(artist)]
             except WSError as err:
                 self.log.warning('{0}: {1}'.format(self.ws.name, err))
-            if self.ws.ratelimit:
-                self.log.info('{0.name} ratelimit: {0.ratelimit}'.format(self.ws))
             for trk in titles:
                 found = self.player.fuzzy_find_track(artist, trk.title)
                 random.shuffle(found)
@@ -389,7 +387,7 @@ class WebService(Plugin):
         self.queue_mode()
         msg = ' '.join(['{0}: {1:>3d}'.format(k, v) for
                         k, v in sorted(self.ws.stats.items())])
-        self.log.debug(msg)
+        self.log.debug('http stats: ' + msg)
         candidates = self.to_add
         self.to_add = list()
         if self.plugin_conf.get('queue_mode') != 'album':

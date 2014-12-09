@@ -48,7 +48,6 @@ class SimaEch:
     """EchoNest http client
     """
     root_url = 'http://{host}/api/{version}'.format(**ECH)
-    ratelimit = None
     name = 'EchoNest'
     cache = False
     stats = {'etag':0,
