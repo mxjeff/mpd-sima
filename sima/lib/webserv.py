@@ -245,13 +245,13 @@ class WebService(Plugin):
             self.log.warning('Got nothing from music library.')
             self.log.warning('Try running in debug mode to guess why...')
             return []
-        queued_artists = { trk.Artist for trk in self.player.queue }
-        for art in queued_artists:
-            if art in ret:
-                self.log.debug('Removing already queued artist: {0}'.format(art))
-        ret = ret - queued_artists
+        # WARNING:
+        #   * operation on set will not match against aliases
+        #   * composite set w/ mbid set and whitout won't match either
+        queued_artists = {trk.Artist for trk in self.player.queue}
         if ret & queued_artists:
-            self.log.debug('Removing already queued artist: {0}'.format(ret & queued_artists))
+            self.log.debug('Removing already queued artists: '
+                           '{0}'.format(ret & queued_artists))
             ret = ret - queued_artists
         if self.player.current and self.player.current.Artist in ret:
             self.log.debug('Removing current artist: {0}'.format(self.player.current.Artist))

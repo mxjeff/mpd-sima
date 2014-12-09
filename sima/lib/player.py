@@ -180,8 +180,8 @@ class Player(object):
             # Regular lowered string comparison
             if artist.name.lower() == fuzz_art.lower():
                 found = True
+                artist.add_alias(fuzz_art)
                 if artist.name != fuzz_art:
-                    artist.add_alias(fuzz_art)
                     self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
                 continue
             # SimaStr string __eq__ (not regular string comparison here)
@@ -190,9 +190,6 @@ class Player(object):
                 artist.add_alias(fuzz_art)
                 self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
                               (fuzz_art, artist))
-            #else:
-                #self.log.debug('FZZZ: "%s" does not match "%s"' %
-                               #(fuzz_art, artist))
         if found:
             if artist.aliases:
                 self.log.debug('Found: {}'.format('/'.join(artist.names)))

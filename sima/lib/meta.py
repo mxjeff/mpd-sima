@@ -90,9 +90,11 @@ class Meta:
         if isinstance(other, Meta) and self.mbid and other.mbid:
             if self.mbid and other.mbid:
                 return self.mbid == other.mbid
-        else:
-            return (other.__str__() == self.__str__() or
-                    other.__str__() in self.__aliases)
+        elif isinstance(other, Meta):
+            return bool(self.names & other.names)
+        elif getattr(other, '__str__', None):
+            # is other.__str__() in self.__name or self.__aliases
+            return other.__str__() in self.names
         return False
 
     def __hash__(self):
@@ -102,10 +104,11 @@ class Meta:
 
     def add_alias(self, other):
         if getattr(other, '__str__', None):
-            if callable(other.__str__):
+            if callable(other.__str__) and other.__str__() != self.name:
                 self.__aliases |= {other.__str__()}
         elif isinstance(other, Meta):
-            self.__aliases |= other.__aliases
+            if other.name != self.name:
+                self.__aliases |= other.__aliases
         else:
             raise MetaException('No __str__ method found in {!r}'.format(other))
 
