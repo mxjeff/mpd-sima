@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 11/24/2014
-.\"    Manual: mpd-sima 0.12.3 User Manual
+.\"      Date: 12/09/2014
+.\"    Manual: mpd-sima 0.13.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "11/24/2014" "mpd-sima" "mpd-sima 0.12.3 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "12/09/2014" "mpd-sima" "mpd-sima 0.13.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -160,6 +160,18 @@ How far to look back in history to avoid to play twice the same track/title (dur
 \fBqueue_length=\fR\fI1\fR
 .RS 4
 This value triggers queue process if the queue length is less than specified queue_length\&.
+.RE
+.PP
+\fBmusicbrainzid=\fR\fItrue\fR
+.RS 4
+Use MusicBrainzIdentifier to search music (mainly for artists)\&. Consider using these metadata as it enhances a lot artist/album/tracks identification\&.
+.br
+
+Default is True, switch to False if you don\*(Aqt have MusicBrainzIdentifier set for at least 80% of you music library\&.
+.br
+
+Use Picard to tag your file:
+\m[blue]\fB\%https://picard.musicbrainz.org/\fR\m[]\&.
 .RE
 .PP
 \fBuser_db=\fR\fIfalse\fR

@@ -52,6 +52,7 @@ DEFAULT_CONF = {
             'history_duration': 8,
             'queue_length': 1,
             'var_dir': 'empty',
+            'musicbrainzid': "true",
             },
         'daemon':{
             'daemon': False,

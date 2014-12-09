@@ -201,6 +201,19 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                             queue_length.</para>
                     </listitem>
                 </varlistentry>
+                <varlistentry> <!-- sima.musicbrainzid -->
+                    <term><option>musicbrainzid=</option><replaceable>true</replaceable></term>
+                    <listitem>
+                        <para>Use MusicBrainzIdentifier to search music (mainly
+                            for artists). Consider using these metadata as it
+                            enhances a lot artist/album/tracks identification.<sbr />
+                            Default is True, switch to False if you don't have
+                            MusicBrainzIdentifier set for at least 80% of you
+                            music library.<sbr />
+                            Use Picard to tag your file: <ulink url="https://picard.musicbrainz.org/"/>.
+                        </para>
+                    </listitem>
+                </varlistentry>
                 <varlistentry> <!-- sima.user_db -->
                     <term><option>user_db=</option><replaceable>false</replaceable></term>
                     <listitem>

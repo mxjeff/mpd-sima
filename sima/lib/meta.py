@@ -38,11 +38,22 @@ class MetaException(Exception):
 class WrongUUID4(MetaException):
     pass
 
+def mbidfilter(func):
+    def wrapper(*args, **kwargs):
+        cls = args[0]
+        if not cls.use_mbid:
+            kwargs.pop('mbid', None)
+            kwargs.pop('musicbrainz_artistid', None)
+            kwargs.pop('musicbrainz_albumartistid', None)
+        func(*args, **kwargs)
+    return wrapper
+
 
 class Meta:
     """Generic Class for Meta object
     Meta(name=<str>[, mbid=UUID4])
     """
+    use_mbid = True
 
     def __init__(self, **kwargs):
         self.__name = None #TODO: should be immutable
@@ -117,6 +128,7 @@ class Album(Meta):
 
 class Artist(Meta):
 
+    @mbidfilter
     def __init__(self, name=None, mbid=None, **kwargs):
         """Artist object built from a mapping dict containing at least an
         "artist" entry:

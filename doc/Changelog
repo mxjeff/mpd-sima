@@ -1,6 +1,7 @@
 MPD_sima v0.13.0
 
- * 
+ * Use of MusicBrainzIdentifier by default
+   Please consider tagging your library with these metadata
 
 -- kaliko jack <kaliko@azylum.org>  UNRELEASED
 

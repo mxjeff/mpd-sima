@@ -317,6 +317,16 @@ class PlayerClient(Player):
                 raise PlayerError('Could connect to "%s", '
                                   'but command "%s" not available' %
                                   (host, nddcmd))
+
+        #  Controls use of MusicBrainzIdentifier
+        if Artist.use_mbid:
+            if 'MUSICBRAINZ_ARTISTID' not in self._client.tagtypes():
+                self.log.warning('Use of MusicBrainzIdentifier is set but MPD is '
+                        'not providing related metadata')
+                self.log.info(self._client.tagtypes())
+        else:
+            self.log.warning('Use of MusicBrainzIdentifier disabled!')
+            self.log.info('Consider using MusicBrainzIdentifier for your music library')
         self._flush_cache()
 
     def disconnect(self):
