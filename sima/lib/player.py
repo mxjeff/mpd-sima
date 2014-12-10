@@ -48,7 +48,7 @@ def blacklist(artist=False, album=False, track=False):
             results = list()
             for elem in func(*args, **kwargs):
                 if bl_getter(elem, add_not=True):
-                    cls.log.debug('Blacklisted "{0}"'.format(elem))
+                    #cls.log.debug('Blacklisted "{0}"'.format(elem))
                     continue
                 if track and cls.database.get_bl_album(elem, add_not=True):
                     # filter album as well in track mode

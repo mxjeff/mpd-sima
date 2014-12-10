@@ -147,7 +147,6 @@ class WebService(Plugin):
                 hist.insert(0, art)
         reorg = [art for art in alist if art not in hist]
         reorg.extend(hist)
-        self.log.info('{}'.format(' / '.join([a.name for a in reorg])))
         return reorg
 
     @cache
@@ -197,6 +196,7 @@ class WebService(Plugin):
             return
         last_trk = self.player.playlist[-1]
         extra_arts = list()
+        ret_extra = list()
         while depth < self.plugin_conf.getint('depth'):
             if len(history) == 0:
                 break
@@ -207,14 +207,14 @@ class WebService(Plugin):
             extra_arts.append(trk.Artist)
             depth += 1
         self.log.info('EXTRA ARTS: {}'.format(
-            '/'.join([art.name for art in extra_arts])))
+                      '/'.join(map(str, extra_arts))))
         for artist in extra_arts:
             self.log.debug('Looking for artist similar '
                            'to "{}" as well'.format(artist))
             similar = self.ws_similar_artists(artist=artist)
             if not similar:
                 return []
-            ret_extra = set(self.get_artists_from_player(similar))
+            ret_extra = self.get_artists_from_player(similar)
             if last_trk.Artist in ret_extra:
                 ret_extra.remove(last_trk.Artist)
         return ret_extra
@@ -232,7 +232,7 @@ class WebService(Plugin):
             self.log.info('Got nothing from {0}!'.format(self.ws.name))
             return []
         self.log.info('First five similar artist(s): {}...'.format(
-                      ' / '.join([a.name for a in list(similar)[0:5]])))
+                      ' / '.join(map(str, list(similar)[:5]))))
         self.log.info('Looking availability in music library')
         ret = set(self.get_artists_from_player(similar))
         ret_extra = None
@@ -240,7 +240,13 @@ class WebService(Plugin):
             if self.plugin_conf.getint('depth') > 1:
                 ret_extra = self.get_recursive_similar_artist()
         if ret_extra:
-            ret = set(ret) | set(ret_extra)
+            # get them reorg to pick up best element
+            ret_extra = self._get_artists_list_reorg(ret_extra)
+            # pickup half the number of ret artist
+            ret_extra = set(ret_extra[:len(ret)//2])
+            self.log.debug('Using extra: {}'.format(
+                           ' / '.join(map(str, ret_extra))))
+            ret = ret | ret_extra
         if not ret:
             self.log.warning('Got nothing from music library.')
             self.log.warning('Try running in debug mode to guess why...')
@@ -259,7 +265,9 @@ class WebService(Plugin):
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         self.log.info('Got {} artists in library'.format(len(ret)))
-        return self._get_artists_list_reorg(list(ret))
+        candidates = self._get_artists_list_reorg(list(ret))
+        self.log.info(' / '.join(map(str, candidates)))
+        return candidates
 
     def _get_album_history(self, artist=None):
         """Retrieve album history"""
