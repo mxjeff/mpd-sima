@@ -196,8 +196,9 @@ class PlayerClient(Player):
                album containing at least a single track for artist
         """
         albums = []
-        for name in artist.aliases:
-            self.log.debug('Searching album for {}'.format(name))
+        for name in artist.names:
+            if len(artist.names) > 1:
+                self.log.debug('Searching album for aliase: "{}"'.format(name))
             kwalbart = {'albumartist':name, 'artist':name}
             for album in self.list('album', 'albumartist', artist):
                 if album and album not in albums:
