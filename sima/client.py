@@ -195,15 +195,20 @@ class PlayerClient(Player):
         found = False
         if artist.mbid:
             # look for exact search w/ musicbrainz_artistid
-            [artist.add_alias(name) for name in
-                    self._client.list('artist', 'musicbrainz_artistid', artist.mbid)]
-            if artist.aliases:
+            exact_m = self._client.list('artist', 'musicbrainz_artistid', artist.mbid)
+            if exact_m:
+                [artist.add_alias(name) for name in exact_m]
                 found = True
         else:
             artist = Artist(name=artist.name)
         # then complete with fuzzy search on artist with no musicbrainz_artistid
-        nombid_artists = self._cache.get('nombid_artists', [])
-        match = get_close_matches(artist.name, nombid_artists, 50, 0.73)
+        if artist.mbid:
+            # we already performed a lookup on artists with mbid set
+            # search through remaining artists
+            artists = self._cache.get('nombid_artists', [])
+        else:
+            artists = self._cache.get('artists', [])
+        match = get_close_matches(artist.name, artists, 50, 0.73)
         if not match and not found:
             return
         if len(match) > 1:
