@@ -207,7 +207,7 @@ class WebService(Plugin):
                 continue
             extra_arts.append(trk.Artist)
             depth += 1
-        self.log.info('EXTRA ARTS: {}'.format(
+        self.log.debug('EXTRA ARTS: {}'.format(
                       '/'.join(map(str, extra_arts))))
         for artist in extra_arts:
             self.log.debug('Looking for artist similar '
@@ -217,11 +217,11 @@ class WebService(Plugin):
                 continue
             ret_extra.extend(self.get_artists_from_player(similar))
 
-        if ret_extra:
-            self.log.debug('similar artist(s) fond: {}...'.format(
-                ' / '.join(map(str, ret_extra))))
         if last_trk.Artist in ret_extra:
             ret_extra.remove(last_trk.Artist)
+        if ret_extra:
+            self.log.debug('similar artist(s) found: {}'.format(
+                ' / '.join(map(str, MetaContainer(ret_extra)))))
         return ret_extra
 
     def get_local_similar_artists(self):
@@ -240,6 +240,9 @@ class WebService(Plugin):
                       ' / '.join(map(str, list(similar)[:5]))))
         self.log.info('Looking availability in music library')
         ret = MetaContainer(self.get_artists_from_player(similar))
+        if ret:
+            self.log.debug('regular found in library: {}'.format(
+                           ' / '.join(map(str, ret))))
         ret_extra = None
         if len(self.history) >= 2:
             if self.plugin_conf.getint('depth') > 1:
@@ -248,9 +251,10 @@ class WebService(Plugin):
             # get them reorg to pick up best element
             ret_extra = self._get_artists_list_reorg(ret_extra)
             # pickup half the number of ret artist
-            ret_extra = MetaContainer(ret_extra[:len(ret)//2])
-            self.log.debug('Using extra: {}'.format(
-                           ' / '.join(map(str, ret_extra))))
+            ret_extra = MetaContainer(ret_extra[:max(4, len(ret))//2])
+            if ret_extra:
+                self.log.debug('extra found in library: {}'.format(
+                               ' / '.join(map(str, ret_extra))))
             ret = ret | ret_extra
         if not ret:
             self.log.warning('Got nothing from music library.')
