@@ -69,7 +69,7 @@ class Meta:
         if 'mbid' in kwargs and kwargs.get('mbid'):
             try:
                 is_uuid4(kwargs.get('mbid'))
-                self.__mbid = kwargs.pop('mbid').upper()
+                self.__mbid = kwargs.pop('mbid').lower()
             except WrongUUID4:
                 self.log.warning('Wrong mbid {}:{}'.format(self.__name,
                                                          kwargs.get('mbid')))
