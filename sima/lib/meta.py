@@ -21,6 +21,7 @@
 Defines some object to handle audio file metadata
 """
 
+import collections.abc  # python >= 3.3
 import logging
 import re
 
@@ -68,7 +69,7 @@ class Meta:
         if 'mbid' in kwargs and kwargs.get('mbid'):
             try:
                 is_uuid4(kwargs.get('mbid'))
-                self.__mbid = kwargs.pop('mbid')
+                self.__mbid = kwargs.pop('mbid').upper()
             except WrongUUID4:
                 self.log.warning('Wrong mbid {}:{}'.format(self.__name,
                                                          kwargs.get('mbid')))
@@ -88,8 +89,7 @@ class Meta:
         """
         #if hasattr(other, 'mbid'):  # better isinstance?
         if isinstance(other, Meta) and self.mbid and other.mbid:
-            if self.mbid and other.mbid:
-                return self.mbid == other.mbid
+            return self.mbid == other.mbid
         elif isinstance(other, Meta):
             return bool(self.names & other.names)
         elif getattr(other, '__str__', None):
@@ -149,7 +149,7 @@ class Artist(Meta):
             >>> artobj0 = Artist(**trk)
             >>> artobj1 = Artist(name='Tool')
         """
-        name = kwargs.get('artist', name)
+        name = kwargs.get('artist', name).split(', ')[0]
         mbid = kwargs.get('musicbrainz_artistid', mbid)
         if (kwargs.get('albumartist', False) and
                 kwargs.get('albumartist') != 'Various Artists'):
@@ -158,6 +158,30 @@ class Artist(Meta):
                 kwargs.get('musicbrainz_albumartistid') != '89ad4ac3-39f7-470e-963a-56509c546377'):
             mbid = kwargs.get('musicbrainz_albumartistid').split(', ')[0]
         super().__init__(name=name, mbid=mbid)
+
+class MetaContainer(collections.abc.Set):
+
+    def __init__(self, iterable):
+        self.elements = lst = []
+        for value in iterable:
+            if value not in lst:
+                lst.append(value)
+            else:
+                for inlst in lst:
+                    if value == inlst:
+                        inlst.add_alias(value)
+
+    def __iter__(self):
+        return iter(self.elements)
+
+    def __contains__(self, value):
+        return value in self.elements
+
+    def __len__(self):
+        return len(self.elements)
+
+    def __repr__(self):
+        return repr(self.elements)
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

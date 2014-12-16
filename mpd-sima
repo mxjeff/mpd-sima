@@ -3,6 +3,7 @@
 
 # Script starts here
 from sima.launch import main
+
 main()
 
 # VIM MODLINE

@@ -36,6 +36,7 @@ except ImportError as err:
     sexit(1)
 
 # local import
+from .lib.simastr import SimaStr
 from .lib.player import Player, blacklist
 from .lib.track import Track
 from .lib.meta import Album, Artist
@@ -49,6 +50,28 @@ class PlayerCommandError(PlayerError):
     """Command error"""
 
 PlayerUnHandledError = MPDError  # pylint: disable=C0103
+
+def bl_artist(func):
+    def wrapper(*args, **kwargs):
+        cls = args[0]
+        if not args[0].database:
+            return func(*args, **kwargs)
+        result = func(*args, **kwargs)
+        if not result:
+            return
+        names = list()
+        for art in result.names:
+            if cls.database.get_bl_artist(art, add_not=True):
+                cls.log.debug('Blacklisted "{0}"'.format(art))
+                continue
+            names.append(art)
+        if not names:
+            return
+        resp = Artist(name=names.pop(), mbid=result.mbid)
+        for name in names:
+            resp.add_alias(name)
+        return resp
+    return wrapper
 
 
 class PlayerClient(Player):
@@ -137,8 +160,10 @@ class PlayerClient(Player):
             self.log.info('Player: Initialising cache!')
         self._cache = {
                 'artists': None,
+                'nombid_artists': None,
                 }
         self._cache['artists'] = frozenset(self._client.list('artist'))
+        self._cache['nombid_artists'] = frozenset(self._client.list('artist', 'musicbrainz_artistid', ''))
 
     @blacklist(track=True)
     def find_track(self, artist, title=None):
@@ -155,6 +180,62 @@ class PlayerClient(Player):
                 tracks |= set(self.find('musicbrainz_artistid', artist.mbid,
                                         'title', title))
         return list(tracks)
+
+    @bl_artist
+    def search_artist(self, artist):
+        """
+        Search artists based on a fuzzy search in the media library
+            >>> art = Artist(name='the beatles', mbid=<UUID4>) # mbid optional
+            >>> bea = player.search_artist(art)
+            >>> print(bea.names)
+            >>> ['The Beatles', 'Beatles', 'the beatles']
+
+        Returns an Artist object
+        """
+        found = False
+        if artist.mbid:
+            # look for exact search w/ musicbrainz_artistid
+            [artist.add_alias(name) for name in
+                    self._client.list('artist', 'musicbrainz_artistid', artist.mbid)]
+            if artist.aliases:
+                found = True
+        else:
+            artist = Artist(name=artist.name)
+        # then complete with fuzzy search on artist with no musicbrainz_artistid
+        nombid_artists = self._cache.get('nombid_artists', [])
+        match = get_close_matches(artist.name, nombid_artists, 50, 0.73)
+        if not match and not found:
+            return
+        if len(match) > 1:
+            self.log.debug('found close match for "%s": %s' %
+                           (artist, '/'.join(match)))
+        # Does not perform fuzzy matching on short and single word strings
+        # Only lowercased comparison
+        if ' ' not in artist.name and len(artist.name) < 8:
+            for fuzz_art in match:
+                # Regular lowered string comparison
+                if artist.name.lower() == fuzz_art.lower():
+                    artist.add_alias(fuzz_art)
+                    return artist
+        fzartist = SimaStr(artist.name)
+        for fuzz_art in match:
+            # Regular lowered string comparison
+            if artist.name.lower() == fuzz_art.lower():
+                found = True
+                artist.add_alias(fuzz_art)
+                if artist.name != fuzz_art:
+                    self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
+                continue
+            # SimaStr string __eq__ (not regular string comparison here)
+            if fzartist == fuzz_art:
+                found = True
+                artist.add_alias(fuzz_art)
+                self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
+                              (fuzz_art, artist))
+        if found:
+            if artist.aliases:
+                self.log.debug('Found: {}'.format('/'.join(list(artist.names)[:4])))
+            return artist
 
     def fuzzy_find_track(self, artist, title):
         # Retrieve all tracks from artist

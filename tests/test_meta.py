@@ -2,7 +2,7 @@
 
 import unittest
 
-from sima.lib.meta import Meta, Artist, is_uuid4
+from sima.lib.meta import Meta, Artist, MetaContainer, is_uuid4
 from sima.lib.meta import WrongUUID4, MetaException
 
 VALID = '110E8100-E29B-41D1-A716-116655250000'
@@ -31,22 +31,19 @@ class TestMetaObject(unittest.TestCase):
     def test_equality(self):
         a = Meta(mbid=VALID, name='a')
         b = Meta(mbid=VALID, name='b')
+        c = Meta(mbid=VALID.lower(), name='c')
         self.assertEqual(a, b)
+        self.assertEqual(a, c)
 
     def test_hash(self):
         a = Meta(mbid=VALID, name='a')
         b = Meta(mbid=VALID, name='b')
         c = Meta(mbid=VALID, name='c')
-        self.assertTrue(len({a,b,c}) == 1)
+        self.assertTrue(len({a, b, c}) == 1)
         self.assertTrue(a in [c, b])
         self.assertTrue(a in {c, b})
         # mbid is immutable
         self.assertRaises(AttributeError, a.__setattr__, 'mbid', VALID)
-
-    def test_identity(self):
-        a = Meta(mbid=VALID, name='a')
-        b = Meta(mbid=VALID, name='a')
-        self.assertTrue(a is not b)
 
     def test_aliases(self):
         art0 = Meta(name='Silver Mt. Zion')
@@ -67,6 +64,8 @@ class TestMetaObject(unittest.TestCase):
                            mbid='f22942a1-6f70-4f48-866e-238cb2308fbd')
         art02 = Meta(name='Some Other Name not even close, avoid fuzzy match',
                            mbid='f22942a1-6f70-4f48-866e-238cb2308fbd')
+        art03 = Meta(name='Aphex Twin',
+                           mbid='322942a1-6f70-4f48-866e-238cb2308fbd')
 
         self.assertTrue(len({art00, art02}) == 1)
         art00._Meta__name = art02._Meta__name = 'Aphex Twin'
@@ -83,6 +82,9 @@ class TestMetaObject(unittest.TestCase):
         # equivalent: self.assertTrue(hash(art00) == hash(art02))
         self.assertTrue(len({art00, art02}) == 1,
                         'wrong: hash({!r}) != hash({!r})'.format(art00, art02))
+
+        self.assertTrue(hash(art00) != hash(art03),
+                        'wrong: hash({!r}) == hash({!r})'.format(art00, art03))
 
     def test_comparison(self):
         art00 = Meta(name='Aphex Twin',
@@ -106,7 +108,7 @@ class TestMetaObject(unittest.TestCase):
 class TestArtistObject(unittest.TestCase):
 
     def test_init(self):
-        artist = {'artist': ['Name featuring', 'Feature'],
+        artist = {'artist': ', '.join(['Original Name', 'Featuring Nane', 'Feature…']),
                   'albumartist': 'Name',
                   'musicbrainz_artistid': VALID,
                   'musicbrainz_albumartistid': VALID.replace('11', '22'),
@@ -119,5 +121,36 @@ class TestArtistObject(unittest.TestCase):
         self.assertTrue(art.mbid == VALID)
         artist.pop('albumartist')
         art = Artist(**artist)
+        self.assertTrue(art.name == 'Original Name', art.name)
+
+
+class TestMetaContainers(unittest.TestCase):
+
+    def  test_init(self):
+        a = Meta(mbid=VALID, name='a')
+        b = Meta(mbid=VALID, name='b')
+        c = Meta(mbid=VALID.replace('11', '22'), name='b')
+        # redondant with Meta test_comparison, but anyway
+        cont = MetaContainer([a, b, c])
+        self.assertTrue(len(cont) == 2)
+        self.assertTrue(a in cont)
+        self.assertTrue(b in cont)
+        self.assertTrue(Meta(name='a') in cont)
+
+    def test_intersection_difference(self):
+        # Now set works as expected with composite (name/mbid) collections of Meta
+        # cf Meta test_union
+        # >>> len(MetaContainer([Artist(name='Name'), Artist(name='Name', mbid=<UUID4>)]) == 1
+        # but
+        # >>> len({Artist(name='Name'), Artist(name='Name', mbid=<UUID4>}) == 2
+        art00 = Meta(name='Aphex Twin', mbid='f22942a1-6f70-4f48-866e-238cb2308fbd')
+        art01 = Meta(name='Aphex Twin', mbid=None)
+        self.assertTrue(MetaContainer([art00]) & MetaContainer([art01]))
+        self.assertFalse(MetaContainer([art01]) - MetaContainer([art01]))
+        art01._Meta__mbid = art00.mbid
+        self.assertTrue(MetaContainer([art00]) & MetaContainer([art01]))
+        self.assertFalse(MetaContainer([art01]) - MetaContainer([art01]))
+        art01._Meta__mbid = art00.mbid.replace('229', '330')
+        self.assertFalse(MetaContainer([art00]) & MetaContainer([art01]))
 
 # vim: ai ts=4 sw=4 sts=4 expandtab

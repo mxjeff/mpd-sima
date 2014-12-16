@@ -60,28 +60,6 @@ def blacklist(artist=False, album=False, track=False):
         return wrapper
     return decorated
 
-def bl_artist(func):
-    def wrapper(*args, **kwargs):
-        cls = args[0]
-        if not args[0].database:
-            return func(*args, **kwargs)
-        result = func(*args, **kwargs)
-        if not result:
-            return
-        names = list()
-        for art in result.names:
-            if cls.database.get_bl_artist(art, add_not=True):
-                cls.log.debug('Blacklisted "{0}"'.format(art))
-                continue
-            names.append(art)
-        if not names:
-            return
-        resp = Artist(name=names.pop(), mbid=result.mbid)
-        for name in names:
-            resp.add_alias(name)
-        return resp
-    return wrapper
-
 
 class Player(object):
     """Player interface to inherit from.
@@ -149,52 +127,17 @@ class Player(object):
         """
         raise NotImplementedError
 
-    @bl_artist
     def search_artist(self, artist):
         """
         Search artists based on a fuzzy search in the media library
-            >>> bea = player.search_artist('The beatles')
+            >>> art = Artist(name='the beatles', mbid=<UUID4>) # mbid optional
+            >>> bea = player.search_artist(art)
             >>> print(bea.names)
             >>> ['The Beatles', 'Beatles', 'the beatles']
 
-        Returns a list of strings (artist names)
+        Returns an Artist object
         """
-        found = False
-        # Then proceed with fuzzy matching if got nothing
-        match = get_close_matches(artist.name, self.artists, 50, 0.73)
-        if not match:
-            return
-        if len(match) > 1:
-            self.log.debug('found close match for "%s": %s' %
-                           (artist, '/'.join(match)))
-        # Does not perform fuzzy matching on short and single word strings
-        # Only lowercased comparison
-        if ' ' not in artist.name and len(artist.name) < 8:
-            for fuzz_art in match:
-                # Regular lowered string comparison
-                if artist.name.lower() == fuzz_art.lower():
-                    artist.add_alias(fuzz_art)
-                    return artist
-        fzartist = SimaStr(artist.name)
-        for fuzz_art in match:
-            # Regular lowered string comparison
-            if artist.name.lower() == fuzz_art.lower():
-                found = True
-                artist.add_alias(fuzz_art)
-                if artist.name != fuzz_art:
-                    self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
-                continue
-            # SimaStr string __eq__ (not regular string comparison here)
-            if fzartist == fuzz_art:
-                found = True
-                artist.add_alias(fuzz_art)
-                self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
-                              (fuzz_art, artist))
-        if found:
-            if artist.aliases:
-                self.log.debug('Found: {}'.format('/'.join(artist.names)))
-            return artist
-        return
+        raise NotImplementedError
 
     def disconnect(self):
         """Closing client connection with the Player

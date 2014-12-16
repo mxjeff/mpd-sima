@@ -32,7 +32,7 @@ from hashlib import md5
 # local import
 from .plugin import Plugin
 from .track import Track
-from .meta import Artist
+from .meta import Artist, MetaContainer
 from ..utils.utils import WSError, WSNotFound
 
 def cache(func):
@@ -189,20 +189,21 @@ class WebService(Plugin):
         return as_art
 
     def get_recursive_similar_artist(self):
-        history = deque(self.history)
-        history.popleft()
-        depth = 0
         if not self.player.playlist:
             return
-        last_trk = self.player.playlist[-1]
+        history = list(self.history)
+        history = self.player.queue + history
+        history = deque(history)
+        last_trk = history.popleft() # remove
         extra_arts = list()
         ret_extra = list()
+        depth = 0
         while depth < self.plugin_conf.getint('depth'):
             if len(history) == 0:
                 break
             trk = history.popleft()
             if (trk.Artist in extra_arts
-                or trk.Artist == last_trk.Artist):
+                    or trk.Artist == last_trk.Artist):
                 continue
             extra_arts.append(trk.Artist)
             depth += 1
@@ -213,10 +214,14 @@ class WebService(Plugin):
                            'to "{}" as well'.format(artist))
             similar = self.ws_similar_artists(artist=artist)
             if not similar:
-                return []
-            ret_extra = self.get_artists_from_player(similar)
-            if last_trk.Artist in ret_extra:
-                ret_extra.remove(last_trk.Artist)
+                continue
+            ret_extra.extend(self.get_artists_from_player(similar))
+
+        if ret_extra:
+            self.log.debug('similar artist(s) fond: {}...'.format(
+                ' / '.join(map(str, ret_extra))))
+        if last_trk.Artist in ret_extra:
+            ret_extra.remove(last_trk.Artist)
         return ret_extra
 
     def get_local_similar_artists(self):
@@ -234,7 +239,7 @@ class WebService(Plugin):
         self.log.info('First five similar artist(s): {}...'.format(
                       ' / '.join(map(str, list(similar)[:5]))))
         self.log.info('Looking availability in music library')
-        ret = set(self.get_artists_from_player(similar))
+        ret = MetaContainer(self.get_artists_from_player(similar))
         ret_extra = None
         if len(self.history) >= 2:
             if self.plugin_conf.getint('depth') > 1:
@@ -243,30 +248,30 @@ class WebService(Plugin):
             # get them reorg to pick up best element
             ret_extra = self._get_artists_list_reorg(ret_extra)
             # pickup half the number of ret artist
-            ret_extra = set(ret_extra[:len(ret)//2])
+            ret_extra = MetaContainer(ret_extra[:len(ret)//2])
             self.log.debug('Using extra: {}'.format(
                            ' / '.join(map(str, ret_extra))))
             ret = ret | ret_extra
         if not ret:
             self.log.warning('Got nothing from music library.')
-            self.log.warning('Try running in debug mode to guess why...')
             return []
         # WARNING:
         #   * operation on set will not match against aliases
         #   * composite set w/ mbid set and whitout won't match either
-        queued_artists = {trk.Artist for trk in self.player.queue}
+        queued_artists = MetaContainer([trk.Artist for trk in self.player.queue])
         if ret & queued_artists:
             self.log.debug('Removing already queued artists: '
-                           '{0}'.format(ret & queued_artists))
+                           '{0}'.format('/'.join(map(str, ret & queued_artists))))
             ret = ret - queued_artists
         if self.player.current and self.player.current.Artist in ret:
             self.log.debug('Removing current artist: {0}'.format(self.player.current.Artist))
-            ret = ret - {self.player.current.Artist}
+            ret = ret -  MetaContainer([self.player.current.Artist])
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         self.log.info('Got {} artists in library'.format(len(ret)))
         candidates = self._get_artists_list_reorg(list(ret))
-        self.log.info(' / '.join(map(str, candidates)))
+        if candidates:
+            self.log.info(' / '.join(map(str, candidates)))
         return candidates
 
     def _get_album_history(self, artist=None):
