@@ -21,7 +21,10 @@
 Defines some object to handle audio file metadata
 """
 
-import collections.abc  # python >= 3.3
+try:
+    from collections.abc import Set # python >= 3.3
+except ImportError:
+    from collections import Set # python 3.2
 import logging
 import re
 
@@ -159,7 +162,7 @@ class Artist(Meta):
             mbid = kwargs.get('musicbrainz_albumartistid').split(', ')[0]
         super().__init__(name=name, mbid=mbid)
 
-class MetaContainer(collections.abc.Set):
+class MetaContainer(Set):
 
     def __init__(self, iterable):
         self.elements = lst = []
