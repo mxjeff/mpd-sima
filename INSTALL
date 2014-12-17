@@ -1,4 +1,4 @@
-Design for python >= 3.3
+Design for python >= 3.2
 
 Requires: python-musicpd >= 0.4.0 [0],
           requests >= 2.2.0 [1]
@@ -9,18 +9,20 @@ Requires: python-musicpd >= 0.4.0 [0],
 
 Virtualenv installation:
 
-Run ./vinstall.sh to generate the python virtualenv and install requirements.
+Run "python3 ./vinstall.py" to generate the python virtualenv and install
+requirements (need at least python 3.3).
 
-Default looks for python3 on the system.
-It will setup a virtualenv within a "venv" directory (same level as vinstall.sh file).
+It will setup a virtualenv within a "venv" directory (same level as vinstall.py file).
 It should also write a shell wrapper to run mpd-sima within the virtualenv.
 
 	./vmpd-sima --help
 
-You might specify a python3 interpreter if the binary name differs from python3:
+You might prefer manual installation:
 
-    PY3=/usr/bin/python ./vinstall.sh
+	# On your system <virtualenv_command> may be "pyenv", "python3 -m venv" or "virtualenv"
+	# Refer to the relevant manual to install a python env, 3.2 minimum.
 
-You can locate the virtalenv somewhere else:
-
-    INSTALL_DIR=/tmp/crap_test/ ./vinstall.sh
+	<virtualenv_command> ./venv
+	. ./venv/bin/activate
+	./setup.py install
+	./venv/bin/mpd-sima --help
