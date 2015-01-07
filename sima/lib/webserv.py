@@ -243,6 +243,8 @@ class WebService(Plugin):
         if ret:
             self.log.debug('regular found in library: {}'.format(
                            ' / '.join(map(str, ret))))
+        else:
+            self.log.debug('Got nothing similar from library!')
         ret_extra = None
         if len(self.history) >= 2:
             if self.plugin_conf.getint('depth') > 1:
@@ -250,8 +252,11 @@ class WebService(Plugin):
         if ret_extra:
             # get them reorg to pick up best element
             ret_extra = self._get_artists_list_reorg(ret_extra)
-            # pickup half the number of ret artist
-            ret_extra = MetaContainer(ret_extra[:max(4, len(ret))//2])
+            # tries to pickup less artist from extra art
+            if len(ret) < 4:
+                ret_extra = MetaContainer(ret_extra)
+            else:
+                ret_extra = MetaContainer(ret_extra[:max(4, len(ret))//2])
             if ret_extra:
                 self.log.debug('extra found in library: {}'.format(
                                ' / '.join(map(str, ret_extra))))
