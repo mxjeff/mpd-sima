@@ -297,7 +297,7 @@ class PlayerClient(Player):
                 arts = set([trk.artist for trk in album_trks])
                 if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
                     if album not in albums:
-                        albums.append(Album(name=album, albumartist=artist))
+                        albums.append(Album(name=album, **kwalbart))
                 elif album and album not in albums:
                     self.log.debug('"{0}" probably not an album of "{1}"'.format(
                                    album, artist) + '({0})'.format('/'.join(arts)))
