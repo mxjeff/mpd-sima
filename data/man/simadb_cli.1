@@ -2,12 +2,12 @@
 .\"     Title: simadb_cli
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 12/08/2014
-.\"    Manual: mpd-sima 0.13.0 User Manual
+.\"      Date: 01/28/2015
+.\"    Manual: mpd-sima 0.13.1 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "SIMADB_CLI" "1" "12/08/2014" "mpd-sima" "mpd-sima 0.13.0 User Manual"
+.TH "SIMADB_CLI" "1" "01/28/2015" "mpd-sima" "mpd-sima 0.13.1 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,15 +31,9 @@
 simadb_cli \- simadb_cli is a command line interface editor for the sima user DB\&.
 .SH "SYNOPSIS"
 .HP \w'\fBsimadb_cli\fR\ 'u
-\fBsimadb_cli\fR \fB\-\-add_similarity=\fR\fIsimilarity_string\fR [\fB\-\-check_names\fR] [\fB\-\-dbfile=\fR\fIdb_file\fR] [\fB\-\-reciprocal\fR] [\fB\-\-host=\fR\fImpd_host\fR] [\fB\-\-port=\fR\fImpd_port\fR]
-.HP \w'\fBsimadb_cli\fR\ 'u
 \fBsimadb_cli\fR \fB\-\-remove_artist=\fR\fIartist\fR [\fB\-\-dbfile=\fR\fIdb_file\fR] [\fB\-\-reciprocal\fR]
 .HP \w'\fBsimadb_cli\fR\ 'u
-\fBsimadb_cli\fR \fB\-\-remove_similarity=\fR\fI"main\ artist,similar\ artist"\fR [\fB\-\-dbfile=\fR\fIdb_file\fR] [\fB\-\-reciprocal\fR]
-.HP \w'\fBsimadb_cli\fR\ 'u
 \fBsimadb_cli\fR \fB\-\-purge_hist\fR [\fB\-\-dbfile=\fR\fIdb_file\fR]
-.HP \w'\fBsimadb_cli\fR\ 'u
-\fBsimadb_cli\fR \fB\-\-view_artist=\fR\fB\fI"artist\ name"\fR\fR [\fB\-\-dbfile=\fR\fIdb_file\fR]
 .HP \w'\fBsimadb_cli\fR\ 'u
 \fBsimadb_cli\fR \fB\-\-view_all\fR [\fB\-\-dbfile=\fR\fIdb_file\fR]
 .HP \w'\fBsimadb_cli\fR\ 'u
@@ -56,37 +50,9 @@ This manual page documents briefly the
 \fBsimadb_cli\fR
 commands\&.
 .PP
-simadb_cli is a command line interface to get and edit users similarities and blacklist database used with MPD_sima\&. The default database file (see
+simadb_cli is a command line interface to get and edit users blacklist database used with MPD_sima\&. The default database file (see
 the section called \(lqFILES\(rq) can be overridden if you want\&.
-.PP
-Consider reading
-the section called \(lqA WORD ABOUT SIMA DATA BASE\(rq
-to understand the structure and relation of similarities within the database\&.
 .SH "EXAMPLE"
-.SS "Similarity edition"
-.PP
-Here follows some simple examples on how to deal with similarity database\&.
-.PP
-Pay attention, the following examples set one\-way similarities in the DB! Read more about it in
-the section called \(lqA WORD ABOUT SIMA DATA BASE\(rq\&.
-.PP
-\fIAdding a similarity between two artists\&.\fR
-In the following example "Pelican" will point to "Russian Circles" with a match score of 88% (ie\&. "Russian Circles" 88% similar to Pelican, not reciprocal), it will also check against MPD the presence of both artists in the music library\&.
-.PP
-\fBsimadb_cli \-\-add "Pelican,Russian Circles:80" \-\-check_names\fR
-.PP
-Similarity string use comma "," as artists separator and semi colon ":" for artist/similarity score separator, cf\&.
-the section called \(lqSIMILARITY FORMAT\(rq\&.
-.PP
-\fIAdding a similarity between multiple artists\&.\fR
-In the following example "Rage Against The Machine" will point to "Tool" and "Audioslave" as similar artists and controls artists names are actually in MPD music library\&.
-.PP
-\fBsimadb_cli \-\-add "Rage Against The Machine,Tool:70,Audiosalve:80" \-\-check_names\fR
-.PP
-\fIViewing similarit(y|ies) for an artist\&.\fR
-In the following example we are looking for entries for "Rage Against The Machine"
-.PP
-\fBsimadb_cli \-\-view_artist "Rage Against The Machine"\fR
 .SS "Black list edition"
 .PP
 \fIAdding to black list\&.\fR
@@ -117,33 +83,6 @@ Print help and exit\&.
 \fB\-\-version\fR
 .RS 4
 Print version and exit\&.
-.RE
-.PP
-\fB\-a \fR\fB\fIsimilarity_string\fR\fR, \fB\-\-add_similarity=\fR\fB\fIsimilarity_string\fR\fR
-.RS 4
-Add similarity to the database\&.
-.br
-For more details about the
-\fIsimilarity_string\fR
-see
-the section called \(lqSIMILARITY FORMAT\(rq\&.
-.RE
-.PP
-\fB\-c\fR, \fB\-\-check_names\fR
-.RS 4
-Use with
-\fB\-\-add_similarity\fR
-in order to check artists names used in
-\fIsimilarity_string\fR\&. simadb_cli will control presence of artists names in MPD library\&. Default is to look for MPD server on localhost:6600 or environment variables
-\fBMPD_HOST\fR
-and
-\fBMPD_PORT\fR
-if set\&.
-.br
-You can as well give simadb_cli host/port on the command line using respectively
-\fB\-S\fR
-and
-\fB\-P\fR\&.
 .RE
 .PP
 \fB\-\-bl_art=\fR\fB\fIartist_name\fR\fR
@@ -188,28 +127,6 @@ the section called \(lqFILES\(rq)\&.
 Purge history, you may supply an alternative DB file with \-\-dbfile option\&.
 .RE
 .PP
-\fB\-r\fR, \fB\-\-reciprocal\fR
-.RS 4
-Use with an editing options in order to edit reciprocal similarity as well\&.
-\fB\-\-add_similarity\fR
-and
-\fB\-\-remove_{artist|similarity}\fR
-are supporting reciprocal edition\&.
-.sp
-\fIN\&.B\fR: this option has to appear after the editing option on the command line\&.
-.sp
-See
-the section called \(lqA WORD ABOUT SIMA DATA BASE\(rq
-for further information about reciprocity notion\&.
-.RE
-.PP
-\fB\-\-remove_artist=\fR\fB\fIartist\fR\fR
-.RS 4
-Use to remove an artist entry (as main artist) with its associated similarities\&. To remove artist where it appears as a similar artist use the
-\fB\-\-reciprocal\fR
-option\&.
-.RE
-.PP
 \fB\-\-remove_bl=\fR\fB\fIrow_id\fR\fR
 .RS 4
 Use to remove a black list entry\&. To get the row_id to suppress use
@@ -217,35 +134,9 @@ Use to remove a black list entry\&. To get the row_id to suppress use
 option\&.
 .RE
 .PP
-\fB\-\-remove_similarity=\fR\fB\fI"main artist,similar artist"\fR\fR
-.RS 4
-Use to remove a single similarity between a main artist and an associated similarity\&. Give the main artist first, use comma (",") to separate it from similar artist\&.
-.br
-Use of
-\fB\-\-reciprocal\fR
-is possible here, see
-the section called \(lqA WORD ABOUT SIMA DATA BASE\(rq\&.
-.sp
-This option is useful in case you want to remove only a specific similarity between two artists, to remove completely an artist use
-\fB\-\-remove_artist\fR
-instead\&.
-.RE
-.PP
-\fB\-v \fR\fB\fI"artist name"\fR\fR, \fB\-\-view_artist=\fR\fB\fI"artist name"\fR\fR
-.RS 4
-Get entries for
-\fI"artist name"\fR
-in the data base (print to stdout)\&.
-.RE
-.PP
 \fB\-\-view_bl\fR
 .RS 4
 Get all entries in the black list\&.
-.RE
-.PP
-\fB\-\-view_all\fR
-.RS 4
-Get all entries in the data base (print to stdout)\&.
 .RE
 .PP
 \fB\-P \fR\fB\fImpd_port\fR\fR, \fB\-\-port=\fR\fB\fImpd_port\fR\fR
@@ -285,70 +176,6 @@ SQLite DB file\&. Usually
 is set to
 ${HOME}/\&.local/share\&.
 .RE
-.SH "SIMILARITY FORMAT"
-.PP
-The
-\fIsimilarity_string\fR
-has to be formatted following a special pattern in order for simadb_cli to extract similarity relations between artists names\&. Usually a similarity entry is defined as a main artist, lets say
-\fImain_art\fR, followed by a list of similar artists which you want to be related to that
-\fImain_art\fR, each artist of that list with a specific similarity value, a match score, quantifying the similarity relation with the
-\fImain_art\fR\&. The match score value is an integer in [0 ,100] with 100 corresponding to a perfect match\&.
-.PP
-\fIsimilarity_string\fR
-is then to be formatted as follow:
-.PP
-\fBmain_art,first artist:<score>,second artist:<score>\fR
-.PP
-Each artist group are separated with commas (",") and inside each group the artist name and the match score is colon (":") separated\&. Obviously the first artist group, as the main artist, does not have a match score\&.
-.PP
-Lets see how it works with an example\&. I consider "Led Zeppelin" to be similar to "Tool" with a match score of 25, I also want to have "Audioslave" related to "Led Zeppelin" with a score of 20\&. Then the
-\fIsimilarity_string\fR
-will be the following:
-.PP
-\fBLed Zeppelin,Tool:25,Audiosalve:20\fR
-.PP
-See
-the section called \(lqA WORD ABOUT SIMA DATA BASE\(rq
-for more details about how similarities are handled
-.SH "A WORD ABOUT SIMA DATA BASE"
-.PP
-The similarity database is defined from the point of view of a
-\fImain artist\fR
-which is declared related to a list of
-\fIsimilar artists\fR\&. That means when you define
-\fImain_art\fR
-to be similar to
-\fIsim_art A\fR
-and
-\fIsim_art B\fR
-the reciprocal won\*(Aqt be true,
-\fIsim_art A\fR
-and
-\fIsim_art B\fR
-are not similar to
-\fImain_art\fR\&. At least this is the default behavior when you edit entries with simadb_cli, this is also the way last\&.fm is working concerning similar artists\&. This documentation is using that particular terminology to specify which kind of artist we are dealing with : "main artist" or "similar artist"\&.
-.br
-The
-\fB\-\-reciprocal\fR
-option allows one to add reciprocal relation where
-\fIsim_art A\fR
-and
-\fIsim_art B\fR
-become respectively the
-\fImain_art\fR\&. Using
-\fB\-\-reciprocal\fR
-you will then edit two more entries in the database\&. To summarize here is what you\*(Aqll end up with in your data base adding similarity with this string
-\fBmain_art,sim_art A:34,sim_art B:45\fR\&.
-.PP
-\fBsimadb_cli \-\-reciprocal \-\-add_similarity=main_art,sim_art A:34,sim_art B:45\fR
-.PP
-main_art similar to sim_art A:34 and sim_art B:45
-.br
-sim_art A similar to main_art:34
-.br
-sim_art B similar to main_art:45
-.PP
-Without the reciprocal option you would have add only the first similarity\&. Usually using the reciprocal option is the desired behavior, at least what users have in mind when thinking of similarity relation between to artists but keep in mind that it may lead to have MPD_sima more sensible to loop over the same two artist (ASSERTION TO BE CONFIRMED)\&.
 .SH "FEEDBACK/BUGS"
 .PP
 The maintainer would be more than happy to ear from you, don\*(Aqt hesitate to send feedback,
@@ -371,7 +198,7 @@ Wrote this man page and is currently leading MPD_sima project\&.
 .RE
 .SH "COPYRIGHT"
 .br
-Copyright \(co 2009-2014 Jack Kaliko
+Copyright \(co 2009-2015 Jack Kaliko
 .br
 .PP
 This manual page was written for the Debian system (and may be used by others)\&.

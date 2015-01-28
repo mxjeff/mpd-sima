@@ -50,7 +50,7 @@ DEFAULT_CONF = {
             'contrib': "",
             'user_db': "false",
             'history_duration': 8,
-            'queue_length': 1,
+            'queue_length': 2,
             'var_dir': 'empty',
             'musicbrainzid': "true",
             },

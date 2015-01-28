@@ -74,7 +74,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
     <cmdsynopsis>
       <command>&dhpackage;</command>
       <arg choice="opt"><option>--var_dir=</option><replaceable class="option">var_directory</replaceable></arg>
-      <arg choice="opt"><option>--create-db></option></arg>
+      <arg choice="opt"><option>--create-db</option></arg>
     </cmdsynopsis>
     <cmdsynopsis>
       <command>&dhpackage;</command>
@@ -250,11 +250,11 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
               <term>DEFAULTS</term>
               <listitem>
                   <para>Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env. var. if set).</para>
-                        <para>The default behavior is to add one track,
-                            this track is to be chosen among titles from
-                            artists similar to the artist of the currently
-                            played track. MPD_sima will add one track when the
-                            unplayed queue is one track long.</para>
+                        <para>The default behavior is to add one track, this
+                            track is to be chosen among titles from artists
+                            similar to the last artist in the queue.  MPD_sima
+                            will add one track when the unplayed queue is one
+                            track long.</para>
                   <para>To change these defaults, use the configuration file <filename>mpd_sima.cfg</filename></para>
               </listitem>
           </varlistentry>

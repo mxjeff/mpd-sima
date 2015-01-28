@@ -1,3 +1,11 @@
+MPD_sima v0.13.1
+
+ * Fixed default conf file name (back to mpd_sima.cfg)
+ * Cleanup code (removed users similarities)
+
+-- kaliko jack <kaliko@azylum.org> UNRELEASED
+
+
 MPD_sima v0.13.0
 
  * Use of MusicBrainzIdentifier by default

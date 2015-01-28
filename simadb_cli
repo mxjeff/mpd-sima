@@ -43,68 +43,15 @@ simadb_cli helps you to edit entries in your own DB of similarity
 between artists."""
 DB_NAME = 'sima.db'
 
-class FooAction(Action):
-    def check(self, namespace):
-        if namespace.similarity: return True
-        if namespace.remove_art: return True
-        if namespace.remove_sim: return True
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        opt_required = '"--remove_artist", "--remove_similarity" or "--add_similarity"'
-        if not self.check(namespace):
-            parser.error(
-                    'can\'t use {0} option before or without {1}'.format(
-                        option_string, opt_required))
-        setattr(namespace, self.dest, True)
-
 # Options list
 # pop out 'sw' value before creating ArgumentParser object.
 OPTS = list([
-    {
-        'sw':['-a', '--add_similarity'],
-        'type': str,
-        'dest':'similarity',
-        'help': 'Similarity to add formated as follow: ' +
-        ' "art_0,art_1:90,art_2:80..."'},
-    {
-        'sw': ['-c', '--check_names'],
-        'action': 'store_true',
-        'default': False,
-        'help': 'Turn on controls of artists names in MPD library.'},
     {
         'sw':['-d', '--dbfile'],
         'type': str,
         'dest':'dbfile',
         'action': utils.Wfile,
         'help': 'File to read/write database from/to'},
-    {
-        'sw': ['-r', '--reciprocal'],
-        'default': False,
-        'nargs': 0, 
-        'action': FooAction,
-        'help': 'Turn on reciprocity for similarity relation when add/remove.'},
-    {
-        'sw':['--remove_artist'],
-        'type': str,
-        'dest': 'remove_art',
-        'metavar': '"ARTIST TO REMOVE"',
-        'help': 'Remove an artist from DB (main artist entries).'},
-    {
-        'sw':['--remove_similarity'],
-        'type': str,
-        'dest': 'remove_sim',
-        'metavar': '"MAIN ART,SIMI ART"',
-        'help': 'Remove an similarity relation from DB (main artist <=> similar artist).'},
-    {
-        'sw':['-v', '--view_artist'],
-        'type': str,
-        'dest':'view',
-        'metavar': '"ARTIST NAME"',
-        'help': 'View an artist from DB.'},
-    {
-        'sw':['--view_all'],
-        'action': 'store_true',
-        'help': 'View all similarity entries.'},
     {
         'sw': ['-S', '--host'],
         'type': str,
@@ -306,54 +253,6 @@ class SimaDB_CLI(object):
         mpd_cli.disconnect()
         return control
 
-    def _parse_similarity(self):
-        """Parse command line option similarity"""
-        cli_sim = self.options.similarity.strip(',').split(',')
-        sim = list([])
-        main = cli_sim[0]
-        for art in cli_sim[1:]:
-            artist = art.split(':')[0]
-            score = int(art.split(':')[1])
-            sim.append({'artist': artist, 'score': score})
-        return (main, sim)
-
-    def _print_main_art(self, art=None):
-        """Print entries, art as main artist."""
-        if not art:
-            art = self.options.view
-        db = simadb.SimaDB(db_path=self.dbfile)
-        art_db = self._get_art_from_db(art)
-        if not art_db: return
-        sims = list([])
-        [sims.append(a) for a in db._get_similar_artists_from_db(art_db[0])]
-        if len(sims) == 0:
-            return False
-        print('"%s" similarities:' % art)
-        for art in sims:
-            mess = str('  - {score:0>2d} {artist}'.format(**art))
-            print(mess)
-        return True
-
-    def _remove_sim(self, art1_db, art2_db):
-        """Remove single similarity between two artists."""
-        db = simadb.SimaDB(db_path=self.dbfile)
-        similarity = db._get_artist_match(art1_db[0], art2_db[0])
-        if similarity == 0:
-            return False
-        db._remove_relation_between_2_artist(art1_db[0], art2_db[0])
-        mess = 'Remove: "{0}" "{1}:{2:0>2d}"'.format(art1_db[1], art2_db[1],
-                                                     similarity)
-        print(mess)
-        return True
-
-    def _revert_similarity(self, sim_formated):
-        """Revert similarity string (for reciprocal editing - add)."""
-        main_art = sim_formated[0]
-        similars = sim_formated[1]
-        for similar in similars:
-            yield (similar.get('artist'),
-                [{'artist':main_art, 'score':similar.get('score')}])
-
     def bl_artist(self):
         """Black list artist"""
         mpd_cli = self._get_mpd_client()
@@ -419,31 +318,6 @@ class SimaDB_CLI(object):
         db.clean_database()
         print('done.')
 
-    def view(self):
-        """Print out entries for an artist."""
-        art = self.options.view
-        db = simadb.SimaDB(db_path=self.dbfile)
-        art_db = self._get_art_from_db(art)
-        if not art_db: return
-        if not self._print_main_art():
-            mess = str('"%s" present in DB but not as a main artist' % art)
-            print(mess)
-        else: print('')
-        art_rev = list([])
-        [art_rev.append(a) for a in db._get_reverse_similar_artists_from_db(art_db[0])]
-        if not art_rev: return
-        mess = str('%s" appears as similar for the following artist(s): %s' %
-                (art,', '.join(art_rev)))
-        print(mess)
-        [self._print_main_art(a) for a in art_rev]
-
-    def view_all(self):
-        """Print out all entries."""
-        db = simadb.SimaDB(db_path=self.dbfile)
-        for art in db.get_artists():
-            if not art[0]: continue
-            self._print_main_art(art=art[0])
-
     def view_bl(self):
         """Print out black list."""
         # TODO: enhance output formating
@@ -451,59 +325,10 @@ class SimaDB_CLI(object):
         for bl_e in db.get_black_list():
             print('\t# '.join([str(e) for e in bl_e]))
 
-    def remove_similarity(self):
-        """Remove entry"""
-        cli_sim = self.options.remove_sim
-        pattern = '^([^,]+?),([^,]+?,?)$'
-        regexp = re.compile(pattern, re.U).match(cli_sim)
-        if not regexp:
-            print('ERROR: similarity badly formated: "%s"' % cli_sim, file=stderr)
-            print('USAGE: A single relation between two artists is expected here.', file=stderr)
-            print('USAGE: "main artist,similar artist"', file=stderr)
-            exit(1)
-        arts = cli_sim.split(',')
-        if len(arts) != 2:
-            print('ERROR: unknown error in similarity format', file=stderr)
-            print('USAGE: "main artist,similar artist"', file=stderr)
-            exit(1)
-        art1_db = self._get_art_from_db(arts[0].strip())
-        art2_db = self._get_art_from_db(arts[1].strip())
-        if not art1_db or not art2_db: return
-        self._remove_sim(art1_db, art2_db)
-        if not self.options.reciprocal:
-            return
-        self._remove_sim(art2_db, art1_db)
-
-    def remove_artist(self):
-        """ Remove artist in the DB."""
-        deep = False
-        art = self.options.remove_art
-        db = simadb.SimaDB(db_path=self.dbfile)
-        art_db = self._get_art_from_db(art)
-        if not art_db: return False
-        print('Removing "%s" from database' % art)
-        if self.options.reciprocal:
-            print('reciprocal option used, performing deep remove!')
-            deep = True
-        db._remove_artist(art_db[0], deep=deep)
-
     def remove_black_list_entry(self):
         """"""
         db = simadb.SimaDB(db_path=self.dbfile)
         db._remove_bl(int(self.options.remove_bl))
-
-    def write_simi(self):
-        """Write similarity to DB.
-        """
-        self._create_db()
-        sim_formated = self._parse_similarity()
-        print('About to update DB with: "%s": %s' % sim_formated)
-        db = simadb.SimaDB(db_path=self.dbfile)
-        db._update_similar_artists(*sim_formated)
-        if self.options.reciprocal:
-            print('...and with reciprocal combinations as well.')
-            for sim_formed_rec in self._revert_similarity(sim_formated):
-                db._update_similar_artists(*sim_formed_rec)
 
     def main(self):
         """
@@ -515,8 +340,6 @@ class SimaDB_CLI(object):
         if self.options.dbfile:
             self.dbfile = self.options.dbfile
             print('Using db file: %s' % self.dbfile)
-        if self.options.reciprocal:
-            print('Editing reciprocal similarity')
         if self.options.bl_art:
             self.bl_artist()
             return
@@ -535,21 +358,6 @@ class SimaDB_CLI(object):
         if self.options.remove_bl:
             self.remove_black_list_entry()
             return
-        if self.options.similarity:
-            self._control_similarity()
-            self.write_simi()
-            return
-        if self.options.remove_art:
-            self.remove_artist()
-            return
-        if self.options.remove_sim:
-            self.remove_similarity()
-            return
-        if self.options.view:
-            self.view()
-            return
-        if self.options.view_all:
-            self.view_all()
         if self.options.do_purge_hist:
             self.purge_history()
         exit(0)

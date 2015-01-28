@@ -2,12 +2,12 @@
 .\"     Title: mpd-sima
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 12/08/2014
-.\"    Manual: mpd-sima 0.13.0 User Manual
+.\"      Date: 01/28/2015
+.\"    Manual: mpd-sima 0.13.1 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD\-SIMA" "1" "12/08/2014" "mpd-sima" "mpd-sima 0.13.0 User Manual"
+.TH "MPD\-SIMA" "1" "01/28/2015" "mpd-sima" "mpd-sima 0.13.1 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -33,7 +33,7 @@ mpd-sima \- mpd\-sima will try to maintain some titles ahead in the queue follow
 .HP \w'\fBmpd\-sima\fR\ 'u
 \fBmpd\-sima\fR [\fB\-\-daemon\fR] [\fB\-\-config=\fR\fIconf_file\fR] [\fB\-\-var_dir=\fR\fIvar_directory\fR] [\fB\-\-pid=\fR\fIpid_file\fR] [\fB\-\-log=\fR\fIlog_file\fR] [\fB\-\-log\-level=\fR\fIlog_level\fR] [\fB\-\-host=\fR\fImpd_host\fR] [\fB\-\-mpd_port=\fR\fImpd_port\fR]
 .HP \w'\fBmpd\-sima\fR\ 'u
-\fBmpd\-sima\fR [\fB\-\-var_dir=\fR\fIvar_directory\fR] [\fB\-\-create\-db>\fR]
+\fBmpd\-sima\fR [\fB\-\-var_dir=\fR\fIvar_directory\fR] [\fB\-\-create\-db\fR]
 .HP \w'\fBmpd\-sima\fR\ 'u
 \fBmpd\-sima\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | \fB\-\-version\fR]
 .SH "DESCRIPTION"
@@ -258,7 +258,7 @@ DEFAULTS
 .RS 4
 Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env\&. var\&. if set)\&.
 .sp
-The default behavior is to add one track, this track is to be chosen among titles from artists similar to the artist of the currently played track\&. MPD_sima will add one track when the unplayed queue is one track long\&.
+The default behavior is to add one track, this track is to be chosen among titles from artists similar to the last artist in the queue\&. MPD_sima will add one track when the unplayed queue is one track long\&.
 .sp
 To change these defaults, use the configuration file
 mpd_sima\&.cfg
@@ -288,7 +288,7 @@ Wrote this man page and is currently leading MPD_sima project\&.
 .RE
 .SH "COPYRIGHT"
 .br
-Copyright \(co 2009-2014 Jack Kaliko
+Copyright \(co 2009-2015 Jack Kaliko
 .br
 .PP
 This manual page was written for the Debian system (and may be used by others)\&.

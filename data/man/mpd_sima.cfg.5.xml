@@ -214,13 +214,6 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                         </para>
                     </listitem>
                 </varlistentry>
-                <varlistentry> <!-- sima.user_db -->
-                    <term><option>user_db=</option><replaceable>false</replaceable></term>
-                    <listitem>
-                        <para>Temporarily removed feature</para>
-                        <!--<para>Look for user defined similarities in user data base.</para>-->
-                    </listitem>
-                </varlistentry>
             </variablelist>
             <para>&dhpackage;'s plugin management for internal source plugin
                 and contrib (ie. external plugins).<sbr /> Plugins list is a

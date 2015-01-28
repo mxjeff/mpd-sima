@@ -28,7 +28,7 @@
 #    Artists: <http://musicbrainz.org/doc/Artist_Name>
 #             <http://musicbrainz.org/doc/Same_Artist_With_Different_Names>
 
-__DB_VERSION__ = 2
+__DB_VERSION__ = 3
 __HIST_DURATION__ = int(30 * 24)  # in hours
 
 import sqlite3
@@ -53,11 +53,6 @@ class SimaDBAccessError(SimaDBError):
 
 class SimaDBNoFile(SimaDBError):
     """No DB file present"""
-    pass
-
-
-class SimaDBUpgradeError(SimaDBError):
-    """Error on upgrade"""
     pass
 
 
@@ -94,23 +89,6 @@ class SimaDB(object):
             self._db_path, timeout=5.0, isolation_level="immediate")
         #connection.text_factory = str
         return connection
-
-    def upgrade(self):
-        """upgrade DB from previous versions"""
-        connection = self.get_database_connection()
-        try:
-            connection.execute('SELECT version FROM db_info')
-        except Exception as err:
-            if err.__str__() == "no such table: db_info":
-                # db version < 2 (MPD_sima 0.6)
-                copyfile(self._db_path, self._db_path + '.0.6')
-                connection.execute('DROP TABLE tracks')
-                connection.commit()
-                self.create_db()
-            else:
-                raise SimaDBUpgradeError('Could not upgrade database: "%s"' %
-                        err)
-        self.close_database_connection(connection)
 
     def get_artist(self, artist_name, mbid=None,
             with_connection=None, add_not=False):
@@ -422,8 +400,7 @@ class SimaDB(object):
         self.close_database_connection(connection)
 
     def _set_mbid(self, artist_id=None, mbid=None, with_connection=None):
-        """get artist information from the database.
-        if not in database insert new entry."""
+        """"""
         if with_connection:
             connection = with_connection
         else:
@@ -434,89 +411,6 @@ class SimaDB(object):
         if not with_connection:
             self.close_database_connection(connection)
 
-    def _get_similar_artists_from_db(self, artist_id):
-        connection = self.get_database_connection()
-        results = [row for row in connection.execute(
-            "SELECT match, name FROM usr_artist_2_artist INNER JOIN"
-            " artists ON usr_artist_2_artist.artist2 = artists.id WHERE"
-            " usr_artist_2_artist.artist1 = ? ORDER BY match DESC;",
-            (artist_id,))]
-        self.close_database_connection(connection)
-        for score, artist in results:
-            yield {'score': score, 'artist': artist}
-
-    def _get_reverse_similar_artists_from_db(self, artist_id):
-        connection = self.get_database_connection()
-        results = [row for row in connection.execute(
-            "SELECT name FROM usr_artist_2_artist INNER JOIN"
-            " artists ON usr_artist_2_artist.artist1 = artists.id WHERE"
-            " usr_artist_2_artist.artist2 = ?;",
-            (artist_id,))]
-        self.close_database_connection(connection)
-        for artist in results:
-            yield artist[0]
-
-    def get_similar_artists(self, artist_name):
-        """get similar artists from the database sorted by descending
-        match score"""
-        artist_id = self.get_artist(artist_name)[0]
-        for result in self._get_similar_artists_from_db(artist_id):
-            yield result
-
-    def _get_artist_match(self, artist1, artist2, with_connection=None):
-        """get artist match score from database"""
-        if with_connection:
-            connection = with_connection
-        else:
-            connection = self.get_database_connection()
-        rows = connection.execute(
-            "SELECT match FROM usr_artist_2_artist WHERE artist1 = ?"
-            " AND artist2 = ?",
-            (artist1, artist2))
-        result = 0
-        for row in rows:
-            result = row[0]
-            break
-        if not with_connection:
-            self.close_database_connection(connection)
-        return result
-
-    def _remove_relation_between_2_artist(self, artist1, artist2):
-        """Remove a similarity relation"""
-        connection = self.get_database_connection()
-        connection.execute(
-            'DELETE FROM usr_artist_2_artist'
-            ' WHERE artist1 = ? AND artist2 = ?;',
-            (artist1, artist2))
-        self.clean_database(with_connection=connection)
-        self._update_artist(artist_id=artist1, with_connection=connection)
-        connection.commit()
-        self.close_database_connection(connection)
-
-    def _remove_artist(self, artist_id, deep=False, with_connection=None):
-        """Remove all artist1 reference"""
-        if with_connection:
-            connection = with_connection
-        else:
-            connection = self.get_database_connection()
-        if deep:
-            connection.execute(
-                'DELETE FROM usr_artist_2_artist'
-                ' WHERE artist1 = ? OR artist2 = ?;',
-                (artist_id, artist_id))
-            connection.execute(
-                'DELETE FROM artists WHERE id = ?;',
-                (artist_id,))
-        else:
-            connection.execute(
-                'DELETE FROM usr_artist_2_artist WHERE artist1 = ?;',
-                (artist_id,))
-        self.clean_database(with_connection=connection)
-        self._update_artist(artist_id=artist_id, with_connection=connection)
-        if not with_connection:
-            connection.commit()
-            self.close_database_connection(connection)
-
     def _remove_bl(self, rowid):
         """Remove bl row id"""
         connection = self.get_database_connection()
@@ -524,22 +418,6 @@ class SimaDB(object):
                 ' WHERE black_list.rowid = ?', (rowid,))
         connection.commit()
         self.close_database_connection(connection)
-
-    def _insert_artist_match(
-        self, artist1, artist2, match, with_connection=None):
-        """write match score to the database.
-        Does not update time stamp in table artist/*_updated"""
-        if with_connection:
-            connection = with_connection
-        else:
-            connection = self.get_database_connection()
-        connection.execute(
-            "INSERT INTO usr_artist_2_artist (artist1, artist2, match) VALUES"
-            " (?, ?, ?)",
-            (artist1, artist2, match))
-        if not with_connection:
-            connection.commit()
-            self.close_database_connection(connection)
 
     def add_history(self, track):
         """Add to history"""
@@ -555,57 +433,6 @@ class SimaDB(object):
         connection.commit()
         self.close_database_connection(connection)
 
-    def _update_artist(self, artist_id, with_connection=None):
-        """write artist information to the database"""
-        if with_connection:
-            connection = with_connection
-        else:
-            connection = self.get_database_connection()
-        connection.execute(
-            "UPDATE artists SET usr_updated = DATETIME('now') WHERE id = ?",
-            (artist_id,))
-        if not with_connection:
-            connection.commit()
-            self.close_database_connection(connection)
-
-    def _update_artist_match(
-        self, artist1, artist2, match, with_connection=None):
-        """write match score to the database"""
-        if with_connection:
-            connection = with_connection
-        else:
-            connection = self.get_database_connection()
-        connection.execute(
-            "UPDATE usr_artist_2_artist SET match = ? WHERE artist1 = ? AND"
-            " artist2 = ?",
-            (match, artist1, artist2))
-        if not with_connection:
-            connection.commit()
-            self.close_database_connection(connection)
-
-    def _update_similar_artists(self, artist, similar_artists):
-        """write user similar artist information to the database
-        """
-        # DOC:   similar_artists = list([{'score': match, 'artist': name}])
-        #
-        connection = self.get_database_connection()
-        artist_id = self.get_artist(artist, with_connection=connection)[0]
-        for artist in similar_artists:
-            id2 = self.get_artist(
-                artist['artist'], with_connection=connection)[0]
-            if self._get_artist_match(
-                artist_id, id2, with_connection=connection):
-                self._update_artist_match(
-                    artist_id, id2, artist['score'],
-                    with_connection=connection)
-                continue
-            self._insert_artist_match(
-                artist_id, id2, artist['score'],
-                with_connection=connection)
-        self._update_artist(artist_id, with_connection=connection)
-        connection.commit()
-        self.close_database_connection(connection)
-
     def _clean_artists_table(self, with_connection=None):
         """Clean orphan artists"""
         if with_connection:
@@ -615,10 +442,6 @@ class SimaDB(object):
         artists_ids = set([row[0] for row in connection.execute(
             "SELECT id FROM artists")])
         artist_2_artist_ids = set([row[0] for row in connection.execute(
-            "SELECT artist1 FROM usr_artist_2_artist")] +
-            [row[0] for row in connection.execute(
-            "SELECT artist2 FROM usr_artist_2_artist")] +
-            [row[0] for row in connection.execute(
             "SELECT artist FROM black_list")] +
             [row[0] for row in connection.execute(
             "SELECT artist FROM albums")] +
@@ -701,7 +524,7 @@ class SimaDB(object):
         self.close_database_connection(connection)
 
     def create_db(self):
-        """ Set up a database for the artist similarity scores
+        """ Set up a database
         """
         connection = self.get_database_connection()
         connection.execute(
@@ -709,13 +532,7 @@ class SimaDB(object):
             ' (version INTEGER, name CHAR(36))')
         connection.execute(
             'CREATE TABLE IF NOT EXISTS artists (id INTEGER PRIMARY KEY, name'
-            ' VARCHAR(100), mbid CHAR(36), lfm_updated DATE, usr_updated DATE)')
-        connection.execute(
-            'CREATE TABLE IF NOT EXISTS usr_artist_2_artist (artist1 INTEGER,'
-            ' artist2 INTEGER, match INTEGER)')
-        connection.execute(
-            'CREATE TABLE IF NOT EXISTS lfm_artist_2_artist (artist1 INTEGER,'
-            ' artist2 INTEGER, match INTEGER)')
+            ' VARCHAR(100), mbid CHAR(36))')
         connection.execute(
             'CREATE TABLE IF NOT EXISTS albums (id INTEGER PRIMARY KEY,'
             ' artist INTEGER, name VARCHAR(100), mbid CHAR(36))')
@@ -729,28 +546,10 @@ class SimaDB(object):
         connection.execute(
             'CREATE TABLE IF NOT EXISTS history (last_play DATE,'
             ' track integer)')
-        connection.execute(
-          "CREATE INDEX IF NOT EXISTS a2aa1x ON usr_artist_2_artist (artist1)")
-        connection.execute(
-          "CREATE INDEX IF NOT EXISTS a2aa2x ON usr_artist_2_artist (artist2)")
-        connection.execute(
-        "CREATE INDEX IF NOT EXISTS lfma2aa1x ON lfm_artist_2_artist (artist1)")
-        connection.execute(
-        "CREATE INDEX IF NOT EXISTS lfma2aa2x ON lfm_artist_2_artist (artist2)")
         connection.commit()
         self.close_database_connection(connection)
         self._set_dbversion()
 
-
-def main():
-    db = SimaDB(db_path='/tmp/sima.db')
-    db.purge_history(int(4))
-    db.clean_database()
-
-
-# Script starts here
-if __name__ == '__main__':
-    main()
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
