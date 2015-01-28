@@ -127,13 +127,19 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         self.config['sima']['db_file'] = join(self.config['sima']['var_dir'], 'sima.db')
 
     def control_facc(self):
-        """TODO: redundant with startopt cli args controls
+        """Controls file access.
+        This is relevant only for file provided through the configuration file
+        since files provided on the command line are already checked with
+        argparse.
         """
         ok = True
         for op, ftochk in [('log', self.config['log']['logfile']),
                            ('pidfile', self.config['daemon']['pidfile']),]:
             if not ftochk:
                 continue
+            if isdir(ftochk):
+                self.log.critical('Need a file not a directory: "{}"'.format(ftochk))
+                ok = False
             if not exists(ftochk):
                 # Is parent directory writable then
                 filedir = dirname(ftochk)
@@ -142,9 +148,11 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
                     ok = False
             else:
                 if not access(ftochk, W_OK):
-                    self.log.critical('no write access to "{0}" ({1}))'.format(ftochk, op))
+                    self.log.critical('no write access to "{0}" ({1})'.format(ftochk, op))
                     ok = False
         if not ok:
+            if exists(self.conf_file):
+                self.log.warning('Try to check the configuration file: {}'.format(self.conf_file))
             sys.exit(2)
 
     def control_mod(self):

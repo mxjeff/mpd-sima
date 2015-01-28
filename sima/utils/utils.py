@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, 2011, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -113,9 +113,11 @@ class Wfile(FileAction):
     """Is file writable
     """
     def checks(self):
+        if isdir(self._file):
+            self.parser.error('need a file not a directory: {}'.format(self._file))
         if not exists(self._dir):
             #raise ArgumentError(self, '"{0}" does not exist'.format(self._dir))
-            self.parser.error('file does not exist: {0}'.format(self._dir))
+            self.parser.error('directory does not exist: {0}'.format(self._dir))
         if not exists(self._file):
             # Is parent directory writable then
             if not access(self._dir, W_OK):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -24,12 +24,9 @@ from argparse import (ArgumentParser, SUPPRESS)
 
 from .utils import Wfile, Rfile, Wdir
 
-USAGE = """USAGE:  %prog [--help] [options]"""
 DESCRIPTION = """
-sima automagicaly queue new tracks in MPD playlist.
-All command line options will override their equivalent in configuration
-file.
-"""
+MPD_sima automagicaly queue new tracks in MPD playlist.
+Command line options override their equivalent in configuration file."""
 
 
 def clean_dict(to_clean):
@@ -124,12 +121,11 @@ class StartOpt(object):
         Declare options in ArgumentParser object.
         """
         self.parser = ArgumentParser(description=DESCRIPTION,
-                                   usage='%(prog)s [options]',
-                                   prog=self.info.get('prog'),
-                                   epilog='Happy Listening',
-                )
+                                     prog=self.info.get('prog'),
+                                     epilog='Happy Listening',
+                                    )
         self.parser.add_argument('--version', action='version',
-                version='%(prog)s {version}'.format(**self.info))
+                        version='%(prog)s {version}'.format(**self.info))
         # Add all options declare in OPTS
         for opt in OPTS:
             opt_names = opt.pop('sw')
