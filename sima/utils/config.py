@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009, 2010, 2011, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -37,7 +37,7 @@ from . import utils
 
 # DEFAULTS
 DIRNAME = 'mpd_sima'
-CONF_FILE = 'sima.cfg'
+CONF_FILE = 'mpd_sima.cfg'
 
 DEFAULT_CONF = {
         'MPD': {
