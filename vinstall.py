@@ -1,7 +1,8 @@
-#
 # Copyright (C) 2013 Vinay Sajip. New BSD License.
 # Copyright (C) 2014 Kaliko Jack
 #
+from __future__ import print_function
+
 REQ_VER = (3,3)
 import sys
 if sys.version_info < REQ_VER:
