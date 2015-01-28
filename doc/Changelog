@@ -4,7 +4,7 @@ MPD_sima v0.13.0
    Please consider tagging your library with these metadata
  * New virtualenv installer in pure python
 
--- kaliko jack <kaliko@azylum.org>  UNRELEASED
+-- kaliko jack <kaliko@azylum.org>  Wed, 28 Jan 2015 12:20:49 +0100
 
 
 MPD_sima v0.12.3
