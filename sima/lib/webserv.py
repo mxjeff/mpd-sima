@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009-2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -343,7 +343,6 @@ class WebService(Plugin):
         self.to_add = list()
         nbtracks_target = self.plugin_conf.getint('track_to_add')
         for artist in artists:
-            artist = Artist(name=artist)
             if len(self.to_add) == nbtracks_target:
                 return True
             self.log.info('Looking for a top track for {0}'.format(artist))
