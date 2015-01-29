@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2010-2013 Jack Kaliko <efrim@azylum.org>
+# Copyright (c) 2010-2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of MPD_sima
 #
@@ -73,6 +73,7 @@ OPTS = list([
     {
         'sw': ['--view_bl'],
         'action': 'store_true',
+        'dest': 'view_bl',
         'help': 'View black list.'},
     {
         'sw': ['--remove_bl'],
@@ -112,7 +113,6 @@ class SimaDB_CLI(object):
         self.options = dict({})
         self.localencoding = 'UTF-8'
         self._get_encoding()
-        self._upgrade()
         self.main()
 
     def _get_encoding(self):

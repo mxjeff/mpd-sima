@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2013-2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -86,24 +86,26 @@ class Plugin:
     def callback_playlist(self):
         """
         Called on playlist changes
-
         Not returning data
         """
         pass
 
     def callback_next_song(self):
-        """Not returning data,
+        """
         Could be use to scrobble, maintain an history…
+        Not returning data,
         """
         pass
 
     def callback_need_track(self):
-        """Returns a list of Track objects to add
+        """
+        Returns a list of Track objects to add
         """
         pass
 
     def callback_need_track_fb(self):
-        """Called when callback_next_song failled to find tracks to queue
+        """
+        Called when callback_need_track failled to find tracks to queue
         Returns a list of Track objects to add
         """
         pass

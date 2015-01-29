@@ -1,4 +1,4 @@
-MPD_sima v0.13.1
+MPD_sima v0.14.0
 
  * Fixed default conf file name (back to mpd_sima.cfg)
  * Cleanup code (removed users similarities)

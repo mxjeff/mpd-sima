@@ -1,4 +1,4 @@
-# Copyright (c) 2010, 2011, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of MPD_sima
 #
@@ -31,7 +31,7 @@ _sima() {
           -l --log \
           -v --log-level \
           -S --host \
-          -P --mpd_port \
+          -P --port \
           -h --help --version \
           --var_dir \
           -d --daemon"
@@ -71,23 +71,17 @@ _sima() {
 complete -F _sima mpd_sima
 complete -F _sima mpd-sima
 
-_art_names_list() {
-    local IFS=$'\n'
-    compgen -W "${artists}" -- ${cur}
-}
-
 _simadb_cli() {
-    local cur prev opts artists
+    local cur prev opts
     local IFS=$'\n'
     COMPREPLY=()
     _get_comp_words_by_ref cur prev
-    opts="--add_similarity -a --remove_similarity --remove_artist \
-    --purge_hist --view_artist --view_all \
-    --bl_curr_trk --bl_curr_art --bl_curr_al --bl_art --remove_bl --view_bl \
-    --dbfile -d \
-    --host -S --port -P \
-    --reciprocal -r --check_names -c \
-    --version -h --help"
+    opts="--purge_hist \
+        --bl_curr_trk --bl_curr_art --bl_curr_al --bl_art --remove_bl --view_bl \
+        --dbfile -d \
+        --host -S --port -P \
+        --check_names -c \
+        --version -h --help"
     opts=$(echo $opts | sed 's/ /\n/g')
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
@@ -104,15 +98,6 @@ _simadb_cli() {
             ;;
         --host|-S)
             COMPREPLY=( $(compgen -A hostname ${cur}) )
-            ;;
-        -a|--add_similarity|--view_artist|-v|--bl_art)
-            if [ -x /usr/bin/mpc ]; then
-                artists=$(for x in $(/usr/bin/mpc list artist) ; do echo "'${x}'"; done)
-                COMPREPLY=( $(compgen -W "${artists}" -- ${cur}) )
-                return 0
-            fi
-            # It should also complete artist name when the string ends with a comma
-            return 0
             ;;
         *)
             ;;
