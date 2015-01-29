@@ -1,3 +1,11 @@
+MPD_sima v0.13.1
+
+ * Fixed top track mode
+ * Fixed default conf file name (back to mpd_sima.cfg)
+
+-- kaliko jack <kaliko@azylum.org>  Thu, 29 Jan 2015 11:43:17 +0100
+
+
 MPD_sima v0.13.0
 
  * Use of MusicBrainzIdentifier by default
