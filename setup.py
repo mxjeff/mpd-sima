@@ -33,7 +33,7 @@ classifiers = [
 
 setup(name='MPD_sima',
       version=VERSION,
-      download_url='http://kaliko.me/media/src/sima/releases/',
+      download_url='http://media.kaliko.me/src/sima/releases/',
       url='http://kaliko.me/code/mpd-sima',
       description='Automagically add titles to MPD playlist',
       author=AUTHOR,
