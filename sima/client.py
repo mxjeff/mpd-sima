@@ -163,7 +163,8 @@ class PlayerClient(Player):
                 'nombid_artists': None,
                 }
         self._cache['artists'] = frozenset(self._client.list('artist'))
-        self._cache['nombid_artists'] = frozenset(self._client.list('artist', 'musicbrainz_artistid', ''))
+        if Artist.use_mbid:
+            self._cache['nombid_artists'] = frozenset(self._client.list('artist', 'musicbrainz_artistid', ''))
 
     @blacklist(track=True)
     def find_track(self, artist, title=None):
