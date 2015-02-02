@@ -33,7 +33,7 @@ from ...lib.cache import FileCache
 
 
 class EchoNest(WebService):
-    """last.fm similar artists
+    """EchoNest similar artists http API
     """
 
     def __init__(self, daemon):

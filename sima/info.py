@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-MPD_sima is an MPD client meant to feed your current queue with tracks
-from artists similar to your currently playing tracks, provided that these
-artists are found in MPD library. Similar artists are fetched from last.fm.
+MPD_sima is an non interactive MPD autoqueue client running in the background.
+It will queue new tracks chosen among artists similar to your current queued
+tracks, provided a title is found in your music library.
+Similar artists are fetched from last.fm or EchoNest webservice.
 
 MPD_sima can queue track, top track or whole album for similar artists.
 
