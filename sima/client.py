@@ -162,9 +162,9 @@ class PlayerClient(Player):
                 'artists': None,
                 'nombid_artists': None,
                 }
-        self._cache['artists'] = frozenset(self._client.list('artist'))
+        self._cache['artists'] = frozenset(self._execute('list', ['artist']))
         if Artist.use_mbid:
-            self._cache['nombid_artists'] = frozenset(self._client.list('artist', 'musicbrainz_artistid', ''))
+            self._cache['nombid_artists'] = frozenset(self._execute('list', ['artist', 'musicbrainz_artistid', '']))
 
     @blacklist(track=True)
     def find_track(self, artist, title=None):
@@ -196,7 +196,7 @@ class PlayerClient(Player):
         found = False
         if artist.mbid:
             # look for exact search w/ musicbrainz_artistid
-            exact_m = self._client.list('artist', 'musicbrainz_artistid', artist.mbid)
+            exact_m = self._execute('list', ['artist', 'musicbrainz_artistid', artist.mbid])
             if exact_m:
                 [artist.add_alias(name) for name in exact_m]
                 found = True
@@ -332,7 +332,7 @@ class PlayerClient(Player):
     def add(self, track):
         """Overriding MPD's add method to accept add signature with a Track
         object"""
-        self._client.add(track.file)
+        self._execute('add', [track.file])
 
     @property
     def artists(self):
