@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009, 2010, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -26,28 +26,25 @@ Logging facility for sima.
 import logging
 import sys
 
-
+DEBUG = logging.DEBUG
+INFO = logging.INFO
+ERROR = logging.ERROR
 LOG_FORMATS = {
-        logging.DEBUG: '[{process}]{filename: >11}:{lineno: <3} {levelname: <7}: {message}',
-        logging.INFO:  '{levelname: <7}: {message}',
+        DEBUG: '[{process}]{filename: >11}:{lineno: <3} {levelname: <7}: {message}',
+        INFO:  '{levelname: <7}: {message}',
         #logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) '
                                  #'{levelname}: {message}',
         }
 DATE_FMT = "%Y-%m-%d %H:%M:%S"
 
 
-class LevelFilter(logging.Filter):# Logging facility
+class LevelFilter(logging.Filter):
     """
     Enable logging between two log level by filtering everything < level.
     """
-
-    def __init__(self, filt_level):
-        logging.Filter.__init__(self)
-        self.level = filt_level
-
     def filter(self, record):
         """Defines loglevel"""
-        return record.levelno <= self.level
+        return record.levelno <= ERROR
 
 
 def set_logger(level='info', logfile=None):
@@ -59,54 +56,51 @@ def set_logger(level='info', logfile=None):
     """
     name = 'sima'
     user_log_level = getattr(logging, level.upper())
-    if user_log_level > logging.DEBUG:
-        log_format = LOG_FORMATS.get(logging.INFO)
+    if user_log_level > DEBUG:
+        log_format = LOG_FORMATS.get(INFO)
     else:
-        log_format = LOG_FORMATS.get(logging.DEBUG)
-    logg = logging.getLogger(name)
+        log_format = LOG_FORMATS.get(DEBUG)
+    logger = logging.getLogger(name)
     formatter = logging.Formatter(log_format, DATE_FMT, '{')
-    logg.setLevel(user_log_level)
+    logger.setLevel(user_log_level)
     filehdl = False
-    if logg.handlers:
-        for hdl in logg.handlers:
+    if logger.handlers:
+        for hdl in logger.handlers:
             hdl.setFormatter(formatter)
             if isinstance(hdl, logging.FileHandler):
                 filehdl = True
             else:
-                logg.removeHandler(hdl)
+                logger.removeHandler(hdl)
 
     if logfile:
         if filehdl:
-            logg.handlers = []
+            logger.handlers = []
         # Add timestamp for file handler
         log_format = '{0} {1}'.format('{asctime}', log_format)
         formatter = logging.Formatter(log_format, DATE_FMT, '{')
         # create file handler
         fileh = logging.FileHandler(logfile)
-        #fileh.setLevel(user_log_level)
         fileh.setFormatter(formatter)
-        logg.addHandler(fileh)
+        logger.addHandler(fileh)
     else:
         if filehdl:
-            logg.info('Not changing logging handlers, only updating formatter')
+            logger.info('Not changing logging handlers, only updating formatter')
             return
         # create console handler with a specified log level (STDOUT)
         couth = logging.StreamHandler(sys.stdout)
-        #couth.setLevel(user_log_level)
-        couth.addFilter(LevelFilter(logging.WARNING))
+        couth.addFilter(LevelFilter())
 
         # create console handler with warning log level (STDERR)
-        cerrh = logging.StreamHandler(sys.stderr)
-        #cerrh.setLevel(logging.WARNING)
-        cerrh.setLevel(logging.ERROR)
+        cerrh = logging.StreamHandler()
+        cerrh.setLevel(ERROR)
 
         # add formatter to the handlers
         cerrh.setFormatter(formatter)
         couth.setFormatter(formatter)
 
         # add the handlers to SIMA_LOGGER
-        logg.addHandler(couth)
-        logg.addHandler(cerrh)
+        logger.addHandler(couth)
+        #logger.addHandler(cerrh)  # Already added creating the handler‽ Still have to figure it out.
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
