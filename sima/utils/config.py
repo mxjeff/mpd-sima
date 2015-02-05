@@ -72,6 +72,7 @@ DEFAULT_CONF = {
             'track_to_add': 1,
             'album_to_add': 1,
             'depth': 1,
+            'priority': 100,
             },
         'lastfm': {
             'queue_mode': "track", #TODO control values
@@ -81,11 +82,13 @@ DEFAULT_CONF = {
             'album_to_add': 1,
             'depth': 1,
             'cache': True,
+            'priority': 100,
             },
-        'randomfallback': {
+        'random': {
             'flavour': "sensible", # in pure, sensible
             'track_to_add': 1,
-            }
+            'priority': 50,
+            },
         }
 #
 

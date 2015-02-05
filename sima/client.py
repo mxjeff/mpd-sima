@@ -336,7 +336,7 @@ class PlayerClient(Player):
 
     @property
     def artists(self):
-        return self._cache.get('artists')
+        return self._cache.get('artists') | self._cache.get('nombid_artists')
 
     @property
     def state(self):

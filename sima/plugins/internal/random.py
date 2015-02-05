@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -18,7 +18,7 @@
 #
 #
 """
-Fetching similar artists from last.fm web services
+Add random title
 """
 
 # standard library import
@@ -31,8 +31,8 @@ from ...lib.plugin import Plugin
 from ...lib.meta import Artist
 
 
-class RandomFallBack(Plugin):
-    """Add random track as fallback
+class Random(Plugin):
+    """Add random track
     TODO: refactor, this plugin does not look good to me.
           callback_need_track_fb/get_trk articulation is not elegant at all
     """
@@ -57,7 +57,7 @@ class RandomFallBack(Plugin):
         artists = [tr[-1] for tr in tracks_from_db]
         return set(artists)
 
-    def callback_need_track_fb(self):
+    def callback_need_track(self):
         trks = list()
         target = self.plugin_conf.getint('track_to_add')
         limit = 0
@@ -92,7 +92,7 @@ class RandomFallBack(Plugin):
         trks = self.player.find_track(Artist(art))
         if trks:
             trk = random.choice(trks)
-            self.log.info('random fallback ({}): {}'.format(self.mode, trk))
+            self.log.info('Random candidate ({}): {}'.format(self.mode, trk))
         return trk
 
 

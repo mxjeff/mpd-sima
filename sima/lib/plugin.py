@@ -21,6 +21,7 @@
 Plugin object to derive from
 """
 
+
 class Plugin:
     """
     First non-empty line of the docstring is used as description
@@ -57,12 +58,20 @@ class Plugin:
         """Get plugin's specific configuration from global applications's config
         """
         conf = self.__daemon.config
-        for sec in conf.sections():
+        for sec in conf.sections():  # Discovering plugin conf
             if sec == self.__class__.__name__.lower():
                 self.plugin_conf = conf[sec]
+                if 'priority' not in self.plugin_conf:
+                    self.plugin_conf['priority'] = '80'
+        if not self.plugin_conf:
+            self.plugin_conf = {'priority': '80'}
         #if self.plugin_conf:
         #    self.log.debug('Got config for {0}: {1}'.format(self,
         #                                                    self.plugin_conf))
+
+    @property
+    def priority(self):
+        return self.plugin_conf.get('priority')
 
     def start(self):
         """

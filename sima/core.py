@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009, 2010, 2011, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -43,7 +43,8 @@ class Sima(Daemon):
         self.sdb = SimaDB(db_path=conf.get('sima', 'db_file'))
         PlayerClient.database = self.sdb
         self.log = getLogger('sima')
-        self.plugins = list()
+        self._plugins = list()
+        self._core_plugins = list()
         self.player = self.__get_player()  # Player client
         self.short_history = deque(maxlen=60)
 
@@ -55,18 +56,37 @@ class Sima(Daemon):
         return PlayerClient(host, port, pswd)
 
     def add_history(self):
-        """Handle local short history"""
+        """Handle local, in memory, short history"""
         self.short_history.appendleft(self.player.current)
 
     def register_plugin(self, plugin_class):
         """Registers plugin in Sima instance..."""
-        self.plugins.append(plugin_class(self))
+        plgn = plugin_class(self)
+        prio = int(plgn.priority)
+        self._plugins.append((prio, plgn))
+
+    def register_core_plugin(self, plugin_class):
+        """Registers core plugins"""
+        plgn = plugin_class(self)
+        prio = int(plgn.priority)
+        self._core_plugins.append((prio, plgn))
 
     def foreach_plugin(self, method, *args, **kwds):
         """Plugin's callbacks dispatcher"""
+        for plugin in self.core_plugins:
+            getattr(plugin, method)(*args, **kwds)
         for plugin in self.plugins:
             #self.log.debug('dispatching {0} to {1}'.format(method, plugin))
             getattr(plugin, method)(*args, **kwds)
+
+    @property
+    def core_plugins(self):
+        return [plugin[1] for plugin in
+                sorted(self._core_plugins, key=lambda pl: pl[0], reverse=True)]
+
+    @property
+    def plugins(self):
+        return [plugin[1] for plugin in sorted(self._plugins, key=lambda pl: pl[0], reverse=True)]
 
     def need_tracks(self):
         """Is the player in need for tracks"""
@@ -84,15 +104,12 @@ class Sima(Daemon):
     def queue(self):
         to_add = list()
         for plugin in self.plugins:
-            pl_callback = getattr(plugin, 'callback_need_track')()
-            if pl_callback:
-                to_add.extend(pl_callback)
-        if not to_add:
-            self.log.warning('Queue plugins returned nothing!')
-            for plugin in self.plugins:
-                pl_callback = getattr(plugin, 'callback_need_track_fb')()
-                if pl_callback:
-                    to_add.extend(pl_callback)
+            self.log.info('running {}'.format(plugin))
+            pl_candidates = getattr(plugin, 'callback_need_track')()
+            if pl_candidates:
+                to_add.extend(pl_candidates)
+            if to_add:
+                break
         for track in to_add:
             self.player.add(track)
 

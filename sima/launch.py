@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -54,6 +54,7 @@ def load_plugins(sima, source):
     if not sima.config.get('sima', source):
         return
     logger = logging.getLogger('sima')
+    # TODO: Sanity check for "sima.config.get('sima', source)" ?
     for plugin in sima.config.get('sima', source).split(','):
         plugin = plugin.strip(' \n')
         module = 'sima.plugins.{0}.{1}'.format(source, plugin.lower())
@@ -71,7 +72,7 @@ def load_plugins(sima, source):
             sima.shutdown()
             sys.exit(1)
         logger.info('Loading {0} plugin: {name} ({doc})'.format(
-                             source, **plugin_obj.info()))
+            source, **plugin_obj.info()))
         sima.register_plugin(plugin_obj)
 
 
@@ -107,14 +108,15 @@ def start(sopt, restart=False):
     core_plugins = [History, MpdOptions, Uniq]
     for cplgn in core_plugins:
         logger.debug('Register core {name} ({doc})'.format(**cplgn.info()))
-        sima.register_plugin(cplgn)
+        sima.register_core_plugin(cplgn)
+    logger.debug('core loaded, prioriy: {}'.format(' > '.join(map(str, sima.core_plugins))))
 
     #  Loading internal plugins
     load_plugins(sima, 'internal')
 
     #  Loading contrib plugins
     load_plugins(sima, 'contrib')
-
+    logger.info('plugins loaded, prioriy: {}'.format(' > '.join(map(str, sima.plugins))))
     #  Set use of MusicBrainzIdentifier
     if not config.getboolean('sima', 'musicbrainzid'):
         logger.info('Disabling MusicBrainzIdentifier')

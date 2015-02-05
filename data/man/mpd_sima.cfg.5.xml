@@ -222,13 +222,13 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 "AwesomePlugin" declared here gets its configuration from the
                 corresponding section "[awesomeplugin]".<sbr />internal plugins
                 will look for a section named after the lower-cased name of the
-                pluglin, ie.  RandomFallBack → randomfallback.
+                plugin, ie.  Random → random.
             </para>
             <variablelist>
                 <varlistentry> <!-- sima.internal -->
-                    <term><option>internal=</option><replaceable>Crop, RandomFallBack, Lastfm</replaceable></term>
+                    <term><option>internal=</option><replaceable>Crop, Random, Lastfm</replaceable></term>
                     <listitem>
-                        <para><option>Crop</option> and <option>RandomFallback</option>
+                        <para><option>Crop</option> and <option>Random</option>
                             are utilities plugins while <option>Lastfm</option> is the
                             actual queue plugin.<sbr /> Another queue plugin is available as
                             a "techno preview", it relies on EchoNest web services, replace
@@ -259,13 +259,13 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                     </listitem>
                 </varlistentry>
         </refsect2>
-        <refsect2 id="randomfallback">
-            <title>RandomFallback section</title>
-            <para>RandomFallback plugin's configuration:</para>
-                <varlistentry> <!-- randomfallback -->
-                    <term><option>[randomfallback]</option></term>
+        <refsect2 id="random">
+            <title>Random section</title>
+            <para>Random plugin's configuration:</para>
+                <varlistentry> <!-- random -->
+                    <term><option>[random]</option></term>
                 </varlistentry>
-                <varlistentry> <!-- randomfallback.flavour -->
+                <varlistentry> <!-- random.flavour -->
                     <term><option>flavour=</option><replaceable>sensible</replaceable></term>
                     <listitem>
                         <para>When no similar tracks are found, falling back to

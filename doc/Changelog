@@ -1,9 +1,10 @@
 MPD_sima v0.14.0
 
+ * Add priority feature for plugins
+ * More robust MPD client
  * Fixed top track mode
  * Fixed default conf file name (back to mpd_sima.cfg)
  * Cleanup code (removed users similarities)
- * More robust MPD client
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 
