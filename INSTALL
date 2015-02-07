@@ -1,23 +1,24 @@
-Design for python >= 3.2
+Design for python3 >= 3.2
 
 Requires: python-musicpd >= 0.4.0 [0],
           requests >= 2.2.0 [1]
 
-	[0] http://media.kaliko.me/src/musicpd/
+	[0] http://media.kaliko.me/src/musicpd/releases/
 	[1] http://docs.python-requests.org/
 
 
 Virtualenv installation:
 
-Run "python3 ./vinstall.py" to generate the python virtualenv and install
-requirements (need at least python 3.3).
+With python >= 3.3:
+	Run "python3 ./vinstall.py" to generate the python virtualenv and install
+	requirements (need at least python 3.3).
 
-It will setup a virtualenv within a "venv" directory (same level as vinstall.py file).
-It should also write a shell wrapper to run mpd-sima within the virtualenv.
+	It will setup a virtualenv within a "venv" directory (same level as vinstall.py file).
+	It should also write a shell wrapper to run mpd-sima within the virtualenv.
 
-	./vmpd-sima --help
+		./vmpd-sima --help
 
-You might prefer manual installation:
+For pyton < 3.3 and > 3.1 or if you prefer manual installation:
 
 	# On your system <virtualenv_command> may be "pyenv", "python3 -m venv" or "virtualenv"
 	# Refer to the relevant manual to install a python env, 3.2 minimum.
