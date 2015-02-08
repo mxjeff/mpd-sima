@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 01/28/2015
-.\"    Manual: mpd-sima 0.13.1 User Manual
+.\"      Date: 02/08/2015
+.\"    Manual: mpd-sima 0.14.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "01/28/2015" "mpd-sima" "mpd-sima 0.13.1 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "02/08/2015" "mpd-sima" "mpd-sima 0.14.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -152,28 +152,12 @@ Core mpd_sima\&.cfg configuration\&.
 .RS 4
 .RE
 .PP
-\fBhistory_duration=\fR\fI8\fR
+\fBcontrib=\fR
 .RS 4
-How far to look back in history to avoid to play twice the same track/title (duration in hours)\&.
 .RE
 .PP
-\fBqueue_length=\fR\fI1\fR
+\fBinternal=\fR\fILastfm, Random, Crop\fR
 .RS 4
-This value triggers queue process if the queue length is less than specified queue_length\&.
-.RE
-.PP
-\fBmusicbrainzid=\fR\fItrue\fR
-.RS 4
-Use MusicBrainzIdentifier to search music (mainly for artists)\&. Consider using these metadata as it enhances a lot artist/album/tracks identification\&.
-.br
-
-Default is True, switch to False if you don\*(Aqt have MusicBrainzIdentifier set for at least 80% of you music library\&.
-.br
-
-Use Picard to tag your file:
-\m[blue]\fB\%https://picard.musicbrainz.org/\fR\m[]\&.
-.RE
-.PP
 mpd\-sima\*(Aqs plugin management for internal source plugin and contrib (ie\&. external plugins)\&.
 .br
 
@@ -183,28 +167,50 @@ Plugins list is a comma separated string list\&.
 Optional plugin\*(Aqs configuration lays in its own section\&.
 .br
 For instance a "AwesomePlugin" declared here gets its configuration from the corresponding section "[awesomeplugin]"\&.
+.sp
+The default list of plugins to load at startup:
+\fBLastfm\fR,\fBRandom\fR,\fBCrop\fR\&.
 .br
-internal plugins will look for a section named after the lower\-cased name of the pluglin, ie\&. RandomFallBack\ \&\(-> randomfallback\&.
-.PP
-\fBinternal=\fR\fICrop, RandomFallBack, Lastfm\fR
-.RS 4
 \fBCrop\fR
-and
-\fBRandomFallback\fR
-are utilities plugins while
-\fBLastfm\fR
-is the actual queue plugin\&.
+is an utility plugin, it does not queue any tracks (cf\&. below)\&.
+.br
+\fBRandom\fR
+will queue a track at random if other plugins did not return any tracks\&.
 .br
 
-Another queue plugin is available as a "techno preview", it relies on EchoNest web services, replace
-\fBLastFm\fR
-with
+.sp
+You can add here as many plugins you want, currently shipping
+\fBLastfm\fR
+and
 \fBEchoNest\fR
-to try\&.
+only\&.
+.br
+
+The priority may be used to order them\&.
 .RE
 .PP
-\fBcontrib=\fR
+\fBhistory_duration=\fR\fI8\fR
 .RS 4
+How far to look back in history to avoid to play twice the same track/title (duration in hours)\&.
+.br
+
+The
+\fBhistory_duration\fR
+is also used to give priority to not recently played artists\&.
+.RE
+.PP
+\fBqueue_length=\fR\fI2\fR
+.RS 4
+Threshold value triggering queue process\&.
+.RE
+.PP
+\fBmusicbrainzid=\fR\fItrue\fR
+.RS 4
+Use MusicBrainzIdentifier to search music (mainly for artists)\&. Default is True, switch to False if you don\*(Aqt have MusicBrainzIdentifier set for at least 80% of you music library\&.
+.br
+
+Consider using these metadata as it enhances a lot artist/album/tracks identification\&. Use Picard to tag your file:
+\m[blue]\fB\%https://picard.musicbrainz.org/\fR\m[]\&.
 .RE
 .SS "Crop section"
 .PP
@@ -218,11 +224,16 @@ crop plugin\*(Aqs configuration:
 .RS 4
 How many played tracks to keep in the queue\&. Allows you to maintain a fixed length queue\&. Set to 0 to keep all played tracks\&.
 .RE
-.SS "RandomFallback section"
 .PP
-RandomFallback plugin\*(Aqs configuration:
+\fBpriority=\fR\fI10\fR
+.RS 4
+Plugin priority
+.RE
+.SS "Random section"
 .PP
-\fB[randomfallback]\fR
+Random plugin\*(Aqs configuration:
+.PP
+\fB[random]\fR
 .RS 4
 .RE
 .PP
@@ -266,6 +277,11 @@ When no similar tracks are found, falling back to random queuing\&. Different mo
 \fIgenre\fR, Not implemented yet\&.
 .RE
 .sp
+.RE
+.PP
+\fBpriority=\fR\fI50\fR
+.RS 4
+Plugin priority
 .RE
 .SS "LastFm section"
 .PP
@@ -337,6 +353,48 @@ $XDG_CONFIG_HOME/mpd_sima/http/WEB_SERVICE\&.
 
 If set to "false", caching is still done but in memory\&.
 .RE
+.PP
+\fBpriority=\fR\fI100\fR
+.RS 4
+Plugin priority
+.RE
+.SS "EchoNest section"
+.PP
+EchoNest plugin\*(Aqs configuration\&.
+.PP
+Options for EchoNest are exactly the same as LastFm (same default as well), except for cache plugin which is always needed to limit number of requests to the service\&.
+.PP
+\fB[echonest]\fR
+.RS 4
+.RE
+.PP
+\fBqueue_mode=\fR\fItrack\fR
+.RS 4
+.RE
+.PP
+\fBmax_art=\fR\fI10\fR
+.RS 4
+.RE
+.PP
+\fBdepth=\fR\fI1\fR
+.RS 4
+.RE
+.PP
+\fBsingle_album=\fR\fIfalse\fR
+.RS 4
+.RE
+.PP
+\fBtrack_to_add=\fR\fI1\fR
+.RS 4
+.RE
+.PP
+\fBalbum_to_add=\fR\fI1\fR
+.RS 4
+.RE
+.PP
+\fBpriority=\fR\fI100\fR
+.RS 4
+.RE
 .SH "QUEUE MODES"
 .PP
 mpd\-sima offers different queue modes\&. All of them pick up tracks from artists similar to the last track in the queue\&.
@@ -369,9 +427,6 @@ For instance looking for album from "The Velvet Underground" will fetch "Last Da
 A solution is for you to set AlbumArtists tag to something different than the actual artist of the track\&. For compilations, OSTs etc\&. a strong convention is to use "Various Artists" for this tag\&.
 .sp
 mpd\-sima is currently looking for AlbumArtists tags and avoid album where this tag is set with "Various Artists"\&. If a single track within an album is found with AlbumArtists:"Various Artists" the complete album is skipped and won\*(Aqt be queued\&.
-.br
-
-It is planned to allow users to set the values of AlbumArtists tag triggering this behaviour\&. cf\&. feature request #2085 on the tracker\&.
 .RE
 .SH "FILES"
 .PP
@@ -402,7 +457,7 @@ ${HOME}/\&.config\&.
 You may override them using command line option
 \fB\-\-var_dir\fR
 (cf\&.
-\fBmpd_sima\fR(1))
+\fBmpd-sima\fR(1))
 .SH "FEEDBACK/BUGS"
 .PP
 The maintainer would be more than happy to ear from you, don\*(Aqt hesitate to send feedback,

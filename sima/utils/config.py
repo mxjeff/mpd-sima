@@ -46,7 +46,7 @@ DEFAULT_CONF = {
             'port': 6600,
             },
         'sima': {
-            'internal': "Crop, Lastfm, RandomFallBack",
+            'internal': "Crop, Lastfm, Random",
             'contrib': "",
             'user_db': "false",
             'history_duration': 8,
@@ -64,6 +64,7 @@ DEFAULT_CONF = {
             },
         'crop': {
             'consume': 10,
+            'priority': 0,
             },
         'echonest': {
             'queue_mode': "track", #TODO control values

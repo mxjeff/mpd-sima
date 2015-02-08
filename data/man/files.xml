@@ -25,7 +25,7 @@
             <filename>${HOME}/.local/share</filename> and <envar>XDG_CONFIG_HOME</envar> to
             <filename>${HOME}/.config</filename>.<sbr />You may override them using
             command line option <option>--var_dir</option> (cf.
-            <citerefentry><refentrytitle>mpd_sima</refentrytitle>
+            <citerefentry><refentrytitle>mpd-sima</refentrytitle>
                 <manvolnum>1</manvolnum></citerefentry>)</para>
     </refsect1>
 <!-- vim:filetype=docbk
