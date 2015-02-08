@@ -4,6 +4,7 @@ MPD_sima v0.14.0
  * More robust MPD client
  * Fixed top track mode
  * Fixed default conf file name (back to mpd_sima.cfg)
+ * Fixed http cache for lastFM
  * Cleanup code (removed users similarities)
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED

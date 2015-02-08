@@ -73,7 +73,7 @@ class FileCache:
         self.forever = forever
 
         if not os.path.isdir(self.directory):
-            os.makedirs(self.directory)
+            os.makedirs(self.directory, mode=0o755)
 
     def encode(self, val):
         return md5(val.encode('utf-8')).hexdigest()

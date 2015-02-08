@@ -38,14 +38,13 @@ class Lastfm(WebService):
 
     def __init__(self, daemon):
         WebService.__init__(self, daemon)
-        self.ws = SimaFM()
         # Set persitent cache
         vardir = daemon.config['sima']['var_dir']
         persitent_cache = daemon.config.getboolean('lastfm', 'cache')
         if persitent_cache:
+            self.log.debug('Persistant cache enabled in {}'.format(join(vardir, 'http', 'LastFM')))
             SimaFM.cache = FileCache(join(vardir, 'http', 'LastFM'))
-        else:
-            SimaFM.cache = DictCache()
+        self.ws = SimaFM()
 
 
 # VIM MODLINE
