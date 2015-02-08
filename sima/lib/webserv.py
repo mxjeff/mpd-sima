@@ -168,7 +168,7 @@ class WebService(Plugin):
                 results.append(res)
         return results
 
-    def ws_similar_artists(self, artist=None):
+    def ws_similar_artists(self, artist):
         """
         Retrieve similar artists from WebServive.
         """
@@ -179,9 +179,13 @@ class WebService(Plugin):
         try:
             [as_art.append(art) for art in as_artists]
         except WSNotFound as err:
-            if artist.mbid:
-                return self.ws_similar_artists(Artist(name=artist.name))
             self.log.warning('{}: {}'.format(self.ws.name, err))
+            if artist.mbid:
+                self.log.debug('Trying without MusicBrainzID')
+                try:
+                    return self.ws_similar_artists(Artist(name=artist.name))
+                except WSNotFound as err:
+                    self.log.debug('{}: {}'.format(self.ws.name, err))
         except WSError as err:
             self.log.warning('{}: {}'.format(self.ws.name, err))
         if as_art:
@@ -264,9 +268,6 @@ class WebService(Plugin):
         if not ret:
             self.log.warning('Got nothing from music library.')
             return []
-        # WARNING:
-        #   * operation on set will not match against aliases
-        #   * composite set w/ mbid set and whitout won't match either
         queued_artists = MetaContainer([trk.Artist for trk in self.player.queue])
         if ret & queued_artists:
             self.log.debug('Removing already queued artists: '
