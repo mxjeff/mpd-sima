@@ -81,8 +81,6 @@ def start(sopt, restart=False):
     """
     # set logger
     verbosity = sopt.options.get('verbosity', 'warning')
-    logfile = sopt.options.get('logfile', None)
-    set_logger(verbosity, logfile)
     # loads configuration
     config = ConfMan(sopt.options).config
     logfile = config.get('log', 'logfile')

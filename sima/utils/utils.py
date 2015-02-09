@@ -22,6 +22,7 @@
 """
 # pylint: disable=C0111
 
+import logging
 import traceback
 import sys
 
@@ -69,8 +70,7 @@ def normalize_path(path):
 
 def exception_log():
     """Log unknown exceptions"""
-    import logging
-    log = logging.getLogger('sima')
+    log = logging.getLogger(__name__)
     log.error('Unhandled Exception!!!')
     log.error(''.join(traceback.format_exc()))
     log.info('Please report the previous message'

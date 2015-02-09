@@ -38,15 +38,6 @@ LOG_FORMATS = {
 DATE_FMT = "%Y-%m-%d %H:%M:%S"
 
 
-class LevelFilter(logging.Filter):
-    """
-    Enable logging between two log level by filtering everything < level.
-    """
-    def filter(self, record):
-        """Defines loglevel"""
-        return record.levelno <= ERROR
-
-
 def set_logger(level='info', logfile=None):
     """
     logger:
@@ -88,10 +79,10 @@ def set_logger(level='info', logfile=None):
             return
         # create console handler with a specified log level (STDOUT)
         couth = logging.StreamHandler(sys.stdout)
-        couth.addFilter(LevelFilter())
+        couth.addFilter(lambda record: record.levelno < ERROR)
 
         # create console handler with warning log level (STDERR)
-        cerrh = logging.StreamHandler()
+        cerrh = logging.StreamHandler(sys.stderr)
         cerrh.setLevel(ERROR)
 
         # add formatter to the handlers
@@ -100,7 +91,7 @@ def set_logger(level='info', logfile=None):
 
         # add the handlers to SIMA_LOGGER
         logger.addHandler(couth)
-        #logger.addHandler(cerrh)  # Already added creating the handler‽ Still have to figure it out.
+        logger.addHandler(cerrh)  # Already added creating the handler‽ Still have to figure it out.
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
