@@ -1,4 +1,4 @@
-Design for python3 >= 3.2
+Designed for python3 >= 3.2
 
 Requires: python-musicpd >= 0.4.0 [0],
           requests >= 2.2.0 [1]
@@ -18,7 +18,7 @@ With python >= 3.3:
 
 		./vmpd-sima --help
 
-For pyton < 3.3 and > 3.1 or if you prefer manual installation:
+For python < 3.3 or if you prefer manual installation:
 
 	# On your system <virtualenv_command> may be "pyenv", "python3 -m venv" or "virtualenv"
 	# Refer to the relevant manual to install a python env, 3.2 minimum.

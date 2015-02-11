@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (C) 2013 Vinay Sajip. New BSD License.
 # Copyright (C) 2014 Kaliko Jack
 #
