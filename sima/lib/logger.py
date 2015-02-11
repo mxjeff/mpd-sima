@@ -26,6 +26,8 @@ Logging facility for sima.
 import logging
 import sys
 
+from os import environ
+
 DEBUG = logging.DEBUG
 INFO = logging.INFO
 ERROR = logging.ERROR
@@ -37,6 +39,15 @@ LOG_FORMATS = {
         }
 DATE_FMT = "%Y-%m-%d %H:%M:%S"
 
+TRACE_LEVEL_NUM = 5
+logging.addLevelName(TRACE_LEVEL_NUM, 'TRACE')
+def trace(self, message, *args, **kwargs):
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(TRACE_LEVEL_NUM):
+        self._log(TRACE_LEVEL_NUM, message, args, **kwargs)
+
+logging.Logger.trace = trace
+
 
 def set_logger(level='info', logfile=None):
     """
@@ -46,7 +57,10 @@ def set_logger(level='info', logfile=None):
 
     """
     name = 'sima'
-    user_log_level = getattr(logging, level.upper())
+    if environ.get('TRACE', False):
+        user_log_level = TRACE_LEVEL_NUM
+    else:
+        user_log_level = getattr(logging, level.upper())
     if user_log_level > DEBUG:
         log_format = LOG_FORMATS.get(INFO)
     else:

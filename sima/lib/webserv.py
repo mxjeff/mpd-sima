@@ -269,6 +269,8 @@ class WebService(Plugin):
             self.log.warning('Got nothing from music library.')
             return []
         queued_artists = MetaContainer([trk.Artist for trk in self.player.queue])
+        self.log.trace('Already queued: {}'.format(queued_artists))
+        self.log.trace('Candidate: {}'.format(ret))
         if ret & queued_artists:
             self.log.debug('Removing already queued artists: '
                            '{0}'.format('/'.join(map(str, ret & queued_artists))))
