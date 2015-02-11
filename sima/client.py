@@ -159,8 +159,8 @@ class PlayerClient(Player):
         else:
             self.log.info('Player: Initialising cache!')
         self._cache = {
-                'artists': None,
-                'nombid_artists': None,
+                'artists': frozenset(),
+                'nombid_artists': frozenset(),
                 }
         self._cache['artists'] = frozenset(self._execute('list', ['artist']))
         if Artist.use_mbid:
@@ -336,7 +336,7 @@ class PlayerClient(Player):
 
     @property
     def artists(self):
-        return self._cache.get('artists') | self._cache.get('nombid_artists')
+        return self._cache.get('artists')
 
     @property
     def state(self):
