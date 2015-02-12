@@ -137,8 +137,8 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         argparse.
         """
         ok = True
-        for op, ftochk in [('log', self.config['log']['logfile']),
-                           ('pidfile', self.config['daemon']['pidfile']),]:
+        for op, ftochk in [('logfile', self.config.get('log','logfile')),
+                           ('pidfile', self.config.get('daemon', 'pidfile')),]:
             if not ftochk:
                 continue
             if isdir(ftochk):

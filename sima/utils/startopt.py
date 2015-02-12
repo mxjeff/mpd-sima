@@ -82,6 +82,13 @@ OPTS = [
         'action': Rfile,
         'help': 'Configuration file to load'},
     {
+        'sw':['--generate-config'],
+        'dest': 'generate_config',
+        'action': 'store_true',
+        'help': 'Generate a sample configuration file to stdout according to the current\
+         configuration. You can put other options with this one to get them in\
+         the generated configuration.'},
+    {
         'sw':['--var_dir'],
         'dest': 'var_dir',
         'action': Wdir,

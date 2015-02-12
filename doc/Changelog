@@ -1,5 +1,6 @@
 MPD_sima v0.14.0
 
+ * Add option to generate config on stdout
  * Add priority feature for plugins
  * More robust MPD client
  * Fixed top track mode

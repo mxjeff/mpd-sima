@@ -206,9 +206,9 @@ class PlayerClient(Player):
         if artist.mbid:
             # we already performed a lookup on artists with mbid set
             # search through remaining artists
-            artists = self._cache.get('nombid_artists', [])
+            artists = self._cache.get('nombid_artists')
         else:
-            artists = self._cache.get('artists', [])
+            artists = self._cache.get('artists')
         match = get_close_matches(artist.name, artists, 50, 0.73)
         if not match and not found:
             return

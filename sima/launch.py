@@ -83,7 +83,7 @@ def start(sopt, restart=False):
     verbosity = sopt.options.get('verbosity', 'warning')
     # loads configuration
     config = ConfMan(sopt.options).config
-    logfile = config.get('log', 'logfile')
+    logfile = config.get('log', 'logfile', fallback=None)
     verbosity = config.get('log', 'verbosity')
     set_logger(verbosity, logfile)
     logger = logging.getLogger('sima')
@@ -98,6 +98,10 @@ def start(sopt, restart=False):
         if sopt.options.get('create_db', None):
             logger.info('Done, bye...')
             sys.exit(0)
+
+    if sopt.options.get('generate_config'):
+        config.write(sys.stdout, space_around_delimiters=True)
+        sys.exit(0)
 
     logger.info('Starting...')
     sima = core.Sima(config)

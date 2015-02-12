@@ -2,12 +2,12 @@
 .\"     Title: mpd-sima
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 02/08/2015
+.\"      Date: 02/12/2015
 .\"    Manual: mpd-sima 0.14.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD\-SIMA" "1" "02/08/2015" "mpd-sima" "mpd-sima 0.14.0 User Manual"
+.TH "MPD\-SIMA" "1" "02/12/2015" "mpd-sima" "mpd-sima 0.14.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -33,9 +33,11 @@ mpd-sima \- mpd\-sima will try to maintain some titles ahead in the queue follow
 .HP \w'\fBmpd\-sima\fR\ 'u
 \fBmpd\-sima\fR [\fB\-\-daemon\fR] [\fB\-\-config=\fR\fIconf_file\fR] [\fB\-\-var_dir=\fR\fIvar_directory\fR] [\fB\-\-pid=\fR\fIpid_file\fR] [\fB\-\-log=\fR\fIlog_file\fR] [\fB\-\-log\-level=\fR\fIlog_level\fR] [\fB\-\-host=\fR\fImpd_host\fR] [\fB\-\-mpd_port=\fR\fImpd_port\fR]
 .HP \w'\fBmpd\-sima\fR\ 'u
-\fBmpd\-sima\fR [\fB\-\-var_dir=\fR\fIvar_directory\fR] [\fB\-\-create\-db\fR]
+\fBmpd\-sima\fR \-\-create\-db [\fB\-\-var_dir=\fR\fIvar_directory\fR]
 .HP \w'\fBmpd\-sima\fR\ 'u
-\fBmpd\-sima\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | \fB\-\-version\fR]
+\fBmpd\-sima\fR \-\-generate\-config [\fB\&...\fR]
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR {{\fB\-h\fR\ |\ \fB\-\-help\fR}\ \fB\-\-version\fR} 
 .SH "DESCRIPTION"
 .PP
 This manual page documents briefly the
@@ -149,6 +151,11 @@ see also
 the section called \(lqFILES\(rq
 .RE
 .PP
+\fB\-\-generate\-config\fR
+.RS 4
+Generate a sample configuration file according to the current configuration\&. You can put other options with this one to get them in the generated configuration\&.
+.RE
+.PP
 \fB\-\-create\-db\fR
 .RS 4
 Create the database and exit\&. Uses folder specified with
@@ -258,10 +265,9 @@ DEFAULTS
 .RS 4
 Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env\&. var\&. if set)\&.
 .sp
-The default behavior is to add one track, this track is to be chosen among titles from artists similar to the last artist in the queue\&. MPD_sima will add one track when the unplayed queue is one track long\&.
+The get the defaults as detected by mpd\-sima on your system you can run mpd\-sima to print the config:
 .sp
-To change these defaults, use the configuration file
-mpd_sima\&.cfg
+\fBmpd\-sima \-\-generate\-config\fR
 .RE
 .PP
 For details about mpd_sima\&.cfg refer to the manual
