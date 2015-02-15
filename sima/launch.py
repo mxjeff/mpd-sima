@@ -79,14 +79,13 @@ def load_plugins(sima, source):
 def start(sopt, restart=False):
     """starts application
     """
-    # set logger
-    verbosity = sopt.options.get('verbosity', 'warning')
     # loads configuration
     config = ConfMan(sopt.options).config
+    # set logger
+    logger = logging.getLogger('sima')
     logfile = config.get('log', 'logfile', fallback=None)
     verbosity = config.get('log', 'verbosity')
     set_logger(verbosity, logfile)
-    logger = logging.getLogger('sima')
     logger.debug('Command line say: {0}'.format(sopt.options))
     # Create Database
     db_file = config.get('sima', 'db_file')

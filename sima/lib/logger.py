@@ -54,7 +54,6 @@ def set_logger(level='info', logfile=None):
     logger:
         level: in debug, info, warning,…
         logfile: file to log to
-
     """
     name = 'sima'
     if environ.get('TRACE', False):

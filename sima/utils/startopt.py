@@ -89,7 +89,7 @@ OPTS = [
          configuration. You can put other options with this one to get them in\
          the generated configuration.'},
     {
-        'sw':['--var_dir'],
+        'sw':['--var-dir', '--var_dir'],
         'dest': 'var_dir',
         'action': Wdir,
         'help': 'Directory to store var content (ie. database, cache)'},
@@ -106,14 +106,14 @@ OPTS = [
         #'help': 'Queue mode in [track, top, album]',
         'help': SUPPRESS, },
     {
-        'sw':['--purge_history'],
+        'sw':['--purge-history'],
         'action': 'store_true',
         'dest': 'do_purge_history',
         'help': SUPPRESS},
 ]
 
 
-class StartOpt(object):
+class StartOpt:
     """Command line management.
     """
 

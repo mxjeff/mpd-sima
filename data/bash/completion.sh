@@ -33,7 +33,8 @@ _sima() {
           -S --host \
           -P --port \
           -h --help --version \
-          --var_dir \
+          --var-dir --var_dir \
+          --generate-config \
           -d --daemon"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
@@ -54,11 +55,11 @@ _sima() {
         -c|--config)
             _filedir
             if [ -z $XDG_DATA_HOME ]; then
-                local confnames=$(for x in $(ls -1 $HOME/.config/mpd_sima/*.cfg 2>/dev/null) ; do echo "${x##*//}"; done)
+                local confnames=$(for x in $(ls -1 $HOME/.config/mpd_sima/*.cfg $PWD/*.cfg 2>/dev/null) ; do echo "${x##*//}"; done)
             else
-                local confnames=$(for x in $(ls -1 $HOME/.config/mpd_sima/*.cfg $XDG_DATA_HOME/mpd_sima/*.cfg 2>/dev/null) ; do echo "${x##*//}"; done)
+                local confnames=$(for x in $(ls -1 $HOME/.config/mpd_sima/*.cfg $XDG_DATA_HOME/mpd_sima/*.cfg $PWD/*.cfg 2>/dev/null) ; do echo "${x##*//}"; done)
             fi
-            COMPREPLY+=( $(compgen -W "${confnames}") )
+            COMPREPLY+=( $(compgen -W "${confnames}" -- ${cur} ) )
             return 0
             ;;
         --host|-S)
