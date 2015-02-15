@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 02/08/2015
+.\"      Date: 02/15/2015
 .\"    Manual: mpd-sima 0.14.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "02/08/2015" "mpd-sima" "mpd-sima 0.14.0 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "02/15/2015" "mpd-sima" "mpd-sima 0.14.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -220,9 +220,9 @@ crop plugin\*(Aqs configuration:
 .RS 4
 .RE
 .PP
-\fBconsume=\fR\fI0\fR
+\fBconsume=\fR\fI10\fR
 .RS 4
-How many played tracks to keep in the queue\&. Allows you to maintain a fixed length queue\&. Set to 0 to keep all played tracks\&.
+How many played tracks to keep in the queue\&. Allows you to maintain a fixed length queue\&. Set to some negative integer to keep all played tracks\&.
 .RE
 .PP
 \fBpriority=\fR\fI10\fR

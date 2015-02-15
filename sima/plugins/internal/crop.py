@@ -38,14 +38,19 @@ class Crop(Plugin):
         self.target = None
         if not self.plugin_conf:
             return
-        target = self.plugin_conf.get('consume', None)
+        target = self.plugin_conf.get('consume')
         if not target:
             return
-        if not target.isdigit():
+        try:
+            if int(target) < 0:
+                self.log.info('Negative value for consume, not cropping')
+                return
+        except ValueError:
             self.log.warning('Bad value for consume, '
                     'expecting an integer, not "{}"'.format(target))
         else:
             self.target = int(target)
+            self.log.debug('Cropping at 15')
 
     def callback_next_song(self):
         if not self.target:

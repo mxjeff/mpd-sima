@@ -252,11 +252,11 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                     <term><option>[crop]</option></term>
                 </varlistentry>
                 <varlistentry> <!-- crop.consume -->
-                    <term><option>consume=</option><replaceable>0</replaceable></term>
+                    <term><option>consume=</option><replaceable>10</replaceable></term>
                     <listitem>
                         <para>How many played tracks to keep in the queue.
                             Allows you to maintain a fixed length queue.
-                            Set to 0 to keep all played tracks.
+                            Set to some negative integer to keep all played tracks.
                         </para>
                     </listitem>
                 </varlistentry>
