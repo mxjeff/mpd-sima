@@ -61,7 +61,7 @@ def load_plugins(sima, source):
         try:
             mod_obj = __import__(module, fromlist=[plugin])
         except ImportError as err:
-            logger.error('Failed to load plugin\'s module: ' +
+            logger.error('Failed to load "{}" plugin\'s module: '.format(plugin) +
                          '{0} ({1})'.format(module, err))
             sima.shutdown()
             sys.exit(1)
