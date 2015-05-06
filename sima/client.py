@@ -169,17 +169,18 @@ class PlayerClient(Player):
     @blacklist(track=True)
     def find_track(self, artist, title=None):
         tracks = set()
-        for name in artist.names:
-            if title:
-                tracks |= set(self.find('artist', name, 'title', title))
-            else:
-                tracks |= set(self.find('artist', name))
         if artist.mbid:
             if title:
-                tracks |= set(self.find('musicbrainz_artistid', artist.mbid))
-            else:
                 tracks |= set(self.find('musicbrainz_artistid', artist.mbid,
                                         'title', title))
+            else:
+                tracks |= set(self.find('musicbrainz_artistid', artist.mbid))
+        else:
+            for name in artist.names:
+                if title:
+                    tracks |= set(self.find('artist', name, 'title', title))
+                else:
+                    tracks |= set(self.find('artist', name))
         return list(tracks)
 
     @bl_artist

@@ -368,7 +368,7 @@ class WebService(Plugin):
         artists = self.get_local_similar_artists()
         nbtracks_target = self.plugin_conf.getint('track_to_add')
         for artist in artists:
-            self.log.debug('Trying to find titles to add for "{}"'.format(
+            self.log.debug('Trying to find titles to add for "{!r}"'.format(
                            artist))
             found = self.player.find_track(artist)
             random.shuffle(found)
