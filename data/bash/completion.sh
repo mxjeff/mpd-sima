@@ -43,7 +43,7 @@ _sima() {
     fi
 
     case "${prev}" in
-        --var_dir)
+        --var_dir|--var-dir)
             _filedir -d
             ;;
         -v|--log-level)
