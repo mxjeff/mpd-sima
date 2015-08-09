@@ -162,10 +162,10 @@ class Sima(Daemon):
         try:
             self.log.info('Connecting MPD: {0}:{1}'.format(*self.player._mpd))
             self.player.connect()
+            self.foreach_plugin('start')
         except (PlayerError, PlayerUnHandledError) as err:
             self.log.warning('Player: {}'.format(err))
             self.reconnect_player()
-        self.foreach_plugin('start')
         while 42:
             try:
                 self.loop()

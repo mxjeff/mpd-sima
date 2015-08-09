@@ -42,14 +42,15 @@ class Uniq(Plugin):
         Plugin.__init__(self, daemon)
         self.chan = 'mpd_sima:{0}.{1}'.format(getfqdn(), getpid())
         self.channels = []
-        self.uniq = True
+        self._registred = False
 
     def start(self):
         if not self.is_capable():
             self.log.warning('MPD does not provide client to client')
             return
         self.is_uniq()
-        self.sub_chan()
+        if not self._registred:
+            self.sub_chan()
 
     def is_capable(self):
         if {'channels', 'subscribe'}.issubset(set(self.player.commands())):
@@ -67,11 +68,11 @@ class Uniq(Plugin):
         if channels:
             self.log.warning('Another instance is queueing on this MPD host')
             self.log.warning(' '.join(channels))
-            self.uniq = False
 
     def sub_chan(self):
         self.log.debug('Registering as {}'.format(self.chan))
         self.player.subscribe(self.chan)
+        self._registred = True
 
     def callback_need_track(self):
         if self.is_capable():
