@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -55,6 +55,9 @@ class Crop(Plugin):
     def callback_next_song(self):
         if not self.target:
             return
+        if not self._Plugin__daemon.enabled:
+            self.log.debug('Queueing disabled, not cropping')
+            return False
         player = self._Plugin__daemon.player
         if player.currentsong().pos > self.target:
             self.log.debug('cropping playlist')
