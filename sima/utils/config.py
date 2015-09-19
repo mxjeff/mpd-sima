@@ -127,8 +127,15 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         self.supersedes_config_with_cmd_line_options()
         # Controls files access
         self.control_facc()
-        # generate dbfile
+        # set dbfile
         self.config['sima']['db_file'] = join(self.config['sima']['var_dir'], 'sima.db')
+
+        # Create directories
+        data_dir = self.config['sima']['var_dir']
+        if not isdir(data_dir):
+            self.log.trace('Creating "{}"'.format(data_dir))
+            makedirs(data_dir)
+            chmod(data_dir, 0o700)
 
     def control_facc(self):
         """Controls file access.
@@ -206,13 +213,9 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         elif homedir and isdir(homedir) and homedir not in ['/']:
             data_dir = join(homedir, '.local', 'share', DIRNAME)
         else:
-            self.log.error('Can\'t find a suitable location for data folder (XDG_DATA_HOME)')
-            self.log.error('Please use "--var_dir" to set a proper location')
+            self.log.critical('Can\'t find a suitable location for data folder (XDG_DATA_HOME)')
+            self.log.critical('Please use "--var_dir" to set a proper location')
             sys.exit(1)
-
-        if not isdir(data_dir):
-            makedirs(data_dir)
-            chmod(data_dir, 0o700)
 
         if self.startopt.get('conf_file'):
             # No need to handle conf file location
@@ -221,10 +224,6 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
             conf_dir = join(environ.get('XDG_CONFIG_HOME'), DIRNAME)
         elif homedir and isdir(homedir) and homedir not in ['/']:
             conf_dir = join(homedir, '.config', DIRNAME)
-            # Create conf_dir if necessary
-            if not isdir(conf_dir):
-                makedirs(conf_dir)
-                chmod(conf_dir, 0o700)
             self.conf_file = join(conf_dir, CONF_FILE)
         else:
             self.log.critical('Can\'t find a suitable location for config folder (XDG_CONFIG_HOME)')
