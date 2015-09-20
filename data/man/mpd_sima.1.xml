@@ -64,7 +64,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
       <command>&dhpackage;</command>
       <arg choice="opt"><option>--daemon</option></arg>
       <arg choice="opt"><option>--config=</option><replaceable class="option">conf_file</replaceable></arg>
-      <arg choice="opt"><option>--var_dir=</option><replaceable class="option">var_directory</replaceable></arg>
+      <arg choice="opt"><option>--var-dir=</option><replaceable class="option">var_directory</replaceable></arg>
       <arg choice="opt"><option>--pid=</option><replaceable class="option">pid_file</replaceable></arg>
       <arg choice="opt"><option>--log=</option><replaceable class="option">log_file</replaceable></arg>
       <arg choice="opt"><option>--log-level=</option><replaceable class="option">log_level</replaceable></arg>
@@ -74,7 +74,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
     <cmdsynopsis>
       <command>&dhpackage;</command>
       <arg choice="plain">--create-db</arg>
-      <arg choice="opt"><option>--var_dir=</option><replaceable class="option">var_directory</replaceable></arg>
+      <arg choice="opt"><option>--var-dir=</option><replaceable class="option">var_directory</replaceable></arg>
     </cmdsynopsis>
     <cmdsynopsis>
       <command>&dhpackage;</command>
@@ -114,7 +114,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         <refsect2 id="daemon">
             <title>Launch as a system service (dæmon).</title>
             <para>Here follows an example on how to launch &dhpackage; as a service on your system, not attach to regular user configuration/database.</para>
-            <para><command>&dhpackage; --daemon --conf=/etc/mpd_sima.cfg --var_dir=/var/cache/mpd-sima/ --pid=/run/mpd-sima.pid --log=/var/log/mpd-sima.log</command></para>
+            <para><command>&dhpackage; --daemon --conf=/etc/mpd_sima.cfg --var-dir=/var/cache/mpd-sima/ --pid=/run/mpd-sima.pid --log=/var/log/mpd-sima.log</command></para>
         </refsect2>
         <refsect2 id="user_land">
             <title>Launch in user land</title>
@@ -189,8 +189,8 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                    </para>
             </listitem>
         </varlistentry>
-        <varlistentry> <!-- var_dir -->
-            <term><option>--var_dir=<replaceable class="parameter">var_directory</replaceable></option></term>
+        <varlistentry> <!-- var-dir -->
+            <term><option>--var-dir=<replaceable class="parameter">var_directory</replaceable></option></term>
             <listitem>
                 <para>Use the specific path <replaceable>var_directory</replaceable> to look for (or create) var files (ie. database) instead of looking at the default user data location.<sbr />Default is to look in <envar>$XDG_DATA_HOME/mpd_sima/</envar>.  Concerning <envar>$XDG_DATA_HOME</envar> see also <xref linkend="files"/></para>
             </listitem>
@@ -204,7 +204,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         <varlistentry> <!-- create-db -->
             <term><option>--create-db</option></term>
             <listitem>
-                <para>Create the database and exit. Uses folder specified with <option>--var_dir</option> or default directory.<sbr />Default is to use <envar>$XDG_DATA_HOME/mpd_sima/</envar>.  Concerning <envar>$XDG_DATA_HOME</envar> see also <xref linkend="files"/></para>
+                <para>Create the database and exit. Uses folder specified with <option>--var-dir</option> or default directory.<sbr />Default is to use <envar>$XDG_DATA_HOME/mpd_sima/</envar>.  Concerning <envar>$XDG_DATA_HOME</envar> see also <xref linkend="files"/></para>
             </listitem>
         </varlistentry>
         <varlistentry><!-- host -->

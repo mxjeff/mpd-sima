@@ -33,7 +33,7 @@ _sima() {
           -S --host \
           -P --port \
           -h --help --version \
-          --var-dir --var_dir \
+          --var-dir \
           --generate-config \
           -d --daemon"
 
@@ -43,7 +43,7 @@ _sima() {
     fi
 
     case "${prev}" in
-        --var_dir|--var-dir)
+        --var-dir)
             _filedir -d
             ;;
         -v|--log-level)

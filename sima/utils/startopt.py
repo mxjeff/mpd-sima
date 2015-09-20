@@ -98,7 +98,7 @@ OPTS = [
         'action': 'store_true',
         'dest': 'create_db',
         'help': '''Create database and exit, use destination
-                   specified in --var_dir or standard location.'''},
+                   specified in --var-dir or standard location.'''},
     {
         'sw':['--queue-mode', '-q'],
         'dest': 'queue_mode',

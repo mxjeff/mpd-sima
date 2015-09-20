@@ -24,7 +24,7 @@
         <para>Usually <envar>XDG_DATA_HOME</envar> is set to
             <filename>${HOME}/.local/share</filename> and <envar>XDG_CONFIG_HOME</envar> to
             <filename>${HOME}/.config</filename>.<sbr />You may override them using
-            command line option <option>--var_dir</option> (cf.
+            command line option <option>--var-dir</option> and <option>--config</option> (cf.
             <citerefentry><refentrytitle>mpd-sima</refentrytitle>
                 <manvolnum>1</manvolnum></citerefentry>)</para>
     </refsect1>

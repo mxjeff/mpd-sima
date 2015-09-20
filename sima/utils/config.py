@@ -214,7 +214,7 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
             data_dir = join(homedir, '.local', 'share', DIRNAME)
         else:
             self.log.critical('Can\'t find a suitable location for data folder (XDG_DATA_HOME)')
-            self.log.critical('Please use "--var_dir" to set a proper location')
+            self.log.critical('Please use "--var-dir" to set a proper location')
             sys.exit(1)
 
         if self.startopt.get('conf_file'):
