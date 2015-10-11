@@ -241,6 +241,12 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                   </para>
               </listitem>
           </varlistentry>
+          <varlistentry>
+              <term><envar>HTTP_PROXY</envar>, <envar>HTTPS_PROXY</envar></term>
+              <listitem>
+                  <para>&dhutils; honors <envar>HTTP_PROXY</envar> environment variables.</para>
+              </listitem>
+          </varlistentry>
       </variablelist>
   </refsect1>
   <refsect1 id="configuration">

@@ -8,6 +8,7 @@ MPD_sima v0.14.0
  * Fixed http cache for lastFM
  * Cleanup code (removed users similarities)
  * Make "var-dir" option default name instead of "var_dir"
+ * Honor HTTP_PROXY env. var.
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 

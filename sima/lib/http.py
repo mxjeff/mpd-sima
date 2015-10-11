@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2014-2015 Jack Kaliko <kaliko@azylum.org>
 # Copyright (c) 2012, 2013 Eric Larson <eric@ionrock.org>
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -301,7 +301,8 @@ class HttpClient:
     def fetch_ws(self, prepreq):
         """fetch from web service"""
         sess = Session()
-        resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT)
+        settings = sess.merge_environment_settings(prepreq.url, {}, None, False, None)
+        resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT, **settings)
         if resp.status_code == 304:
             self.stats.update(etag=self.stats.get('etag')+1)
             resp = self.controller.update_cached_response(prepreq, resp)
