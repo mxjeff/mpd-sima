@@ -122,7 +122,7 @@ class SimaFM:
                     song.pop(key)
             song.update(art)
             song.update(title=song.pop('name'))
-            song.update(time=song.pop('duration'))
+            song.update(time=song.pop('duration', 0))
             yield Track(**song)
 
 # VIM MODLINE
