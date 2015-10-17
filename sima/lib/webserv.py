@@ -67,11 +67,9 @@ class WebService(Plugin):
         self.to_add = list()
         self._cache = None
         self._flush_cache()
-        wrapper = {
-                'track': self._track,
-                'top': self._top,
-                'album': self._album,
-                }
+        wrapper = {'track': self._track,
+                   'top': self._top,
+                   'album': self._album,}
         self.queue_mode = wrapper.get(self.plugin_conf.get('queue_mode'))
         self.ws = None
 
@@ -84,10 +82,8 @@ class WebService(Plugin):
             self.log.info('{0}: Flushing cache!'.format(name))
         else:
             self.log.info('{0}: Initialising cache!'.format(name))
-        self._cache = {
-                'asearch': dict(),
-                'tsearch': dict(),
-                }
+        self._cache = {'asearch': dict(),
+                       'tsearch': dict(),}
 
     def _cleanup_cache(self):
         """Avoid bloated cache
@@ -123,11 +119,11 @@ class WebService(Plugin):
         candidate = []
         for trk in [_ for _ in not_in_hist if _ not in black_list]:
             # Should use albumartist heuristic as well
-            if self.plugin_conf.getboolean('single_album'):
+            if self.plugin_conf.getboolean('single_album'): # pylint: disable=no-member
                 if (trk.album == self.player.current.album or
-                    trk.album in [tr.album for tr in self.to_add]):
+                        trk.album in [tr.album for tr in self.to_add]):
                     self.log.debug('Found unplayed track ' +
-                               'but from an album already queued: %s' % (trk))
+                                   'but from an album already queued: %s', trk)
                     continue
             candidate.append(trk)
         if not candidate:
@@ -155,7 +151,7 @@ class WebService(Plugin):
         Look in player library for availability of similar artists in
         similarities
         """
-        dynamic = self.plugin_conf.getint('max_art')
+        dynamic = self.plugin_conf.getint('max_art') # pylint: disable=no-member
         if dynamic <= 0:
             dynamic = 100
         results = list()
@@ -202,7 +198,7 @@ class WebService(Plugin):
         extra_arts = list()
         ret_extra = list()
         depth = 0
-        while depth < self.plugin_conf.getint('depth'):
+        while depth < self.plugin_conf.getint('depth'): # pylint: disable=no-member
             if len(history) == 0:
                 break
             trk = history.popleft()
@@ -211,8 +207,7 @@ class WebService(Plugin):
                 continue
             extra_arts.append(trk.Artist)
             depth += 1
-        self.log.debug('EXTRA ARTS: {}'.format(
-                      '/'.join(map(str, extra_arts))))
+        self.log.debug('EXTRA ARTS: %s', '/'.join(map(str, extra_arts)))
         for artist in extra_arts:
             self.log.debug('Looking for artist similar '
                            'to "{}" as well'.format(artist))
@@ -224,8 +219,8 @@ class WebService(Plugin):
         if last_trk.Artist in ret_extra:
             ret_extra.remove(last_trk.Artist)
         if ret_extra:
-            self.log.debug('similar artist(s) found: {}'.format(
-                ' / '.join(map(str, MetaContainer(ret_extra)))))
+            self.log.debug('similar artist(s) found: %s',
+                           ' / '.join(map(str, MetaContainer(ret_extra))))
         return ret_extra
 
     def get_local_similar_artists(self):
@@ -240,18 +235,18 @@ class WebService(Plugin):
         if not similar:
             self.log.info('Got nothing from {0}!'.format(self.ws.name))
             return []
-        self.log.info('First five similar artist(s): {}...'.format(
-                      ' / '.join(map(str, list(similar)[:5]))))
+        self.log.info('First five similar artist(s): %s...',
+                      ' / '.join(map(str, list(similar)[:5])))
         self.log.info('Looking availability in music library')
         ret = MetaContainer(self.get_artists_from_player(similar))
         if ret:
-            self.log.debug('regular found in library: {}'.format(
-                           ' / '.join(map(str, ret))))
+            self.log.debug('regular found in library: %s',
+                           ' / '.join(map(str, ret)))
         else:
             self.log.debug('Got nothing similar from library!')
         ret_extra = None
         if len(self.history) >= 2:
-            if self.plugin_conf.getint('depth') > 1:
+            if self.plugin_conf.getint('depth') > 1: # pylint: disable=no-member
                 ret_extra = self.get_recursive_similar_artist()
         if ret_extra:
             # get them reorg to pick up best element
@@ -262,8 +257,8 @@ class WebService(Plugin):
             else:
                 ret_extra = MetaContainer(ret_extra[:max(4, len(ret))//2])
             if ret_extra:
-                self.log.debug('extra found in library: {}'.format(
-                               ' / '.join(map(str, ret_extra))))
+                self.log.debug('extra found in library: %s',
+                               ' / '.join(map(str, ret_extra)))
             ret = ret | ret_extra
         if not ret:
             self.log.warning('Got nothing from music library.')
@@ -299,15 +294,14 @@ class WebService(Plugin):
         """
         self.to_add = list()
         nb_album_add = 0
-        target_album_to_add = self.plugin_conf.getint('album_to_add')
+        target_album_to_add = self.plugin_conf.getint('album_to_add') # pylint: disable=no-member
         for artist in artists:
             self.log.info('Looking for an album to add for "%s"...' % artist)
             albums = self.player.search_albums(artist)
             # str conversion while Album type is not propagated
             albums = [str(album) for album in albums]
             if albums:
-                self.log.debug('Albums candidate: {0:s}'.format(
-                               ' / '.join(albums)))
+                self.log.debug('Albums candidate: %s', ' / '.join(albums))
             else: continue
             # albums yet in history for this artist
             albums = set(albums)
@@ -325,15 +319,13 @@ class WebService(Plugin):
                 # Good heuristic, at least enough to guess if the whole album is
                 # already queued.
                 if tracks[0] in self.player.queue:
-                    self.log.debug('"%s" already queued, skipping!' %
-                            tracks[0].album)
+                    self.log.debug('"%s" already queued, skipping!', tracks[0].album)
                     continue
                 album_to_queue = album
             if not album_to_queue:
-                self.log.info('No album found for "%s"' % artist)
+                self.log.info('No album found for "%s"', artist)
                 continue
-            self.log.info('{2} album candidate: {0} - {1}'.format(
-                           artist, album_to_queue, self.ws.name))
+            self.log.info('%s album candidate: %s - %s', self.ws.name, artist, album_to_queue)
             nb_album_add += 1
             self.to_add.extend(self.player.find_album(artist, album_to_queue))
             if nb_album_add == target_album_to_add:
@@ -344,7 +336,7 @@ class WebService(Plugin):
         find top tracks for artists in artists list.
         """
         self.to_add = list()
-        nbtracks_target = self.plugin_conf.getint('track_to_add')
+        nbtracks_target = self.plugin_conf.getint('track_to_add') # pylint: disable=no-member
         for artist in artists:
             if len(self.to_add) == nbtracks_target:
                 return True
@@ -353,12 +345,12 @@ class WebService(Plugin):
             try:
                 titles = [t for t in self.ws.get_toptrack(artist)]
             except WSError as err:
-                self.log.warning('{0}: {1}'.format(self.ws.name, err))
+                self.log.warning('%s: %s', self.ws.name, err)
             for trk in titles:
                 found = self.player.fuzzy_find_track(artist, trk.title)
                 random.shuffle(found)
                 if found:
-                    self.log.debug('{0}'.format(found[0]))
+                    self.log.debug('%s', found[0])
                     if self.filter_track(found):
                         break
 
@@ -366,10 +358,9 @@ class WebService(Plugin):
         """Get some tracks for track queue mode
         """
         artists = self.get_local_similar_artists()
-        nbtracks_target = self.plugin_conf.getint('track_to_add')
+        nbtracks_target = self.plugin_conf.getint('track_to_add') # pylint: disable=no-member
         for artist in artists:
-            self.log.debug('Trying to find titles to add for "{!r}"'.format(
-                           artist))
+            self.log.debug('Trying to find titles to add for "%r"', artist)
             found = self.player.find_track(artist)
             random.shuffle(found)
             if not found:

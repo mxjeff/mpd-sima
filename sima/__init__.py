@@ -5,13 +5,11 @@ from datetime import timedelta
 
 LFM = {'apikey': 'NG4xcDlxcXJwMjk4MTZycTgwM3E3b3I5MTEzb240cG8',
        'host':'ws.audioscrobbler.com',
-       'version': '2.0',
-       }
+       'version': '2.0',}
 
 ECH = {'apikey': 'WlRKQkhTS0JHWFVDUEZZRFA',
        'host': 'developer.echonest.com',
-       'version': 'v4',
-       }
+       'version': 'v4',}
 
 WAIT_BETWEEN_REQUESTS = timedelta(days=0, seconds=2)
 SOCKET_TIMEOUT = 6

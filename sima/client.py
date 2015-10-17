@@ -132,8 +132,8 @@ class PlayerClient(Player):
         """
         # TODO: ain't working for "sticker find" and "sticker list"
         tracks_listing = ["playlistfind", "playlistid", "playlistinfo",
-                "playlistsearch", "plchanges", "listplaylistinfo", "find",
-                "search", "sticker find",]
+                          "playlistsearch", "plchanges", "listplaylistinfo", "find",
+                          "search", "sticker find",]
         track_obj = ['currentsong']
         if self._comm in tracks_listing + track_obj:
             #  pylint: disable=w0142
@@ -145,8 +145,8 @@ class PlayerClient(Player):
 
     def __skipped_track(self, old_curr):
         if (self.state == 'stop'
-            or not hasattr(old_curr, 'id')
-            or not hasattr(self.current, 'id')):
+                or not hasattr(old_curr, 'id')
+                or not hasattr(self.current, 'id')):
             return False
         return self.current.id != old_curr.id  # pylint: disable=no-member
 
@@ -158,10 +158,8 @@ class PlayerClient(Player):
             self.log.info('Player: Flushing cache!')
         else:
             self.log.info('Player: Initialising cache!')
-        self._cache = {
-                'artists': frozenset(),
-                'nombid_artists': frozenset(),
-                }
+        self._cache = {'artists': frozenset(),
+                       'nombid_artists': frozenset(),}
         self._cache['artists'] = frozenset(self._execute('list', ['artist']))
         if Artist.use_mbid:
             self._cache['nombid_artists'] = frozenset(self._execute('list', ['artist', 'musicbrainz_artistid', '']))
@@ -214,8 +212,7 @@ class PlayerClient(Player):
         if not match and not found:
             return
         if len(match) > 1:
-            self.log.debug('found close match for "%s": %s' %
-                           (artist, '/'.join(match)))
+            self.log.debug('found close match for "%s": %s', artist, '/'.join(match))
         # Does not perform fuzzy matching on short and single word strings
         # Only lowercased comparison
         if ' ' not in artist.name and len(artist.name) < 8:
@@ -231,17 +228,17 @@ class PlayerClient(Player):
                 found = True
                 artist.add_alias(fuzz_art)
                 if artist.name != fuzz_art:
-                    self.log.debug('"%s" matches "%s".' % (fuzz_art, artist))
+                    self.log.debug('"%s" matches "%s".', fuzz_art, artist)
                 continue
             # SimaStr string __eq__ (not regular string comparison here)
             if fzartist == fuzz_art:
                 found = True
                 artist.add_alias(fuzz_art)
-                self.log.info('"%s" quite probably matches "%s" (SimaStr)' %
-                              (fuzz_art, artist))
+                self.log.info('"%s" quite probably matches "%s" (SimaStr)',
+                              fuzz_art, artist)
         if found:
             if artist.aliases:
-                self.log.debug('Found: {}'.format('/'.join(list(artist.names)[:4])))
+                self.log.debug('Found: %s', '/'.join(list(artist.names)[:4]))
             return artist
 
     def fuzzy_find_track(self, artist, title):
@@ -258,11 +255,11 @@ class PlayerClient(Player):
             if leven == 1:
                 pass
             elif leven >= 0.79:  # PARAM
-                self.log.debug('title: "%s" should match "%s" (lr=%1.3f)' %
-                               (title_, title, leven))
+                self.log.debug('title: "%s" should match "%s" (lr=%1.3f)',
+                               title_, title, leven)
             else:
-                self.log.debug('title: "%s" does not match "%s" (lr=%1.3f)' %
-                               (title_, title, leven))
+                self.log.debug('title: "%s" does not match "%s" (lr=%1.3f)',
+                               title_, title, leven)
                 return []
             return self.find('artist', artist, 'title', title_)
 
@@ -286,7 +283,7 @@ class PlayerClient(Player):
         albums = []
         for name in artist.names:
             if len(artist.names) > 1:
-                self.log.debug('Searching album for aliase: "{}"'.format(name))
+                self.log.debug('Searching album for aliase: "%s"', name)
             kwalbart = {'albumartist':name, 'artist':name}
             for album in self.list('album', 'albumartist', artist):
                 if album and album not in albums:
@@ -294,7 +291,7 @@ class PlayerClient(Player):
             for album in self.list('album', 'artist', artist):
                 album_trks = [trk for trk in self.find('album', album)]
                 if 'Various Artists' in [tr.albumartist for tr in album_trks]:
-                    self.log.debug('Discarding {0} ("Various Artists" set)'.format(album))
+                    self.log.debug('Discarding %s ("Various Artists" set)', album)
                     continue
                 arts = set([trk.artist for trk in album_trks])
                 if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
@@ -302,7 +299,7 @@ class PlayerClient(Player):
                         albums.append(Album(name=album, **kwalbart))
                 elif album and album not in albums:
                     self.log.debug('"{0}" probably not an album of "{1}"'.format(
-                                   album, artist) + '({0})'.format('/'.join(arts)))
+                        album, artist) + '({0})'.format('/'.join(arts)))
         return albums
 
     def monitor(self):
@@ -325,7 +322,7 @@ class PlayerClient(Player):
         if 'idle' in self._client._pending:
             self._client.noidle()
         elif self._client._pending:
-            self.log.warning('pending commands: {}'.format(self._client._pending))
+            self.log.warning('pending commands: %s', self._client._pending)
 
     def remove(self, position=0):
         self.delete(position)
@@ -410,7 +407,7 @@ class PlayerClient(Player):
         if Artist.use_mbid:
             if 'MUSICBRAINZ_ARTISTID' not in self._client.tagtypes():
                 self.log.warning('Use of MusicBrainzIdentifier is set but MPD is '
-                        'not providing related metadata')
+                                 'not providing related metadata')
                 self.log.info(self._client.tagtypes())
                 self.log.warning('Disabling MusicBrainzIdentifier')
                 Artist.use_mbid = False

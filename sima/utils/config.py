@@ -16,7 +16,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with sima.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
+# pylint: disable=bad-continuation
 
 """
 Deal with configuration and data files.
@@ -29,7 +29,7 @@ import logging
 import sys
 
 from configparser import Error
-from os import (access, makedirs, environ, stat, chmod, W_OK, R_OK)
+from os import (access, makedirs, environ, stat, chmod, W_OK)
 from os.path import (join, isdir, isfile, dirname, exists)
 from stat import (S_IMODE, ST_MODE, S_IRWXO, S_IRWXG)
 
@@ -144,26 +144,26 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         argparse.
         """
         ok = True
-        for op, ftochk in [('logfile', self.config.get('log','logfile')),
+        for op, ftochk in [('logfile', self.config.get('log', 'logfile')),
                            ('pidfile', self.config.get('daemon', 'pidfile')),]:
             if not ftochk:
                 continue
             if isdir(ftochk):
-                self.log.critical('Need a file not a directory: "{}"'.format(ftochk))
+                self.log.critical('Need a file not a directory: "%s"', ftochk)
                 ok = False
             if not exists(ftochk):
                 # Is parent directory writable then
                 filedir = dirname(ftochk)
                 if not access(filedir, W_OK):
-                    self.log.critical('no write access to "{0}" ({1})'.format(filedir, op))
+                    self.log.critical('no write access to "%s" (%s)', filedir, op)
                     ok = False
             else:
                 if not access(ftochk, W_OK):
-                    self.log.critical('no write access to "{0}" ({1})'.format(ftochk, op))
+                    self.log.critical('no write access to "%s" (%s)', ftochk, op)
                     ok = False
         if not ok:
             if exists(self.conf_file):
-                self.log.warning('Try to check the configuration file: {}'.format(self.conf_file))
+                self.log.warning('Try to check the configuration file: %s', self.conf_file)
             sys.exit(2)
 
     def control_mod(self):
@@ -171,7 +171,7 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         Controls conf file permissions.
         """
         mode = S_IMODE(stat(self.conf_file)[ST_MODE])
-        self.log.debug('file permission is: %o' % mode)
+        self.log.debug('file permission is: %o', mode)
         if mode & S_IRWXO or mode & S_IRWXG:
             self.log.warning('File is readable by "other" and/or' +
                              ' "group" (actual permission %o octal).' %
@@ -190,13 +190,13 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         """Use MPD en.var. to set defaults"""
         mpd_host, mpd_port, passwd = utils.get_mpd_environ()
         if mpd_host:
-            self.log.info('Env. variable MPD_HOST set to "%s"' % mpd_host)
+            self.log.info('Env. variable MPD_HOST set to "%s"', mpd_host)
             self.config['MPD'].update(host=mpd_host)
         if passwd:
             self.log.info('Env. variable MPD_HOST contains password.')
             self.config['MPD'].update(password=passwd)
         if mpd_port:
-            self.log.info('Env. variable MPD_PORT set to "%s".' % mpd_port)
+            self.log.info('Env. variable MPD_PORT set to "%s".', mpd_port)
             self.config['MPD'].update(port=mpd_port)
 
     def init_config(self):
@@ -237,7 +237,7 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         if not isfile(self.conf_file):
             return
 
-        self.log.info('Loading configuration from:  %s' % self.conf_file)
+        self.log.info('Loading configuration from:  %s', self.conf_file)
         self.control_mod()
 
         try:

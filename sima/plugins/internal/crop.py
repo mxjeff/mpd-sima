@@ -47,7 +47,7 @@ class Crop(Plugin):
                 return
         except ValueError:
             self.log.warning('Bad value for consume, '
-                    'expecting an integer, not "{}"'.format(target))
+                             'expecting an integer, not "%s"', target)
         else:
             self.target = int(target)
             self.log.debug('Cropping at 15')

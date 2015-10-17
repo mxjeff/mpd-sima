@@ -23,13 +23,9 @@
 
 # standard library import
 import logging
-from difflib import get_close_matches
 from itertools import dropwhile
 
 # local import
-from .meta import Artist
-from .simastr import SimaStr
-from ..utils.leven import levenshtein_ratio
 
 def blacklist(artist=False, album=False, track=False):
     #pylint: disable=C0111,W0212
@@ -151,22 +147,27 @@ class Player(object):
 
     @property
     def artists(self):
+        #pylint: disable=C0111
         raise NotImplementedError
 
     @property
     def state(self):
+        #pylint: disable=C0111
         raise NotImplementedError
 
     @property
     def current(self):
+        #pylint: disable=C0111
         raise NotImplementedError
 
     @property
     def queue(self):
+        #pylint: disable=C0111
         raise NotImplementedError
 
     @property
     def playlist(self):
+        #pylint: disable=C0111
         raise NotImplementedError
 
 # VIM MODLINE

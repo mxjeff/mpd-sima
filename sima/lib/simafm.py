@@ -44,8 +44,8 @@ class SimaFM:
     name = 'Last.fm'
     cache = False
     stats = {'etag':0,
-            'ccontrol':0,
-            'total':0}
+             'ccontrol':0,
+             'total':0}
 
     def __init__(self):
         self.http = HttpClient(cache=self.cache, stats=self.stats)
@@ -66,9 +66,9 @@ class SimaFM:
         """Build payload
         """
         payloads = dict({'similar': {'method':'artist.getsimilar',},
-                        'top': {'method':'artist.gettoptracks',},
-                        'track': {'method':'track.getsimilar',},
-                        'info': {'method':'artist.getinfo',},
+                         'top': {'method':'artist.gettoptracks',},
+                         'track': {'method':'track.getsimilar',},
+                         'info': {'method':'artist.getinfo',},
                         })
         payload = payloads.get(method)
         payload.update(api_key=LFM.get('apikey'), format='json')
@@ -93,17 +93,17 @@ class SimaFM:
         payload = self._forge_payload(artist)
         # Construct URL
         ans = self.http(self.root_url, payload)
-        self._controls_answer(ans.json())
+        self._controls_answer(ans.json()) # pylint: disable=no-member
         # Artist might be found be return no 'artist' list…
         # cf. "Mulatu Astatqe" vs. "Mulatu Astatqé" with autocorrect=0
         # json format is broken IMHO, xml is more consistent IIRC
         # Here what we got:
         # >>> {"similarartists":{"#text":"\n","artist":"Mulatu Astatqe"}}
         # autocorrect=1 should fix it, checking anyway.
-        simarts = ans.json().get('similarartists').get('artist')
+        simarts = ans.json().get('similarartists').get('artist') # pylint: disable=no-member
         if not isinstance(simarts, list):
             raise WSError('Artist found but no similarities returned')
-        for art in ans.json().get('similarartists').get('artist'):
+        for art in ans.json().get('similarartists').get('artist'): # pylint: disable=no-member
             yield Artist(name=art.get('name'), mbid=art.get('mbid', None))
 
     def get_toptrack(self, artist=None):
@@ -111,12 +111,10 @@ class SimaFM:
         """
         payload = self._forge_payload(artist, method='top')
         ans = self.http(self.root_url, payload)
-        self._controls_answer(ans.json())
-        tops = ans.json().get('toptracks').get('track')
-        art = {
-                'artist': artist.name,
-                'musicbrainz_artistid': artist.mbid,
-                }
+        self._controls_answer(ans.json()) # pylint: disable=no-member
+        tops = ans.json().get('toptracks').get('track') # pylint: disable=no-member
+        art = {'artist': artist.name,
+               'musicbrainz_artistid': artist.mbid,}
         for song in tops:
             for key in ['artist', 'streamable', 'listeners',
                         'url', 'image', '@attr']:

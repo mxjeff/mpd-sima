@@ -36,7 +36,6 @@ import sqlite3
 from datetime import (datetime, timedelta)
 from os.path import dirname, isdir
 from os import (access, W_OK, F_OK)
-from shutil import copyfile
 
 
 class SimaDBError(Exception):
@@ -69,7 +68,7 @@ class SimaDB(object):
         # Controls directory access
         if not isdir(dirname(db_path)):
             raise SimaDBAccessError('Not a regular directory: "%s"' %
-                    dirname(db_path))
+                                    dirname(db_path))
         if not access(dirname(db_path), W_OK):
             raise SimaDBAccessError('No write access to "%s"' % dirname(db_path))
         # Is a file but no write access
@@ -91,7 +90,7 @@ class SimaDB(object):
         return connection
 
     def get_artist(self, artist_name, mbid=None,
-            with_connection=None, add_not=False):
+                   with_connection=None, add_not=False):
         """get artist information from the database.
         if not in database insert new entry."""
         if with_connection:
@@ -161,7 +160,7 @@ class SimaDB(object):
             self.close_database_connection(connection)
 
     def get_album(self, track, mbid=None,
-            with_connection=None, add_not=False):
+                  with_connection=None, add_not=False):
         """
         get album information from the database.
         if not in database insert new entry.
@@ -215,19 +214,19 @@ class SimaDB(object):
             yield artist
 
     def get_bl_artist(self, artist_name,
-            with_connection=None, add_not=None):
+                      with_connection=None, add_not=None):
         """get blacklisted artist information from the database."""
         if with_connection:
             connection = with_connection
         else:
             connection = self.get_database_connection()
-        art = self.get_artist(artist_name,
-                with_connection=connection, add_not=add_not)
+        art = self.get_artist(artist_name, with_connection=connection,
+                              add_not=add_not)
         if not art:
             return False
         art_id = art[0]
         rows = connection.execute("SELECT * FROM black_list WHERE artist = ?",
-                (art_id,))
+                                  (art_id,))
         for row in rows:
             if not with_connection:
                 self.close_database_connection(connection)
@@ -237,12 +236,12 @@ class SimaDB(object):
                 self.close_database_connection(connection)
             return False
         connection.execute("INSERT INTO black_list (artist) VALUES (?)",
-                (art_id,))
+                           (art_id,))
         connection.execute("UPDATE black_list SET updated = DATETIME('now')"
-                " WHERE artist = ?", (art_id,))
+                           " WHERE artist = ?", (art_id,))
         connection.commit()
         rows = connection.execute("SELECT * FROM black_list WHERE artist = ?",
-                (art_id,))
+                                  (art_id,))
         for row in rows:
             if not with_connection:
                 self.close_database_connection(connection)
@@ -251,20 +250,19 @@ class SimaDB(object):
             self.close_database_connection(connection)
         return False
 
-    def get_bl_album(self, track,
-            with_connection=None, add_not=None):
+    def get_bl_album(self, track, with_connection=None, add_not=None):
         """get blacklisted album information from the database."""
         if with_connection:
             connection = with_connection
         else:
             connection = self.get_database_connection()
-        album = self.get_album(track,
-                with_connection=connection, add_not=add_not)
+        album = self.get_album(track, with_connection=connection,
+                               add_not=add_not)
         if not album:
             return False
         alb_id = album[0]
         rows = connection.execute("SELECT * FROM black_list WHERE album = ?",
-                (alb_id,))
+                                  (alb_id,))
         for row in rows:
             if not with_connection:
                 self.close_database_connection(connection)
@@ -274,12 +272,12 @@ class SimaDB(object):
                 self.close_database_connection(connection)
             return False
         connection.execute("INSERT INTO black_list (album) VALUES (?)",
-                (alb_id,))
+                           (alb_id,))
         connection.execute("UPDATE black_list SET updated = DATETIME('now')"
-                " WHERE album = ?", (alb_id,))
+                           " WHERE album = ?", (alb_id,))
         connection.commit()
         rows = connection.execute("SELECT * FROM black_list WHERE album = ?",
-                (alb_id,))
+                                  (alb_id,))
         for row in rows:
             if not with_connection:
                 self.close_database_connection(connection)
@@ -294,13 +292,13 @@ class SimaDB(object):
             connection = with_connection
         else:
             connection = self.get_database_connection()
-        track = self.get_track(track,
-                with_connection=connection, add_not=add_not)
+        track = self.get_track(track, with_connection=connection,
+                               add_not=add_not)
         if not track:
             return False
         track_id = track[0]
         rows = connection.execute("SELECT * FROM black_list WHERE track = ?",
-                (track_id,))
+                                  (track_id,))
         for row in rows:
             if not with_connection:
                 self.close_database_connection(connection)
@@ -310,12 +308,12 @@ class SimaDB(object):
                 self.close_database_connection(connection)
             return False
         connection.execute("INSERT INTO black_list (track) VALUES (?)",
-                (track_id,))
+                           (track_id,))
         connection.execute("UPDATE black_list SET updated = DATETIME('now')"
-                " WHERE track = ?", (track_id,))
+                           " WHERE track = ?", (track_id,))
         connection.commit()
         rows = connection.execute("SELECT * FROM black_list WHERE track = ?",
-                (track_id,))
+                                  (track_id,))
         for row in rows:
             if not with_connection:
                 self.close_database_connection(connection)
@@ -372,8 +370,8 @@ class SimaDB(object):
         """Retrieve complete black list."""
         connection = self.get_database_connection()
         rows = connection.execute('SELECT black_list.rowid, artists.name'
-                ' FROM artists INNER JOIN black_list'
-                ' ON artists.id = black_list.artist')
+                                  ' FROM artists INNER JOIN black_list'
+                                  ' ON artists.id = black_list.artist')
         yield ('Row ID', 'Actual black listed element', 'Extra information',)
         yield ('',)
         yield ('Row ID', 'Artist',)
@@ -406,7 +404,7 @@ class SimaDB(object):
         else:
             connection = self.get_database_connection()
         connection.execute("UPDATE artists SET mbid = ? WHERE id = ?",
-            (mbid, artist_id))
+                           (mbid, artist_id))
         connection.commit()
         if not with_connection:
             self.close_database_connection(connection)
@@ -415,7 +413,7 @@ class SimaDB(object):
         """Remove bl row id"""
         connection = self.get_database_connection()
         connection.execute('DELETE FROM black_list'
-                ' WHERE black_list.rowid = ?', (rowid,))
+                           ' WHERE black_list.rowid = ?', (rowid,))
         connection.commit()
         self.close_database_connection(connection)
 
@@ -429,7 +427,7 @@ class SimaDB(object):
             connection.execute("INSERT INTO history (track) VALUES (?)",
                                (track_id,))
         connection.execute("UPDATE history SET last_play = DATETIME('now') "
-                " WHERE track = ?", (track_id,))
+                           " WHERE track = ?", (track_id,))
         connection.commit()
         self.close_database_connection(connection)
 
@@ -511,7 +509,7 @@ class SimaDB(object):
         """Remove old entries in history"""
         connection = self.get_database_connection()
         connection.execute("DELETE FROM history WHERE last_play"
-                " < datetime('now', '-%i hours')" % duration)
+                           " < datetime('now', '-%i hours')" % duration)
         connection.commit()
         self.close_database_connection(connection)
 
@@ -519,7 +517,7 @@ class SimaDB(object):
         """Add db version"""
         connection = self.get_database_connection()
         connection.execute('INSERT INTO db_info (version, name) VALUES (?, ?)',
-                (__DB_VERSION__, 'Sima DB'))
+                           (__DB_VERSION__, 'Sima DB'))
         connection.commit()
         self.close_database_connection(connection)
 

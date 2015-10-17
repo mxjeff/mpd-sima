@@ -45,7 +45,7 @@ class Random(Plugin):
         self.mode = self.plugin_conf.get('flavour', None)
         if self.mode not in ['pure', 'sensible']:
             self.log.warning('Bad value for flavour, '
-                    '"{}" not in ["pure", "sensible"]'.format(self.mode))
+                             '"%s" not in ["pure", "sensible"]', self.mode)
             self.mode = 'pure'
 
     def get_played_artist(self,):

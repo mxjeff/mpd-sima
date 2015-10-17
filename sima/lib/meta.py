@@ -74,8 +74,8 @@ class Meta:
                 is_uuid4(kwargs.get('mbid'))
                 self.__mbid = kwargs.pop('mbid').lower()
             except WrongUUID4:
-                self.log.warning('Wrong mbid {}:{}'.format(self.__name,
-                                                         kwargs.get('mbid')))
+                self.log.warning('Wrong mbid %s:%s', self.__name,
+                                 kwargs.get('mbid'))
             # mbid immutable as hash rests on
         self.__dict__.update(**kwargs)
 

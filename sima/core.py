@@ -95,8 +95,7 @@ class Sima(Daemon):
             return False
         queue = self.player.queue
         queue_trigger = self.config.getint('sima', 'queue_length')
-        self.log.debug('Currently {0} track(s) ahead. (target {1})'.format(
-                       len(queue), queue_trigger))
+        self.log.debug('Currently %s track(s) ahead. (target %s)', len(queue), queue_trigger)
         if len(queue) < queue_trigger:
             return True
         return False
@@ -104,7 +103,7 @@ class Sima(Daemon):
     def queue(self):
         to_add = list()
         for plugin in self.plugins:
-            self.log.info('running {}'.format(plugin))
+            self.log.info('running %s', plugin)
             pl_candidates = getattr(plugin, 'callback_need_track')()
             if pl_candidates:
                 to_add.extend(pl_candidates)
@@ -130,7 +129,7 @@ class Sima(Daemon):
                 continue
             except PlayerUnHandledError as err:
                 #TODO: unhandled Player exceptions
-                self.log.warning('Unhandled player exception: %s' % err)
+                self.log.warning('Unhandled player exception: %s', err)
             self.log.info('Got reconnected')
             break
         self.foreach_plugin('start')
@@ -164,19 +163,19 @@ class Sima(Daemon):
             self.player.connect()
             self.foreach_plugin('start')
         except (PlayerError, PlayerUnHandledError) as err:
-            self.log.warning('Player: {}'.format(err))
+            self.log.warning('Player: %s', err)
             self.reconnect_player()
         while 42:
             try:
                 self.loop()
             except PlayerUnHandledError as err:
                 #TODO: unhandled Player exceptions
-                self.log.warning('Unhandled player exception: {}'.format(err))
+                self.log.warning('Unhandled player exception: %s', err)
                 del self.player
                 self.player = PlayerClient()
                 time.sleep(10)
             except PlayerError as err:
-                self.log.warning('Player error: %s' % err)
+                self.log.warning('Player error: %s', err)
                 self.reconnect_player()
                 del self.changed
 
@@ -188,17 +187,16 @@ class Sima(Daemon):
             self.changed = self.player.monitor()
         else:  # first iteration goes through else
             self.changed = ['playlist', 'player', 'skipped']
-        self.log.debug('changed: {}'.format(', '.join(self.changed)))
+        self.log.debug('changed: %s', ', '.join(self.changed))
         if 'playlist' in self.changed:
             self.foreach_plugin('callback_playlist')
-        if ('player' in self.changed
-            or 'options' in self.changed):
+        if 'player' in self.changed or 'options' in self.changed:
             self.foreach_plugin('callback_player')
         if 'database' in self.changed:
             self.foreach_plugin('callback_player_database')
         if 'skipped' in self.changed:
             if self.player.state == 'play':
-                self.log.info('Playing: {}'.format(self.player.current))
+                self.log.info('Playing: %s', self.player.current)
                 self.add_history()
                 self.foreach_plugin('callback_next_song')
         if self.need_tracks():

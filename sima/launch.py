@@ -24,7 +24,7 @@
 import logging
 import sys
 
-from importlib import __import__
+from importlib import __import__ as sima_import
 from os.path import isfile
 ##
 
@@ -59,7 +59,7 @@ def load_plugins(sima, source):
         plugin = plugin.strip(' \n')
         module = 'sima.plugins.{0}.{1}'.format(source, plugin.lower())
         try:
-            mod_obj = __import__(module, fromlist=[plugin])
+            mod_obj = sima_import(module, fromlist=[plugin])
         except ImportError as err:
             logger.error('Failed to load "{}" plugin\'s module: '.format(plugin) +
                          '{0} ({1})'.format(module, err))
@@ -86,12 +86,12 @@ def start(sopt, restart=False):
     logfile = config.get('log', 'logfile', fallback=None)
     verbosity = config.get('log', 'verbosity')
     set_logger(verbosity, logfile)
-    logger.debug('Command line say: {0}'.format(sopt.options))
+    logger.debug('Command line say: %s', sopt.options)
     # Create Database
     db_file = config.get('sima', 'db_file')
     if (sopt.options.get('create_db', None)
-       or not isfile(db_file)):
-        logger.info('Creating database in "{}"'.format(db_file))
+            or not isfile(db_file)):
+        logger.info('Creating database in "%s"', db_file)
         open(db_file, 'a').close()
         SimaDB(db_path=db_file).create_db()
         if sopt.options.get('create_db', None):
@@ -155,7 +155,7 @@ def run(sopt, restart=False):
 def main():
     """Entry point"""
     nfo = dict({'version': info.__version__,
-                 'prog': 'sima'})
+                'prog': 'sima'})
     # StartOpt gathers options from command line call (in StartOpt().options)
     sopt = StartOpt(nfo)
     run(sopt)

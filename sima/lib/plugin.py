@@ -41,8 +41,7 @@ class Plugin:
         if cls.__doc__:
             doc = cls.__doc__.strip(' \n').splitlines()[0]
         return {'name': cls.__name__,
-                'doc': doc,
-                }
+                'doc': doc,}
 
     def __init__(self, daemon):
         self.log = daemon.log

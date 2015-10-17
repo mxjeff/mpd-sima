@@ -29,7 +29,7 @@ from os.path import join
 # local import
 from ...lib.simafm import SimaFM
 from ...lib.webserv import WebService
-from ...lib.cache import FileCache, DictCache
+from ...lib.cache import FileCache
 
 
 class Lastfm(WebService):
