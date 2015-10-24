@@ -73,7 +73,7 @@ class Sima(Daemon):
 
     def foreach_plugin(self, method, *args, **kwds):
         """Plugin's callbacks dispatcher"""
-        self.log.trace('dispatching %s to plugins', method)
+        self.log.trace('dispatching %s to plugins', method)  # pylint: disable=no-member
         for plugin in self.core_plugins:
             getattr(plugin, method)(*args, **kwds)
         for plugin in self.plugins:

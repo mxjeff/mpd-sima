@@ -76,8 +76,7 @@ class SimaEch:
         if not isinstance(artist, Artist):
             raise TypeError('"{0!r}" not an Artist object'.format(artist))
         if artist.mbid:
-            payload.update(
-                    id='musicbrainz:artist:{0}'.format(artist.mbid))
+            payload.update(id='musicbrainz:artist:{0}'.format(artist.mbid))
         else:
             payload.update(name=artist.name)
         payload.update(bucket='id:musicbrainz')
@@ -102,8 +101,8 @@ class SimaEch:
         # Construct URL
         ressource = '{0}/artist/similar'.format(SimaEch.root_url)
         ans = self.http(ressource, payload)
-        self._controls_answer(ans.json())
-        for art in ans.json().get('response').get('artists'):
+        self._controls_answer(ans.json())  # pylint: disable=no-member
+        for art in ans.json().get('response').get('artists'):  # pylint: disable=no-member
             mbid = get_mbid(art)
             yield Artist(mbid=mbid, name=art.get('name'))
 
@@ -114,13 +113,11 @@ class SimaEch:
         # Construct URL
         ressource = '{0}/song/search'.format(SimaEch.root_url)
         ans = self.http(ressource, payload)
-        self._controls_answer(ans.json())
+        self._controls_answer(ans.json())  # pylint: disable=no-member
         titles = list()
-        art = {
-                'artist': artist.name,
-                'musicbrainz_artistid': artist.mbid,
-                }
-        for song in ans.json().get('response').get('songs'):
+        art = {'artist': artist.name,
+               'musicbrainz_artistid': artist.mbid,}
+        for song in ans.json().get('response').get('songs'):  # pylint: disable=no-member
             title = song.get('title')
             if not art.get('musicbrainz_artistid'):
                 art['musicbrainz_artistid'] = get_mbid(song, 'artist_foreign_ids')

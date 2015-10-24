@@ -136,7 +136,7 @@ class PlayerClient(Player):
                           "search", "sticker find",]
         track_obj = ['currentsong']
         if self._comm in tracks_listing + track_obj:
-            #  pylint: disable=w0142
+            #  pylint: disable=star-args
             if isinstance(ans, list):
                 return [Track(**track) for track in ans]
             elif isinstance(ans, dict):
@@ -197,7 +197,7 @@ class PlayerClient(Player):
             # look for exact search w/ musicbrainz_artistid
             exact_m = self._execute('list', ['artist', 'musicbrainz_artistid', artist.mbid])
             if exact_m:
-                [artist.add_alias(name) for name in exact_m]
+                _ = [artist.add_alias(name) for name in exact_m]
                 found = True
         else:
             artist = Artist(name=artist.name)
@@ -287,7 +287,7 @@ class PlayerClient(Player):
             kwalbart = {'albumartist':name, 'artist':name}
             for album in self.list('album', 'albumartist', artist):
                 if album and album not in albums:
-                    albums.append(Album(name=album, **kwalbart))
+                    albums.append(Album(name=album, **kwalbart))  #pylint: disable=star-args
             for album in self.list('album', 'artist', artist):
                 album_trks = [trk for trk in self.find('album', album)]
                 if 'Various Artists' in [tr.albumartist for tr in album_trks]:
@@ -412,7 +412,7 @@ class PlayerClient(Player):
                 self.log.warning('Disabling MusicBrainzIdentifier')
                 Artist.use_mbid = False
             else:
-                self.log.trace('Available metadata: %s', self._client.tagtypes())
+                self.log.trace('Available metadata: %s', self._client.tagtypes())  # pylint: disable=no-member
         else:
             self.log.warning('Use of MusicBrainzIdentifier disabled!')
             self.log.info('Consider using MusicBrainzIdentifier for your music library')

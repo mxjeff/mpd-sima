@@ -68,7 +68,7 @@ def load_plugins(sima, source):
         try:
             plugin_obj = getattr(mod_obj, plugin)
         except AttributeError as err:
-            logger.error('Failed to load plugin {0} ({1})'.format(plugin, err))
+            logger.error('Failed to load plugin %s (%s)', plugin, err)
             sima.shutdown()
             sys.exit(1)
         logger.info('Loading {0} plugin: {name} ({doc})'.format(

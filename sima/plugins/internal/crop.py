@@ -35,6 +35,7 @@ class Crop(Plugin):
     """
     def __init__(self, daemon):
         super().__init__(daemon)
+        self.daemon = daemon
         self.target = None
         if not self.plugin_conf:
             return
@@ -55,10 +56,10 @@ class Crop(Plugin):
     def callback_next_song(self):
         if not self.target:
             return
-        if not self._Plugin__daemon.enabled:
+        if not self.daemon.enabled:
             self.log.debug('Queueing disabled, not cropping')
             return False
-        player = self._Plugin__daemon.player
+        player = self.daemon.player
         if player.currentsong().pos > self.target:
             self.log.debug('cropping playlist')
         while player.currentsong().pos > self.target:
