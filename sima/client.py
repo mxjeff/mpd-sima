@@ -411,6 +411,8 @@ class PlayerClient(Player):
                 self.log.info(self._client.tagtypes())
                 self.log.warning('Disabling MusicBrainzIdentifier')
                 Artist.use_mbid = False
+            else:
+                self.log.trace('Available metadata: %s', self._client.tagtypes())
         else:
             self.log.warning('Use of MusicBrainzIdentifier disabled!')
             self.log.info('Consider using MusicBrainzIdentifier for your music library')

@@ -30,6 +30,7 @@ from socket import getfqdn
 # third parties components
 
 # local import
+from ...client import PlayerError
 from ...lib.plugin import Plugin
 
 
@@ -71,8 +72,11 @@ class Uniq(Plugin):
 
     def sub_chan(self):
         self.log.debug('Registering as {}'.format(self.chan))
-        self.player.subscribe(self.chan)
-        self._registred = True
+        try:
+            self.player.subscribe(self.chan)
+            self._registred = True
+        except PlayerError as err:
+            self.log.error('Failed to register: %s', err)
 
     def callback_need_track(self):
         if self.is_capable():

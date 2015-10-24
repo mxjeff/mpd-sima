@@ -102,7 +102,7 @@ def start(sopt, restart=False):
         config.write(sys.stdout, space_around_delimiters=True)
         sys.exit(0)
 
-    logger.info('Starting...')
+    logger.info('Starting (%s)...', info.__version__)
     sima = core.Sima(config)
 
     # required core plugins
