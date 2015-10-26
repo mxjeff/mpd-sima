@@ -1,9 +1,15 @@
 MPD_sima Automagically add titles to MPD playlist.
+==================================================
 
-MPD_Sima is a Python script meant to feed your MPD's queue with tracks from
-artists similar to your currently playing track, provided that these artists
-are found in MPD library. Similar artists are fetched from last.fm.  MPD_sima
-can queue track, top track or whole album for similar artists.
+MPD_sima_ is a non interactive MPD autoqueue client running in the background.
+It will queue new tracks chosen among artists similar to your current queued
+tracks, provided a title is found in your music library.
 
-This client allows you to never run out of music when your playlist queue is
-getting short.
+Similar artists are fetched from last.fm or EchoNest webservice.
+
+MPD_sima can queue track, top track or whole album for similar artists.
+
+This client allows you to never run out of music when your queue is getting
+short.
+
+.. _MPD_sima: http://kaliko.me/code/mpd-sima/
