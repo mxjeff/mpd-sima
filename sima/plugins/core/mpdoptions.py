@@ -31,7 +31,7 @@ from ...lib.plugin import Plugin
 
 class MpdOptions(Plugin):
     """
-    Deal with MPD options ‑ idle and repeat mode
+    Deal with MPD options - idle and repeat mode
     """
 
     def __init__(self, daemon):

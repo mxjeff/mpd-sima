@@ -3,7 +3,7 @@
 import unittest
 
 from sima.lib.meta import Meta, Artist, MetaContainer, is_uuid4
-from sima.lib.meta import WrongUUID4, MetaException
+from sima.lib.meta import WrongUUID4, MetaException, SEPARATOR
 
 VALID = '110e8100-e29b-41d1-a716-116655250000'
 
@@ -106,7 +106,7 @@ class TestMetaObject(unittest.TestCase):
 class TestArtistObject(unittest.TestCase):
 
     def test_init(self):
-        artist = {'artist': ', '.join(['Original Name', 'Featuring Nane', 'Feature…']),
+        artist = {'artist': SEPARATOR.join(['Original Name', 'Featuring Nane', 'Feature…']),
                   'albumartist': 'Name',
                   'musicbrainz_artistid': VALID,
                   'musicbrainz_albumartistid': VALID.replace('11', '22'),
@@ -121,6 +121,15 @@ class TestArtistObject(unittest.TestCase):
         art = Artist(**artist)
         self.assertTrue(art.name == 'Original Name', art.name)
 
+    def test_empty_name(self):
+        for args in [
+                {'mbid':VALID},
+                {'name': None},
+                {},
+                ]:
+            with self.assertRaises(MetaException,
+                                   msg='{} does not raise an except.'.format(args)):
+                Artist(**args)
 
 class TestMetaContainers(unittest.TestCase):
 

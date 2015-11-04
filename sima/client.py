@@ -136,7 +136,7 @@ class PlayerClient(Player):
                           "search", "sticker find",]
         track_obj = ['currentsong']
         if self._comm in tracks_listing + track_obj:
-            #  pylint: disable=star-args
+            # pylint: disable=star-args
             if isinstance(ans, list):
                 return [Track(**track) for track in ans]
             elif isinstance(ans, dict):
@@ -287,7 +287,7 @@ class PlayerClient(Player):
             kwalbart = {'albumartist':name, 'artist':name}
             for album in self.list('album', 'albumartist', artist):
                 if album and album not in albums:
-                    albums.append(Album(name=album, **kwalbart))  #pylint: disable=star-args
+                    albums.append(Album(name=album, **kwalbart))  # pylint: disable=star-args
             for album in self.list('album', 'artist', artist):
                 album_trks = [trk for trk in self.find('album', album)]
                 if 'Various Artists' in [tr.albumartist for tr in album_trks]:

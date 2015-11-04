@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009, 2010, 2011, 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 # Copyright (c) 2009 J. Alexander Treuman (Tag collapse method)
 # Copyright (c) 2008 Rick van Hattem
 #
@@ -23,7 +23,7 @@
 
 import time
 
-from .meta import Artist
+from .meta import Artist, SEPARATOR
 
 class Track:
     """
@@ -60,7 +60,7 @@ class Track:
                 continue
             if isinstance(value, list):
                 self.collapsed_tags.append(tag)
-                self.__dict__.update({tag: ', '.join(set(value))})
+                self.__dict__.update({tag: SEPARATOR.join(set(value))})
 
     def __repr__(self):
         return '%s(artist="%s", album="%s", title="%s", file="%s")' % (

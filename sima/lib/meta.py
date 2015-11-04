@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -29,6 +29,9 @@ import logging
 import re
 
 UUID_RE = r'^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$'
+# The Track Object is collapsing multiple tags into a single string using this
+# separator. It is used then to split back the string to tags list.
+SEPARATOR = chr(0x1F)  # ASCII Unit Separator
 
 def is_uuid4(uuid):
     regexp = re.compile(UUID_RE, re.IGNORECASE)
@@ -146,20 +149,22 @@ class Artist(Meta):
         "artist" entry:
             >>> trk = {'artist':'Art Name',
             >>>        'albumartist': 'Alb Art Name',           # optional
-            >>>        'musicbrainz_artistid': '<UUID4>'    ,   # optional
+            >>>        'musicbrainz_artistid': '<UUID4>',       # optional
             >>>        'musicbrainz_albumartistid': '<UUID4>',  # optional
             >>>       }
             >>> artobj0 = Artist(**trk)
             >>> artobj1 = Artist(name='Tool')
         """
-        name = kwargs.get('artist', name).split(', ')[0]
-        mbid = kwargs.get('musicbrainz_artistid', mbid)
+        if kwargs.get('artist', False):
+            name = kwargs.get('artist').split(SEPARATOR)[0]
+        if kwargs.get('musicbrainz_artistid', False):
+            mbid = kwargs.get('musicbrainz_artistid').split(SEPARATOR)[0]
         if (kwargs.get('albumartist', False) and
                 kwargs.get('albumartist') != 'Various Artists'):
-            name = kwargs.get('albumartist').split(', ')[0]
+            name = kwargs.get('albumartist').split(SEPARATOR)[0]
         if (kwargs.get('musicbrainz_albumartistid', False) and
                 kwargs.get('musicbrainz_albumartistid') != '89ad4ac3-39f7-470e-963a-56509c546377'):
-            mbid = kwargs.get('musicbrainz_albumartistid').split(', ')[0]
+            mbid = kwargs.get('musicbrainz_albumartistid').split(SEPARATOR)[0]
         super().__init__(name=name, mbid=mbid)
 
 class MetaContainer(Set):
