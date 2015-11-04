@@ -1,3 +1,10 @@
+MPD_sima v0.14.1
+
+ * Prevent adding empty track to history (Closes #5)
+ * Fixed false warning about wrong MBID format (Closes #6)
+
+-- kaliko jack <kaliko@azylum.org> UNRELEASED
+
 MPD_sima v0.14.0
 
  * Add option to generate config on stdout
@@ -11,6 +18,7 @@ MPD_sima v0.14.0
  * Honor HTTP_PROXY env. var. (need requests >2.4.0)
 
 -- kaliko jack <kaliko@azylum.org> Sat, 17 Oct 2015 10:48:41 +0200
+
 
 MPD_sima v0.13.0
 
