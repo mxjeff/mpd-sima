@@ -57,6 +57,7 @@ def cache(func):
 class WebService(Plugin):
     """similar artists webservice
     """
+    # pylint: disable=bad-builtin
 
     def __init__(self, daemon):
         Plugin.__init__(self, daemon)
@@ -189,6 +190,8 @@ class WebService(Plugin):
         return as_art
 
     def get_recursive_similar_artist(self):
+        """Check against local player for similar artists (recursive w/ history)
+        """
         if not self.player.playlist:
             return
         history = list(self.history)
