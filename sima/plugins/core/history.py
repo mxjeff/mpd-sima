@@ -42,7 +42,9 @@ class History(Plugin):
 
     def callback_next_song(self):
         current = self.player.current
-        self.log.debug('add history: "{}"'.format(current))
+        self.log.debug('add history: "%s"', current)
+        if not current:
+            self.log.warning('Cannot add "%s" to history (empty or missing file)', current)
         self.sdb.add_history(current)
 
 

@@ -33,6 +33,8 @@ class TestTrackObject(unittest.TestCase):
 
     def test_boolean_type(self):
         self.assertFalse(bool(Track()))
+        for trk in [{}, {'artist': 'Devolt'}, {'artist': 'Devolt', 'file':''}]:
+            self.assertFalse(bool(Track(**trk)))
 
     def test_albumartist(self):
         trk = Track(albumartist='album_artist', artist='track_artist')

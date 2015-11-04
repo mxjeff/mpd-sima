@@ -99,6 +99,8 @@ class Track:
         return hash(self) != hash(other)
 
     def __bool__(self):
+        if not self._file:
+            return False
         return not self._empty
 
     @property
