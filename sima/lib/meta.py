@@ -34,16 +34,18 @@ UUID_RE = r'^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{1
 SEPARATOR = chr(0x1F)  # ASCII Unit Separator
 
 def is_uuid4(uuid):
+    """Controls MusicBrainz UUID4 format
+
+    :param str uuid: String representing the UUID
+    :returns: boolean
+    """
     regexp = re.compile(UUID_RE, re.IGNORECASE)
     if regexp.match(uuid):
         return True
-    raise WrongUUID4(uuid)
+    return False
 
 class MetaException(Exception):
     """Generic Meta Exception"""
-    pass
-
-class WrongUUID4(MetaException):
     pass
 
 def mbidfilter(func):
@@ -58,16 +60,20 @@ def mbidfilter(func):
 
 
 class Meta:
-    """Generic Class for Meta object
+    """
+    A generic Class to handle tracks metadata such as artist, album, albumartist
+    names and their associated MusicBrainz's ID.
+
 
     Using generic kwargs in constructor for convenience but the actual signature is:
 
     >>> Meta(name, mbid=None, **kwargs)
 
-    :param string name: set name attribute
-    :param string mbid: set MusicBrainz ID (optional)
+    :param str name: set name attribute
+    :param str mbid: set MusicBrainz ID
     """
     use_mbid = True
+    """Class attribute to disable use of MusicBrainz IDs"""
 
     def __init__(self, **kwargs):
         """Meta(name=<str>[, mbid=UUID4])"""
@@ -80,10 +86,9 @@ class Meta:
         else:
             self.__name = kwargs.pop('name')
         if 'mbid' in kwargs and kwargs.get('mbid'):
-            try:
-                is_uuid4(kwargs.get('mbid'))
+            if is_uuid4(kwargs.get('mbid')):
                 self.__mbid = kwargs.pop('mbid').lower()
-            except WrongUUID4:
+            else:
                 self.log.warning('Wrong mbid %s:%s', self.__name,
                                  kwargs.get('mbid'))
             # mbid immutable as hash rests on
@@ -116,6 +121,12 @@ class Meta:
         return hash(self.__name)
 
     def add_alias(self, other):
+        """Add alternative name to `aliases` attibute.
+
+        `other` can be a :class:`sima.lib.meta.Meta` object in which case aliases are merged.
+
+        :param str other: Alias to add, could be any object with ``__str__`` method.
+        """
         if getattr(other, '__str__', None):
             if callable(other.__str__) and other.__str__() != self.name:
                 self.__aliases |= {other.__str__()}
@@ -139,6 +150,7 @@ class Meta:
 
     @property
     def names(self):
+        """aliases + name"""
         return self.__aliases | {self.__name,}
 
 
@@ -152,12 +164,12 @@ class Album(Meta):
 class Artist(Meta):
     """Artist object deriving from :class:`Meta`.
 
-    :param string name: Artist name, default ``None``
-    :param string mbid: Musicbrainz artist ID, defautl ``None``
-    :param string artist: Overrides "name" argument
-    :param string albumartist: Overrides "name" and "artist" argument
-    :param string musicbrainz_artistid: Overrides "mbid" argument
-    :param string musicbrainz_albumartistid: Overrides "musicbrainz_artistid" argument
+    :param str name: Artist name
+    :param str mbid: Musicbrainz artist ID
+    :param str artist: Overrides "name" argument
+    :param str albumartist: Overrides "name" and "artist" argument
+    :param str musicbrainz_artistid: Overrides "mbid" argument
+    :param str musicbrainz_albumartistid: Overrides "musicbrainz_artistid" argument
 
     :Example:
 

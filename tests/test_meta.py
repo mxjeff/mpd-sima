@@ -3,7 +3,7 @@
 import unittest
 
 from sima.lib.meta import Meta, Artist, MetaContainer, is_uuid4
-from sima.lib.meta import WrongUUID4, MetaException, SEPARATOR
+from sima.lib.meta import MetaException, SEPARATOR
 
 VALID = '110e8100-e29b-41d1-a716-116655250000'
 
@@ -11,10 +11,10 @@ class TestMetaObject(unittest.TestCase):
 
     def test_uuid_integrity(self):
         wrong = VALID +'a'
-        self.assertRaises(WrongUUID4, is_uuid4, wrong)
+        self.assertFalse(is_uuid4(wrong))
         #  test UUID4 format validation
-        self.assertRaises(WrongUUID4, is_uuid4, VALID.replace('4', '3'))
-        self.assertRaises(WrongUUID4, is_uuid4, VALID.replace('a', 'z'))
+        self.assertFalse(is_uuid4(VALID.replace('4', '3')))
+        self.assertFalse(is_uuid4(VALID.replace('a', 'z')))
 
     def test_init(self):
         for args in [

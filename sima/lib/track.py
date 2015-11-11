@@ -29,6 +29,12 @@ class Track:
     """
     Track object.
     Instantiate with Player replies.
+
+    :param str file: media file, defaults to ``None``
+    :param int time: duration in second, defaults to 0
+    :param int pos: position in queue, defaults to -1
+    :param str title|artist|album: defaults to ""
+    :param str musicbrainz_artistid|musicbrainz_albumartistid: MusicBrainz IDs, defaults to ``None``
     """
 
     def __init__(self, file=None, time=0, pos=-1, **kwargs):
@@ -120,7 +126,7 @@ class Track:
 
     @property
     def duration(self):
-        """Get a fancy duration %H:%M:%S (use :attr:`time` to get duration in second only)"""
+        """Get a fancy duration as ``%H:%M:%S`` (use :attr:`time` to get duration in second only)"""
         temps = time.gmtime(int(self.time))
         if temps.tm_hour:
             fmt = '%H:%M:%S'
