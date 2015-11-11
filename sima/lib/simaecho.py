@@ -94,8 +94,10 @@ class SimaEch:
         # return a sorted list of 2-tuple to have consistent cache
         return sorted(payload.items(), key=lambda param: param[0])
 
-    def get_similar(self, artist=None):
+    def get_similar(self, artist):
         """Fetch similar artists
+
+        param: artist Artist: Artist object to get similarities from
         """
         payload = self._forge_payload(artist)
         # Construct URL
@@ -106,8 +108,10 @@ class SimaEch:
             mbid = get_mbid(art)
             yield Artist(mbid=mbid, name=art.get('name'))
 
-    def get_toptrack(self, artist=None):
+    def get_toptrack(self, artist):
         """Fetch artist top tracks
+
+        param: artist Artist: Artist object to get top tracks from
         """
         payload = self._forge_payload(artist, top=True)
         # Construct URL

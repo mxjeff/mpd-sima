@@ -190,12 +190,6 @@ class CacheController(object):
         # return the original handler
         return False
 
-    def add_headers(self, url):
-        resp = self.cache.get(url)
-        if resp and 'etag' in resp.headers:
-            return {'If-None-Match': resp.headers['etag']}
-        return {}
-
     def cache_response(self, request, resp):
         """
         Algorithm for caching requests.

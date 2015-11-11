@@ -28,7 +28,7 @@ from .meta import Artist, SEPARATOR
 class Track:
     """
     Track object.
-    Instanciate with Player replies.
+    Instantiate with Player replies.
     """
 
     def __init__(self, file=None, time=0, pos=-1, **kwargs):
@@ -48,9 +48,9 @@ class Track:
         #  have tags been collapsed?
         self.collapsed_tags = list()
         # Needed for multiple tags which returns a list instead of a string
-        self.collapse_tags()
+        self._collapse_tags()
 
-    def collapse_tags(self):
+    def _collapse_tags(self):
         """
         Necessary to deal with tags defined multiple times.
         These entries are set as lists instead of strings.
@@ -116,11 +116,11 @@ class Track:
         """set time property"""
         self._time = int(value)
 
-    time = property(get_time, set_time, doc='song duration in seconds')
+    time = property(get_time, set_time, doc='song duration in seconds (use :attr:`duration` for human readable time)')
 
     @property
     def duration(self):
-        """Compute fancy duration"""
+        """Get a fancy duration %H:%M:%S (use :attr:`time` to get duration in second only)"""
         temps = time.gmtime(int(self.time))
         if temps.tm_hour:
             fmt = '%H:%M:%S'
@@ -130,7 +130,7 @@ class Track:
 
     @property
     def Artist(self):
-        """Get artist object from track"""
+        """Get the :class:`sima.lib.meta.Artist` associated to this track"""
         if not self.artist:
             if not self.musicbrainz_artistid:
                 return Artist(name='[unknown]',

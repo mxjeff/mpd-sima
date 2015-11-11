@@ -59,11 +59,18 @@ def mbidfilter(func):
 
 class Meta:
     """Generic Class for Meta object
-    Meta(name=<str>[, mbid=UUID4])
+
+    Using generic kwargs in constructor for convenience but the actual signature is:
+
+    >>> Meta(name, mbid=None, **kwargs)
+
+    :param string name: set name attribute
+    :param string mbid: set MusicBrainz ID (optional)
     """
     use_mbid = True
 
     def __init__(self, **kwargs):
+        """Meta(name=<str>[, mbid=UUID4])"""
         self.__name = None #TODO: should be immutable
         self.__mbid = None
         self.__aliases = set()
@@ -136,25 +143,35 @@ class Meta:
 
 
 class Album(Meta):
+    """Album object"""
 
     @property
     def album(self):
         return self.name
 
 class Artist(Meta):
+    """Artist object deriving from :class:`Meta`.
+
+    :param string name: Artist name, default ``None``
+    :param string mbid: Musicbrainz artist ID, defautl ``None``
+    :param string artist: Overrides "name" argument
+    :param string albumartist: Overrides "name" and "artist" argument
+    :param string musicbrainz_artistid: Overrides "mbid" argument
+    :param string musicbrainz_albumartistid: Overrides "musicbrainz_artistid" argument
+
+    :Example:
+
+    >>> trk = {'artist':'Art Name',
+    >>>        'albumartist': 'Alb Art Name',           # optional
+    >>>        'musicbrainz_artistid': '<UUID4>',       # optional
+    >>>        'musicbrainz_albumartistid': '<UUID4>',  # optional
+    >>>       }
+    >>> artobj0 = Artist(**trk)
+    >>> artobj1 = Artist(name='Tool')
+    """
 
     @mbidfilter
     def __init__(self, name=None, mbid=None, **kwargs):
-        """Artist object built from a mapping dict containing at least an
-        "artist" entry:
-            >>> trk = {'artist':'Art Name',
-            >>>        'albumartist': 'Alb Art Name',           # optional
-            >>>        'musicbrainz_artistid': '<UUID4>',       # optional
-            >>>        'musicbrainz_albumartistid': '<UUID4>',  # optional
-            >>>       }
-            >>> artobj0 = Artist(**trk)
-            >>> artobj1 = Artist(name='Tool')
-        """
         if kwargs.get('artist', False):
             name = kwargs.get('artist').split(SEPARATOR)[0]
         if kwargs.get('musicbrainz_artistid', False):

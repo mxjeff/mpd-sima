@@ -87,8 +87,11 @@ class SimaFM:
         # return a sorted list of 2-tuple to have consistent cache
         return sorted(payload.items(), key=lambda param: param[0])
 
-    def get_similar(self, artist=None):
+    def get_similar(self, artist):
         """Fetch similar artists
+
+        :param Artist artist: :class:`Artist` to fetch similar artists from
+        :returns: generator of :class:`sima.lib.meta.Artist`
         """
         payload = self._forge_payload(artist)
         # Construct URL
@@ -106,8 +109,11 @@ class SimaFM:
         for art in ans.json().get('similarartists').get('artist'): # pylint: disable=no-member
             yield Artist(name=art.get('name'), mbid=art.get('mbid', None))
 
-    def get_toptrack(self, artist=None):
+    def get_toptrack(self, artist):
         """Fetch artist top tracks
+
+        :param Artist artist: :class:`Artist` to fetch top tracks from
+        :returns: generator of :class:`sima.lib.track.Track`
         """
         payload = self._forge_payload(artist, method='top')
         ans = self.http(self.root_url, payload)
