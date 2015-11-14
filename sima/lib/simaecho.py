@@ -50,6 +50,10 @@ class SimaEch:
     root_url = 'http://{host}/api/{version}'.format(**ECH)
     name = 'EchoNest'
     cache = False
+    """HTTP cache to use, in memory or persitent.
+
+    :param BaseCache cache: Set a cache, defaults to `False`.
+    """
     stats = {'etag':0,
              'ccontrol':0,
              'minrl':120,
@@ -97,7 +101,8 @@ class SimaEch:
     def get_similar(self, artist):
         """Fetch similar artists
 
-        param: artist Artist: Artist object to get similarities from
+        :param sima.lib.meta.Artist artist: `Artist` to fetch similar artists from
+        :returns: generator of :class:`sima.lib.meta.Artist`
         """
         payload = self._forge_payload(artist)
         # Construct URL
@@ -111,7 +116,8 @@ class SimaEch:
     def get_toptrack(self, artist):
         """Fetch artist top tracks
 
-        param: artist Artist: Artist object to get top tracks from
+        :param sima.lib.meta.Artist artist: `Artist` to fetch top tracks from
+        :returns: generator of :class:`sima.lib.track.Track`
         """
         payload = self._forge_payload(artist, top=True)
         # Construct URL

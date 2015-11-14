@@ -20,12 +20,10 @@
 #
 #
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 # IMPORT#
-import re
-
-from argparse import (ArgumentParser, SUPPRESS, Action)
+from argparse import (ArgumentParser, SUPPRESS)
 from difflib import get_close_matches
 from locale import getpreferredencoding
 from os import (environ, chmod, makedirs)
@@ -35,7 +33,7 @@ from sys import (exit, stdout, stderr)
 from sima.lib.track import Track
 from sima.utils import utils
 from sima.lib import simadb
-from musicpd import MPDClient, ConnectionError
+from musicpd import MPDClient, MPDError
 
 
 DESCRIPTION = """
@@ -140,13 +138,6 @@ class SimaDB_CLI(object):
             else:
                 self.options.mpdport = 6600
 
-    def _upgrade(self):
-        """Upgrades DB if necessary, create one if not existing."""
-        if not isfile(self.dbfile): # No db file
-            return
-        db = simadb.SimaDB(db_path=self.dbfile)
-        db.upgrade()
-
     def _declare_opts(self):
         """
         Declare options in ArgumentParser object.
@@ -183,14 +174,16 @@ class SimaDB_CLI(object):
 
     def _get_mpd_client(self):
         """"""
-        # TODO: encode properly host name
         host = self.options.mpdhost
         port = self.options.mpdport
+        passwd = self.options.passwd
         cli = MPDClient()
         try:
-            cli.connect(host=host, port=port)
-        except ConnectionError as err:
-            mess = 'ERROR: fail to connect MPD (host: %s:%s): %s' % (
+            cli.connect(host, port)
+            if passwd:
+                cli.password(passwd)
+        except MPDError as err:
+            mess = 'ERROR: fail to connect MPD on %s:%s %s' % (
                     host, port, err)
             print(mess, file=stderr)
             exit(1)
@@ -213,51 +206,9 @@ class SimaDB_CLI(object):
             return None
         return art_db
 
-    def _control_similarity(self):
-        """
-         * Regex check of command line similarity
-         * Controls artist presence in MPD library
-        """
-        usage = ('USAGE: "main artist,similar artist:<match score>,other' +
-                'similar artist:<match score>,..."')
-        cli_sim = self.options.similarity
-        pattern = '^([^,]+?),([^:,]+?:\d{1,2},?)+$'
-        regexp = re.compile(pattern, re.U).match(cli_sim)
-        if not regexp:
-            mess = 'ERROR: similarity badly formated: "%s"' % cli_sim
-            print(mess, file=stderr)
-            print(usage, file=stderr)
-            exit(1)
-        if self.options.check_names:
-            if not self._control_artist_names():
-                mess = 'ERROR: some artist names not found in MPD library!'
-                print(mess, file=stderr)
-                exit(1)
-
-    def _control_artist_names(self):
-        """Controls artist names exist in MPD library"""
-        mpd_cli = self._get_mpd_client()
-        artists_list = mpd_cli.list('artist')
-        sim_formated = self._parse_similarity()
-        control = True
-        if sim_formated[0] not in artists_list:
-            mess = 'WARNING: Main artist not found in MPD: %s' % sim_formated[0]
-            print(mess)
-            control = False
-        for sart in sim_formated[1]:
-            art = sart.get('artist')
-            if art not in artists_list:
-                mess = str('WARNING: Similar artist not found in MPD: %s' % art)
-                print(mess)
-                control = False
-        mpd_cli.disconnect()
-        return control
-
     def bl_artist(self):
         """Black list artist"""
         mpd_cli = self._get_mpd_client()
-        if not mpd_cli:
-            return False
         artists_list = mpd_cli.list('artist')
         # Unicode cli given artist name
         cli_artist_to_bl = self.options.bl_art
@@ -275,8 +226,6 @@ class SimaDB_CLI(object):
     def bl_current_artist(self):
         """Black list current artist"""
         mpd_cli = self._get_mpd_client()
-        if not mpd_cli:
-            return False
         artist = mpd_cli.currentsong().get('artist', '')
         if not artist:
             print('No artist found.')
@@ -288,8 +237,6 @@ class SimaDB_CLI(object):
     def bl_current_album(self):
         """Black list current artist"""
         mpd_cli = self._get_mpd_client()
-        if not mpd_cli:
-            return False
         track = Track(**mpd_cli.currentsong())
         if not track.album:
             print('No album set for this track: %s' % track)
@@ -301,8 +248,6 @@ class SimaDB_CLI(object):
     def bl_current_track(self):
         """Black list current artist"""
         mpd_cli = self._get_mpd_client()
-        if not mpd_cli:
-            return False
         track = Track(**mpd_cli.currentsong())
         print('Black listing track: %s' % track)
         db = simadb.SimaDB(db_path=self.dbfile)
@@ -363,12 +308,13 @@ class SimaDB_CLI(object):
         exit(0)
 
 
-def main():
-    SimaDB_CLI()
-
 # Script starts here
 if __name__ == '__main__':
-    main()
+    try:
+        SimaDB_CLI()
+    except Exception as err:
+        print(err)
+        exit(1)
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

@@ -43,6 +43,10 @@ class SimaFM:
     root_url = 'http://{host}/{version}/'.format(**LFM)
     name = 'Last.fm'
     cache = False
+    """HTTP cache to use, in memory or persitent.
+
+    :param BaseCache cache: Set a cache, defaults to `False`.
+    """
     stats = {'etag':0,
              'ccontrol':0,
              'total':0}
@@ -90,7 +94,7 @@ class SimaFM:
     def get_similar(self, artist):
         """Fetch similar artists
 
-        :param Artist artist: :class:`Artist` to fetch similar artists from
+        :param sima.lib.meta.Artist artist: `Artist` to fetch similar artists from
         :returns: generator of :class:`sima.lib.meta.Artist`
         """
         payload = self._forge_payload(artist)
@@ -112,7 +116,7 @@ class SimaFM:
     def get_toptrack(self, artist):
         """Fetch artist top tracks
 
-        :param Artist artist: :class:`Artist` to fetch top tracks from
+        :param sima.lib.meta.Artist artist: `Artist` to fetch top tracks from
         :returns: generator of :class:`sima.lib.track.Track`
         """
         payload = self._forge_payload(artist, method='top')
