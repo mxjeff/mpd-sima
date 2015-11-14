@@ -10,15 +10,16 @@ MPD_sima's documentation!
 Development documentation
 -------------------------
 
-Contents:
+**Contents:**
 
 .. toctree::
    :maxdepth: 2
+   :titlesonly:
 
-   meta
-   lastfm
-   echonest
-   cache
+   dev/meta
+   dev/lastfm
+   dev/echonest
+   dev/cache
 
 
 
