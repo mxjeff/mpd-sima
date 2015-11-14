@@ -378,18 +378,8 @@ class PlayerClient(Player):
         if password:
             try:
                 self._client.password(password)
-
-            # Catch errors with the password command (e.g., wrong password)
-            except CommandError as err:
-                raise PlayerError("Could not connect to '%s': "
-                                  "password command failed: %s" %
-                                  (host, err))
-
-            # Catch all other possible errors
             except (MPDError, IOError) as err:
-                raise PlayerError("Could not connect to '%s': "
-                                  "error with password command: %s" %
-                                  (host, err))
+                raise PlayerError("Could not connect to '%s': %s", (host, err))
         # Controls we have sufficient rights
         needed_cmds = ['status', 'stats', 'add', 'find', \
                        'search', 'currentsong', 'ping']
