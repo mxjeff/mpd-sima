@@ -115,14 +115,14 @@ class WebService(Plugin):
         black_list = self.player.queue + self.to_add
         not_in_hist = list(set(tracks) - set(self.get_history(artist=artist)))
         if self.plugin_conf.get('queue_mode') != 'top' and not not_in_hist:
-            self.log.debug('All tracks already played for "{}"'.format(artist))
+            self.log.debug('All tracks already played for "%s"', artist)
         random.shuffle(not_in_hist)
         candidate = []
         for trk in [_ for _ in not_in_hist if _ not in black_list]:
             # Should use albumartist heuristic as well
             if self.plugin_conf.getboolean('single_album'): # pylint: disable=no-member
                 if (trk.album == self.player.current.album or
-                        trk.album in [tr.album for tr in self.to_add]):
+                        trk.album in [tr.album for tr in black_list]):
                     self.log.debug('Found unplayed track ' +
                                    'but from an album already queued: %s', trk)
                     continue
