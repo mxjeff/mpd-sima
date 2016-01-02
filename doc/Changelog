@@ -1,3 +1,9 @@
+MPD_sima v0.14.2
+
+ * 
+
+-- kaliko jack <kaliko@azylum.org> UNRELEASED
+
 MPD_sima v0.14.1
 
  * Prevent adding empty track to history (Closes #5)
