@@ -3,7 +3,7 @@ MPD_sima v0.14.1
  * Prevent adding empty track to history (Closes #5)
  * Fixed false warning about wrong MBID format (Closes #6)
 
--- kaliko jack <kaliko@azylum.org> UNRELEASED
+-- kaliko jack <kaliko@azylum.org> Sat, 02 Jan 2016 16:03:39 +0100
 
 MPD_sima v0.14.0
 
