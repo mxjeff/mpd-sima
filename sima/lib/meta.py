@@ -82,7 +82,9 @@ class Meta:
         self.__aliases = set()
         self.log = logging.getLogger(__name__)
         if 'name' not in kwargs or not kwargs.get('name'):
-            raise MetaException('Need a "name" argument')
+            raise MetaException('Need a "name" argument (str type)')
+        elif not isinstance(kwargs.get('name'), str):
+            raise MetaException('"name" argument not a string')
         else:
             self.__name = kwargs.pop('name')
         if 'mbid' in kwargs and kwargs.get('mbid'):

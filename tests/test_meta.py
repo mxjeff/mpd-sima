@@ -20,7 +20,7 @@ class TestMetaObject(unittest.TestCase):
         for args in [
                 {'mbid':VALID},
                 {'name': None},
-                {},
+                {'name': 42},
                 ]:
             with self.assertRaises(MetaException,
                                    msg='{} does not raise an except.'.format(args)):
