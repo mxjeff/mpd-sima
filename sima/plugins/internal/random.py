@@ -47,6 +47,7 @@ class Random(Plugin):
             self.log.warning('Bad value for flavour, '
                              '"%s" not in ["pure", "sensible"]', self.mode)
             self.mode = 'pure'
+        self.log.debug('Random flavour: %s', self.mode)
 
     def get_played_artist(self,):
         """Constructs list of already played artists.

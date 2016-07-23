@@ -159,9 +159,9 @@ class PlayerClient(Player):
             self.log.info('Player: Initialising cache!')
         self._cache = {'artists': frozenset(),
                        'nombid_artists': frozenset(),}
-        self._cache['artists'] = frozenset(self._execute('list', ['artist']))
+        self._cache['artists'] = frozenset(filter(None, self._execute('list', ['artist'])))
         if Artist.use_mbid:
-            self._cache['nombid_artists'] = frozenset(self._execute('list', ['artist', 'musicbrainz_artistid', '']))
+            self._cache['nombid_artists'] = frozenset(filter(None, self._execute('list', ['artist', 'musicbrainz_artistid', ''])))
 
     @blacklist(track=True)
     def find_track(self, artist, title=None):
