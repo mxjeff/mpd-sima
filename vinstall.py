@@ -116,7 +116,7 @@ class ExtendedEnvBuilder(venv.EnvBuilder):
         :param context: The information for the environment creation request
                         being processed.
         """
-        url = 'https://raw.github.com/pypa/pip/master/contrib/get-pip.py'
+        url = 'https://bootstrap.pypa.io/get-pip.py'
         self.install_script(context, 'pip', url)
         # pip installs to "local/bin" on Linux, but it needs to be accessible
         # from "bin" since the "activate" script prepends "bin" to $PATH
