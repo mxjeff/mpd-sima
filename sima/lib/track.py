@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015, 2016 Jack Kaliko <kaliko@azylum.org>
 # Copyright (c) 2009 J. Alexander Treuman (Tag collapse method)
 # Copyright (c) 2008 Rick van Hattem
 #
@@ -78,8 +78,8 @@ class Track:
         )
 
     def __str__(self):
-        return '{artist} - {album} - {title} ({duration})'.format(
-                duration=self.duration,
+        return '{artist} - {album} - {title} ({length})'.format(
+                length=self.length,
                 **self.__dict__
                 )
 
@@ -122,12 +122,12 @@ class Track:
         """set time property"""
         self._time = int(value)
 
-    time = property(get_time, set_time, doc='song duration in seconds (use :attr:`duration` for human readable time)')
+    time = property(get_time, set_time, doc='song duration in seconds (use :attr:`length` for human readable time)')
 
     @property
-    def duration(self):
+    def length(self):
         """Get a fancy duration as ``%H:%M:%S`` (use :attr:`time` to get duration in second only)"""
-        temps = time.gmtime(int(self.time))
+        temps = time.gmtime(int(self.time))  #TODO: returns a date not a duration
         if temps.tm_hour:
             fmt = '%H:%M:%S'
         else:

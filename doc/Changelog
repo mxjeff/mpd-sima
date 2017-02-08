@@ -1,6 +1,7 @@
 MPD_sima v0.14.2
 
  * Fixed MPD client cache (filters empty strings)
+ * Fixed Track object to work with MPD >= 0.20
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 
