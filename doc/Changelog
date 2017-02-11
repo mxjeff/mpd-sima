@@ -4,7 +4,7 @@ MPD_sima v0.14.2
  * Fixed Track object to work with MPD >= 0.20 (Closes #12)
  * Fixed python virtualenv installer
 
--- kaliko jack <kaliko@azylum.org> UNRELEASED
+-- kaliko jack <kaliko@azylum.org> Sat, 11 Feb 2017 13:04:27 +0100
 
 MPD_sima v0.14.1
 
