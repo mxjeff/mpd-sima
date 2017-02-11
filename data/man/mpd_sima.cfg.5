@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: mpd_sima.cfg
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
-.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 01/02/2016
-.\"    Manual: mpd-sima 0.14.1 User Manual
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 02/11/2017
+.\"    Manual: mpd-sima 0.14.2 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "01/02/2016" "mpd-sima" "mpd-sima 0.14.1 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "02/11/2017" "mpd-sima" "mpd-sima 0.14.2 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -171,9 +171,11 @@ For instance a "AwesomePlugin" declared here gets its configuration from the cor
 The default list of plugins to load at startup:
 \fBLastfm\fR,\fBRandom\fR,\fBCrop\fR\&.
 .br
+
 \fBCrop\fR
 is an utility plugin, it does not queue any tracks (cf\&. below)\&.
 .br
+
 \fBRandom\fR
 will queue a track at random if other plugins did not return any tracks\&.
 .br
@@ -348,6 +350,7 @@ Whether or not to use on\-disk persistent http cache\&.
 .br
 When set to "true", sima will use a persistent cache for its http client\&. The cache is written along with the dbfile in:
 .br
+
 $XDG_CONFIG_HOME/mpd_sima/http/WEB_SERVICE\&.
 .br
 
@@ -482,7 +485,7 @@ Wrote this man page and is currently leading MPD_sima project\&.
 .RE
 .SH "COPYRIGHT"
 .br
-Copyright \(co 2009-2016 Jack Kaliko
+Copyright \(co 2009-2017 Jack Kaliko
 .br
 .PP
 This manual page was written for the Debian system (and may be used by others)\&.

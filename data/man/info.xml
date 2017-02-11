@@ -5,7 +5,7 @@
   <!ENTITY dhemail     "kaliko@azylum.org">
   <!ENTITY dhusername  "&dhfirstname; &dhsurname;">
   <!ENTITY dhpackage "mpd-sima">
-  <!ENTITY release   "0.14.1">
+  <!ENTITY release   "0.14.2">
   <!-- TITLE should be something like "User commands" or similar (see
        http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
   <!ENTITY dhtitle     "&dhpackage; &release; User Manual">
@@ -32,6 +32,7 @@
             <year>2014</year>
             <year>2015</year>
             <year>2016</year>
+            <year>2017</year>
             <holder>&dhusername;</holder>
         </copyright>
         <legalnotice>

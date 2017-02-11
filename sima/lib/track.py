@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015, 2016 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2017 Jack Kaliko <kaliko@azylum.org>
 # Copyright (c) 2009 J. Alexander Treuman (Tag collapse method)
 # Copyright (c) 2008 Rick van Hattem
 #
