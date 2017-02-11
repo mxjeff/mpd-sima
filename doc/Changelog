@@ -1,3 +1,9 @@
+MPD_sima v0.14.3
+
+ * …
+
+-- kaliko jack <kaliko@azylum.org> UNRELEASED
+
 MPD_sima v0.14.2
 
  * Fixed MPD client cache (filters empty strings)
