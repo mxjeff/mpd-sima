@@ -1,8 +1,11 @@
 MPD_sima v0.14.3
 
- * …
+ * This release in only intended to get rid of 0.14.2 source tarball.
+   Source tar ball for v0.14.2 was badly generated. Release 0.14.2 and 0.14.3
+   are actually the same source code, only generated tar were affected.
+   Sorry for the inconvenience.
 
--- kaliko jack <kaliko@azylum.org> UNRELEASED
+-- kaliko jack <kaliko@azylum.org> Sun, 12 Feb 2017 15:49:03 +0100
 
 MPD_sima v0.14.2
 
