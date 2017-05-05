@@ -62,7 +62,7 @@ def bl_artist(func):
         names = list()
         for art in result.names:
             if cls.database.get_bl_artist(art, add_not=True):
-                cls.log.debug('Blacklisted "{0}"'.format(art))
+                cls.log.debug('Blacklisted "%s"', art)
                 continue
             names.append(art)
         if not names:

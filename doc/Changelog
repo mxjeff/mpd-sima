@@ -1,6 +1,6 @@
 MPD_sima v0.14.4
 
- * …
+ * Fixed blacklisting for Random plugin (Closes #14)
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 

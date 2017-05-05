@@ -82,6 +82,9 @@ class Random(Plugin):
             played_art = self.get_played_artist()
             while artists:
                 art = random.choice(artists)
+                if self.daemon.sdb.get_bl_artist(art, add_not=True):
+                    self.log.debug('Random: Blacklisted "%s"', art)
+                    continue
                 if art not in played_art:
                     break
                 artists.pop(art)
