@@ -55,7 +55,7 @@ class Random(Plugin):
         duration = self.daemon.config.getint('sima', 'history_duration')
         tracks_from_db = self.daemon.sdb.get_history(duration=duration)
         # Construct Track() objects list from database history
-        artists = [tr[-1] for tr in tracks_from_db]
+        artists = [tr[0] for tr in tracks_from_db]
         return set(artists)
 
     def callback_need_track(self):
@@ -87,7 +87,7 @@ class Random(Plugin):
                     continue
                 if art not in played_art:
                     break
-                artists.pop(art)
+                artists.remove(art)
         elif self.mode == 'pure':
             art = random.choice(artists)
         if art is None:
