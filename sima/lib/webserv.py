@@ -312,7 +312,7 @@ class WebService(Plugin):
             albums_not_in_hist = list(albums - albums_yet_in_hist)
             # Get to next artist if there are no unplayed albums
             if not albums_not_in_hist:
-                self.log.info('No album found for "%s"' % artist)
+                self.log.info('No unplayed album found for "%s"' % artist)
                 continue
             album_to_queue = str()
             random.shuffle(albums_not_in_hist)
