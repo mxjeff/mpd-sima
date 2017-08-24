@@ -3,7 +3,8 @@ MPD_sima v0.14.4
  * Fixed blacklisting for Random plugin (Closes #14)
  * Fixed sensible flavour of random plugin, thanks dnmx (Closes #15)
 
--- kaliko jack <kaliko@azylum.org> UNRELEASED
+-- kaliko jack <kaliko@azylum.org> Thu, 24 Aug 2017 11:46:14 +0200
+
 
 MPD_sima v0.14.3
 
@@ -14,6 +15,7 @@ MPD_sima v0.14.3
 
 -- kaliko jack <kaliko@azylum.org> Sun, 12 Feb 2017 15:49:03 +0100
 
+
 MPD_sima v0.14.2
 
  * Fixed MPD client cache (filters empty strings)
@@ -22,12 +24,14 @@ MPD_sima v0.14.2
 
 -- kaliko jack <kaliko@azylum.org> Sat, 11 Feb 2017 13:04:27 +0100
 
+
 MPD_sima v0.14.1
 
  * Prevent adding empty track to history (Closes #5)
  * Fixed false warning about wrong MBID format (Closes #6)
 
 -- kaliko jack <kaliko@azylum.org> Sat, 02 Jan 2016 16:03:39 +0100
+
 
 MPD_sima v0.14.0
 
