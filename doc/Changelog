@@ -1,3 +1,9 @@
+MPD_sima v0.14.5
+
+ * …
+
+-- kaliko jack <kaliko@azylum.org> UNRELEASED
+
 MPD_sima v0.14.4
 
  * Fixed blacklisting for Random plugin (Closes #14)
@@ -335,3 +341,4 @@ MPD_sima v0.1.0 (first stable release)
 -- kaliko jack <kaliko@azylum.org>  Thu, 28 May 2009 20:45:03 +0200
 
 # vim: fileencoding=utf-8
+# -*- coding: utf-8 -*-
