@@ -185,63 +185,77 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                     <term><option>[sima]</option></term>
                     <listitem><para></para></listitem>
                 </varlistentry>
-            <variablelist>
-                <varlistentry> <!-- sima.contrib -->
-                    <term><option>contrib=</option><replaceable></replaceable></term>
-                    <listitem>
-                        <para></para>
-                    </listitem>
-                </varlistentry>
-                <varlistentry> <!-- sima.internal -->
-                    <term><option>internal=</option><replaceable>Lastfm, Random, Crop</replaceable></term>
-                    <listitem>
-                        <para>&dhpackage;'s plugin management for internal source plugin
-                            and contrib (ie. external plugins).<sbr /> Plugins list is a
-                            comma separated string list.<sbr /> Optional plugin's
-                            configuration lays in its own section.<sbr />For instance a
-                            "AwesomePlugin" declared here gets its configuration from the
-                            corresponding section "[awesomeplugin]".
-                        </para>
-                        <para>The default list of plugins to load at startup: <option>Lastfm</option>,<option>Random</option>,<option>Crop</option>.<sbr />
-                            <option>Crop</option> is an utility plugin, it does not queue any tracks (cf. below).<sbr />
-                            <option>Random</option> will queue a track at random if other plugins did not return any tracks.<sbr />
-                        </para>
-                        <para>You can add here as many plugins you want,
-                            currently shipping <option>Lastfm</option> only.<sbr />
-                            The priority may be used to order them.
-                        </para>
-                    </listitem>
-                </varlistentry>
-                <varlistentry> <!-- sima.history_duration -->
-                    <term><option>history_duration=</option><replaceable>8</replaceable></term>
-                    <listitem>
-                        <para>How far to look back in history to avoid to play
-                            twice the same track/title (duration in
-                            hours).<sbr />
-                            The <option>history_duration</option> is also used to give priority to not recently played artists.
-                        </para>
-                    </listitem>
-                </varlistentry>
-                <varlistentry> <!-- sima.queue_length -->
-                    <term><option>queue_length=</option><replaceable>2</replaceable></term>
-                    <listitem>
-                        <para>Threshold value triggering queue process.</para>
-                    </listitem>
-                </varlistentry>
-                <varlistentry> <!-- sima.musicbrainzid -->
-                    <term><option>musicbrainzid=</option><replaceable>true</replaceable></term>
-                    <listitem>
-                        <para>Use MusicBrainzIdentifier to search music (mainly
-                            for artists).
-                            Default is True, switch to False if you don't have
-                            MusicBrainzIdentifier set for at least 80% of you
-                            music library.<sbr /> Consider using these metadata as it
-                            enhances a lot artist/album/tracks identification.
-                            Use Picard to tag your file: <ulink url="https://picard.musicbrainz.org/"/>.
-                        </para>
-                    </listitem>
-                </varlistentry>
-            </variablelist>
+                <variablelist>
+                    <varlistentry> <!-- sima.contrib -->
+                        <term><option>contrib=</option><replaceable></replaceable></term>
+                        <listitem>
+                            <para></para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry> <!-- sima.internal -->
+                        <term><option>internal=</option><replaceable>Lastfm, Random, Crop</replaceable></term>
+                        <listitem>
+                            <para>&dhpackage;'s plugin management for internal source plugin
+                                and contrib (ie. external plugins).<sbr /> Plugins list is a
+                                comma separated string list.<sbr /> Optional plugin's
+                                configuration lays in its own section.<sbr />For instance a
+                                "AwesomePlugin" declared here gets its configuration from the
+                                corresponding section "[awesomeplugin]".
+                            </para>
+                            <para>The default list of plugins to load at startup: <option>Lastfm</option>,<option>Random</option>,<option>Crop</option>.<sbr />
+                                <option>Crop</option> is an utility plugin, it does not queue any tracks (cf. below).<sbr />
+                                <option>Random</option> will queue a track at random if other plugins did not return any tracks.<sbr />
+                            </para>
+                            <para>You can add here as many plugins you want,
+                                currently shipping <option>Lastfm</option> only.<sbr />
+                                The priority may be used to order them.
+                            </para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry> <!-- sima.history_duration -->
+                        <term><option>history_duration=</option><replaceable>8</replaceable></term>
+                        <listitem>
+                            <para>How far to look back in history to avoid to play
+                                twice the same track/title (duration in
+                                hours).<sbr />
+                                The <option>history_duration</option> is also used to give priority to not recently played artists.
+                            </para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry> <!-- sima.queue_length -->
+                        <term><option>queue_length=</option><replaceable>2</replaceable></term>
+                        <listitem>
+                            <para>Threshold value triggering queue process.</para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry> <!-- sima.musicbrainzid -->
+                        <term><option>musicbrainzid=</option><replaceable>true</replaceable></term>
+                        <listitem>
+                            <para>Use MusicBrainzIdentifier to search music (mainly
+                                for artists).
+                                Default is True, switch to False if you don't have
+                                MusicBrainzIdentifier set for at least 80% of you
+                                music library.<sbr /> Consider using these metadata as it
+                                enhances a lot artist/album/tracks identification.
+                                Use Picard to tag your file: <ulink url="https://picard.musicbrainz.org/"/>.
+                            </para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry> <!-- sima.repeat_disable_queue -->
+                        <term><option>repeat_disable_queue=</option><replaceable>true</replaceable></term>
+                        <listitem>
+                            <para>Prevent disabling queuing in repeat play mode.
+                            </para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry> <!-- sima.single_disable_queue -->
+                        <term><option>single_disable_queue=</option><replaceable>true</replaceable></term>
+                        <listitem>
+                            <para>Prevent disabling queuing in single play mode.
+                            </para>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
             </variablelist>
         </refsect2>
         <refsect2 id="crop">

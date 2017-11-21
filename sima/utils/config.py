@@ -53,6 +53,8 @@ DEFAULT_CONF = {
             'queue_length': 2,
             'var_dir': 'empty',
             'musicbrainzid': "true",
+            'repeat_disable_queue': "true",
+            'single_disable_queue': "true",
             },
         'daemon':{
             'daemon': False,

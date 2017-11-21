@@ -2,6 +2,7 @@ MPD_sima v0.15.0
 
  * Remove EchoNest support (Closes #10)
  * Enhanced queuing behavior in random mode (Closes #16)
+ * Add option to prevent single & repeat mode to disable queuing (Closes #19)
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 

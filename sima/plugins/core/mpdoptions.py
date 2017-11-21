@@ -18,7 +18,7 @@
 #
 #
 """
-    Deal with MPD options ‑ idle and repeat mode
+    Deal with MPD options ‑ single and repeat mode
 """
 
 # standard library import
@@ -44,11 +44,13 @@ class MpdOptions(Plugin):
         """
         player = self.daemon.player
         if player.playmode.get('single'):
-            self.log.info('MPD "single" mode activated.')
-            self.daemon.enabled = False
+            if self.daemon.config.getboolean('sima', 'single_disable_queue'):
+                self.log.info('MPD "single" mode activated.')
+                self.daemon.enabled = False
         elif player.playmode.get('repeat'):
-            self.log.info('MPD "repeat" mode activated.')
-            self.daemon.enabled = False
+            if self.daemon.config.getboolean('sima', 'repeat_disable_queue'):
+                self.log.info('MPD "repeat" mode activated.')
+                self.daemon.enabled = False
         else:
             if self.daemon.enabled is False:
                 self.log.debug('enabling queuing (leaving single|repeat mode)')
