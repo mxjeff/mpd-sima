@@ -66,15 +66,6 @@ DEFAULT_CONF = {
             'consume': 10,
             'priority': 0,
             },
-        'echonest': {
-            'queue_mode': "track", #TODO control values
-            'max_art': 15,
-            'single_album': "false",
-            'track_to_add': 1,
-            'album_to_add': 1,
-            'depth': 1,
-            'priority': 100,
-            },
         'lastfm': {
             'queue_mode': "track", #TODO control values
             'max_art': 10,

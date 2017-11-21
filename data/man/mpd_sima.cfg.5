@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: 11/18/2017
+.\"      Date: 11/21/2017
 .\"    Manual: mpd-sima 0.14.5 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "11/18/2017" "mpd-sima" "mpd-sima 0.14.5 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "11/21/2017" "mpd-sima" "mpd-sima 0.14.5 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -183,8 +183,6 @@ will queue a track at random if other plugins did not return any tracks\&.
 .sp
 You can add here as many plugins you want, currently shipping
 \fBLastfm\fR
-and
-\fBEchoNest\fR
 only\&.
 .br
 
@@ -360,43 +358,6 @@ If set to "false", caching is still done but in memory\&.
 \fBpriority=\fR\fI100\fR
 .RS 4
 Plugin priority
-.RE
-.SS "EchoNest section"
-.PP
-EchoNest plugin\*(Aqs configuration\&.
-.PP
-Options for EchoNest are exactly the same as LastFm (same default as well), except for cache plugin which is always needed to limit number of requests to the service\&.
-.PP
-\fB[echonest]\fR
-.RS 4
-.RE
-.PP
-\fBqueue_mode=\fR\fItrack\fR
-.RS 4
-.RE
-.PP
-\fBmax_art=\fR\fI10\fR
-.RS 4
-.RE
-.PP
-\fBdepth=\fR\fI1\fR
-.RS 4
-.RE
-.PP
-\fBsingle_album=\fR\fIfalse\fR
-.RS 4
-.RE
-.PP
-\fBtrack_to_add=\fR\fI1\fR
-.RS 4
-.RE
-.PP
-\fBalbum_to_add=\fR\fI1\fR
-.RS 4
-.RE
-.PP
-\fBpriority=\fR\fI100\fR
-.RS 4
 .RE
 .SH "QUEUE MODES"
 .PP

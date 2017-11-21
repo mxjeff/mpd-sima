@@ -207,8 +207,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                             <option>Random</option> will queue a track at random if other plugins did not return any tracks.<sbr />
                         </para>
                         <para>You can add here as many plugins you want,
-                            currently shipping <option>Lastfm</option> and
-                            <option>EchoNest</option> only.<sbr />
+                            currently shipping <option>Lastfm</option> only.<sbr />
                             The priority may be used to order them.
                         </para>
                     </listitem>
@@ -388,39 +387,6 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                             Plugin priority
                         </para>
                     </listitem>
-                </varlistentry>
-            </variablelist>
-        </refsect2>
-        <refsect2 id="echonest">
-            <title>EchoNest section</title>
-            <para>EchoNest plugin's configuration.</para>
-            <para>Options for EchoNest are exactly the same as LastFm (same
-                default as well), except for cache plugin which is always
-                needed to limit number of requests to the service.</para>
-            <variablelist>
-                <varlistentry> <!-- echonest -->
-                    <term><option>[echonest]</option></term>
-                </varlistentry>
-                <varlistentry> <!-- echonest.queue_mode -->
-                    <term><option>queue_mode=</option><replaceable>track</replaceable></term>
-                </varlistentry>
-                <varlistentry> <!-- echonest.max_art -->
-                    <term><option>max_art=</option><replaceable>10</replaceable></term>
-                </varlistentry>
-                <varlistentry> <!-- echonest.depth -->
-                    <term><option>depth=</option><replaceable>1</replaceable></term>
-                </varlistentry>
-                <varlistentry> <!-- echonest.single_album -->
-                    <term><option>single_album=</option><replaceable>false</replaceable></term>
-                </varlistentry>
-                <varlistentry> <!-- echonest.track_to_add -->
-                    <term><option>track_to_add=</option><replaceable>1</replaceable></term>
-                </varlistentry>
-                <varlistentry> <!-- echonest.album_to_add -->
-                    <term><option>album_to_add=</option><replaceable>1</replaceable></term>
-                </varlistentry>
-                <varlistentry> <!-- echonest.priority -->
-                    <term><option>priority=</option><replaceable>100</replaceable></term>
                 </varlistentry>
             </variablelist>
         </refsect2>

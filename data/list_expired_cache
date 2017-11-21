@@ -26,8 +26,6 @@ from os.path import join as pjoin
 
 import sima.lib.cache
 
-SERVICE = ('EchoNest', 'LastFM')
-
 def parse_cache_control(headers):
     """
     Parse the cache control headers returning a dictionary with values
@@ -53,7 +51,7 @@ def encode(val):
 
 homedir = environ.get('HOME')
 xdh = environ.get('XDG_DATA_HOME', pjoin(homedir, '.local/share/'))
-default_cache = pjoin(xdh, 'mpd_sima/http/', SERVICE[1])
+default_cache = pjoin(xdh, 'mpd_sima/http/LastFM')
 cache = environ.get('SIMA_VARDIR', default_cache)
 
 if len(sys.argv) > 1:

@@ -302,10 +302,6 @@ class HttpClient:
             resp = self.controller.update_cached_response(prepreq, resp)
         elif resp.status_code != 200:
             raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
-        ratelimit = resp.headers.get('x-ratelimit-remaining', None)
-        if ratelimit and self.stats:
-            minrl = min(int(ratelimit), self.stats.get('minrl'))
-            self.stats.update(minrl=minrl)
         self.controller.cache_response(resp.request, resp)
         return resp
 
