@@ -152,6 +152,21 @@ class Player(object):
 
     @property
     def state(self):
+        """Returns (play|stop|pause)"""
+        #pylint: disable=C0111
+        raise NotImplementedError
+
+    @property
+    def playmode(self):
+        """Returns a mapping
+        {
+            'repeat': boolean,
+            'random': boolean,
+            'single': boolean,
+            'consume': boolean,
+            …
+            }
+        """
         #pylint: disable=C0111
         raise NotImplementedError
 

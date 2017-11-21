@@ -1,6 +1,6 @@
-MPD_sima v0.14.5
+MPD_sima v0.15.0
 
- * …
+ * Enhanced queuing behavior in random mode (Closes #16)
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 

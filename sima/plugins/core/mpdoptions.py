@@ -43,10 +43,10 @@ class MpdOptions(Plugin):
         Called on player changes
         """
         player = self.daemon.player
-        if player.status().get('single') == str(1):
+        if player.playmode.get('single'):
             self.log.info('MPD "single" mode activated.')
             self.daemon.enabled = False
-        elif player.status().get('repeat') == str(1):
+        elif player.playmode.get('repeat'):
             self.log.info('MPD "repeat" mode activated.')
             self.daemon.enabled = False
         else:

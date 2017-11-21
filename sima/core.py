@@ -93,9 +93,13 @@ class Sima(Daemon):
         if not self.enabled:
             self.log.debug('Queueing disabled!')
             return False
-        queue = self.player.queue
         queue_trigger = self.config.getint('sima', 'queue_length')
-        self.log.debug('Currently %s track(s) ahead. (target %s)', len(queue), queue_trigger)
+        if self.player.playmode.get('random'):
+            queue = self.player.playlist
+            self.log.debug('Currently %s track(s) in the playlist. (target %s)', len(queue), queue_trigger)
+        else:
+            queue = self.player.queue
+            self.log.debug('Currently %s track(s) ahead. (target %s)', len(queue), queue_trigger)
         if len(queue) < queue_trigger:
             return True
         return False

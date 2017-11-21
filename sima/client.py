@@ -340,6 +340,18 @@ class PlayerClient(Player):
         return str(self.status().get('state'))
 
     @property
+    def playmode(self):
+        plm = {'repeat': None,
+               'single': None,
+               'random': None,
+               'consume': None,
+              }
+        for key, val in self.status().items():
+            if key in plm.keys():
+                plm.update({key:bool(int(val))})
+        return plm
+
+    @property
     def current(self):
         return self.currentsong()
 

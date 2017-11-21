@@ -112,7 +112,10 @@ class WebService(Plugin):
             * not blacklisted
         """
         artist = tracks[0].artist
-        black_list = self.player.queue + self.to_add
+        if self.player.playmode.get('random'):
+            black_list = self.player.playlist + self.to_add
+        else:
+            black_list = self.player.queue + self.to_add
         not_in_hist = list(set(tracks) - set(self.get_history(artist=artist)))
         if self.plugin_conf.get('queue_mode') != 'top' and not not_in_hist:
             self.log.debug('All tracks already played for "%s"', artist)
@@ -195,7 +198,10 @@ class WebService(Plugin):
         if not self.player.playlist:
             return
         history = list(self.history)
-        history = self.player.queue + history
+        if self.player.playmode.get('random'):
+            history = self.player.playlist + history
+        else:
+            history = self.player.queue + history
         history = deque(history)
         last_trk = history.popleft() # remove
         extra_arts = list()
@@ -266,7 +272,10 @@ class WebService(Plugin):
         if not ret:
             self.log.warning('Got nothing from music library.')
             return []
-        queued_artists = MetaContainer([trk.Artist for trk in self.player.queue])
+        if self.player.playmode.get('random'):
+            queued_artists = MetaContainer([trk.Artist for trk in self.player.playlist])
+        else:
+            queued_artists = MetaContainer([trk.Artist for trk in self.player.queue])
         self.log.trace('Already queued: {}'.format(queued_artists))
         self.log.trace('Candidate: {}'.format(ret))
         if ret & queued_artists:
@@ -324,6 +333,10 @@ class WebService(Plugin):
                 if tracks[0] in self.player.queue:
                     self.log.debug('"%s" already queued, skipping!', tracks[0].album)
                     continue
+                if tracks[0] in self.player.playlist:
+                    if self.player.playmode.get('random'):
+                        self.log.debug('"%s" already in playlist, skipping!', tracks[0].album)
+                        continue
                 album_to_queue = album
             if not album_to_queue:
                 self.log.info('No album found for "%s"', artist)
