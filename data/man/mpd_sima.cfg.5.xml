@@ -139,7 +139,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <varlistentry> <!-- log.logfile -->
                     <term><option>logfile=</option></term>
                     <listitem>
-                        <para>File to log to, usually in dæmon mode.<sbr />Defaut
+                        <para>File to log to, usually in dæmon mode.<sbr />Default
                             (empty or unset) is to log to stdin/stdout.</para>
                     </listitem>
                 </varlistentry>
