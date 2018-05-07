@@ -198,8 +198,6 @@ class PlayerClient(Player):
             if exact_m:
                 _ = [artist.add_alias(name) for name in exact_m]
                 found = True
-        else:
-            artist = Artist(name=artist.name)
         # then complete with fuzzy search on artist with no musicbrainz_artistid
         if artist.mbid:
             # we already performed a lookup on artists with mbid set
@@ -215,12 +213,13 @@ class PlayerClient(Player):
         # Does not perform fuzzy matching on short and single word strings
         # Only lowercased comparison
         if ' ' not in artist.name and len(artist.name) < 8:
-            for fuzz_art in match:
+            for close_art in match:
                 # Regular lowered string comparison
-                if artist.name.lower() == fuzz_art.lower():
-                    artist.add_alias(fuzz_art)
+                if artist.name.lower() == close_art.lower():
+                    artist.add_alias(close_art)
                     return artist
-        fzartist = SimaStr(artist.name)
+                else:
+                    return
         for fuzz_art in match:
             # Regular lowered string comparison
             if artist.name.lower() == fuzz_art.lower():
@@ -230,7 +229,7 @@ class PlayerClient(Player):
                     self.log.debug('"%s" matches "%s".', fuzz_art, artist)
                 continue
             # SimaStr string __eq__ (not regular string comparison here)
-            if fzartist == fuzz_art:
+            if SimaStr(artist.name) == fuzz_art:
                 found = True
                 artist.add_alias(fuzz_art)
                 self.log.info('"%s" quite probably matches "%s" (SimaStr)',
