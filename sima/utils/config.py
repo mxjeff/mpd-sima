@@ -178,6 +178,13 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
             for opt in self.config.options(sec):
                 if opt in list(self.startopt.keys()):
                     self.config.set(sec, opt, str(self.startopt.get(opt)))
+        # honor MPD_HOST format as in mpc(1)  for command line option --host
+        if self.startopt.get('host'):
+            if '@' in self.startopt.get('host'):
+                print(self.startopt.get('host').split('@'))
+                passwd, host = self.startopt.get('host').split('@')
+                self.config.set('MPD', 'password', passwd)
+                self.config.set('MPD', 'host', host)
 
     def use_envar(self):
         """Use MPD en.var. to set defaults"""
