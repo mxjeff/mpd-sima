@@ -5,6 +5,7 @@ MPD_sima v0.15.0
  * Add option to prevent single & repeat mode to disable queuing (Closes #19)
  * Honor MPC password/host format on command line option 'host'
  * Fixed fuzzy search for short artist names
+ * Client side hardcoded one month caching (ugly workaround for #7)
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 

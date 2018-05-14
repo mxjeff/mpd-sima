@@ -48,6 +48,8 @@ def parse_uri(uri):
 class CacheController(object):
     """An interface to see if request should cached or not.
     """
+    CACHE_ANYWAY = False
+
     def __init__(self, cache=None, cache_etags=True):
         self.cache = cache or DictCache()
         self.cache_etags = cache_etags
@@ -102,7 +104,6 @@ class CacheController(object):
         no_cache = True if 'no-cache' in cc else False
         if 'max-age' in cc and cc['max-age'] == 0:
             no_cache = True
-
         # see if it is in the cache anyways
         in_cache = self.cache.get(cache_url)
         if no_cache or not in_cache:
@@ -229,6 +230,12 @@ class CacheController(object):
             elif 'expires' in resp.headers:
                 if resp.headers['expires']:
                     self.cache.set(cache_url, resp)
+            # Force one month max age if no Cache-Control header is found
+            # Overriding header disappearance on LastFM web service...
+            # https://getsatisfaction.com/lastfm/topics/-web-api-http-cache-control-header
+            elif CacheController.CACHE_ANYWAY:
+                resp.headers['Cache-Control'] = 'max-age=2419200'
+                self.cache.set(cache_url, resp)
 
     def update_cached_response(self, request, response):
         """On a 304 we will get a new set of headers that we want to
