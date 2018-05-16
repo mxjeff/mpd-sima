@@ -6,6 +6,8 @@ MPD_sima v0.15.0
  * Honor MPC password/host format on command line option 'host'
  * Fixed fuzzy search for short artist names
  * Client side hardcoded one month caching (ugly workaround for #7)
+ * Simplified album search
+ * Track search aggregates artist name and MusicBrainzID searches
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 

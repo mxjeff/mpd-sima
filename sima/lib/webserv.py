@@ -112,6 +112,7 @@ class WebService(Plugin):
             * not blacklisted
         """
         artist = tracks[0].artist
+        # In random play mode use complete playlist to filter
         if self.player.playmode.get('random'):
             black_list = self.player.playlist + self.to_add
         else:
@@ -198,6 +199,7 @@ class WebService(Plugin):
         if not self.player.playlist:
             return
         history = list(self.history)
+        # In random play mode use complete playlist to filter
         if self.player.playmode.get('random'):
             history = self.player.playlist + history
         else:
@@ -272,6 +274,7 @@ class WebService(Plugin):
         if not ret:
             self.log.warning('Got nothing from music library.')
             return []
+        # In random play mode use complete playlist to filter
         if self.player.playmode.get('random'):
             queued_artists = MetaContainer([trk.Artist for trk in self.player.playlist])
         else:
@@ -326,16 +329,14 @@ class WebService(Plugin):
             album_to_queue = str()
             random.shuffle(albums_not_in_hist)
             for album in albums_not_in_hist:
-                tracks = self.player.find_album(artist, album)
-                # Look if one track of the album is already queued
-                # Good heuristic, at least enough to guess if the whole album is
-                # already queued.
-                if tracks[0] in self.player.queue:
-                    self.log.debug('"%s" already queued, skipping!', tracks[0].album)
+                # Controls the album found is not already queued
+                if album in {t.album for t in self.player.queue}:
+                    self.log.debug('"%s" already queued, skipping!', album)
                     continue
-                if tracks[0] in self.player.playlist:
-                    if self.player.playmode.get('random'):
-                        self.log.debug('"%s" already in playlist, skipping!', tracks[0].album)
+                # In random play mode use complete playlist to filter
+                if self.player.playmode.get('random'):
+                    if album in {t.album for t in self.player.playlist}:
+                        self.log.debug('"%s" already in playlist, skipping!', album)
                         continue
                 album_to_queue = album
             if not album_to_queue:

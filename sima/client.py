@@ -172,12 +172,11 @@ class PlayerClient(Player):
                                         'title', title))
             else:
                 tracks |= set(self.find('musicbrainz_artistid', artist.mbid))
-        else:
-            for name in artist.names:
-                if title:
-                    tracks |= set(self.find('artist', name, 'title', title))
-                else:
-                    tracks |= set(self.find('artist', name))
+        for name in artist.names:
+            if title:
+                tracks |= set(self.find('artist', name, 'title', title))
+            else:
+                tracks |= set(self.find('artist', name))
         return list(tracks)
 
     @bl_artist
@@ -248,28 +247,26 @@ class PlayerClient(Player):
         match = get_close_matches(title, all_artist_titles, 50, 0.78)
         if not match:
             return []
-        for title_ in match:
-            leven = levenshtein_ratio(title.lower(), title_.lower())
+        for mtitle in match:
+            leven = levenshtein_ratio(title.lower(), mtitle.lower())
             if leven == 1:
                 pass
             elif leven >= 0.79:  # PARAM
                 self.log.debug('title: "%s" should match "%s" (lr=%1.3f)',
-                               title_, title, leven)
+                               mtitle, title, leven)
             else:
                 self.log.debug('title: "%s" does not match "%s" (lr=%1.3f)',
-                               title_, title, leven)
+                               mtitle, title, leven)
                 return []
-            return self.find('artist', artist, 'title', title_)
+            return self.find('artist', artist, 'title', mtitle)
 
     def find_album(self, artist, album):
         """
         Special wrapper around album search:
         Album lookup is made through AlbumArtist/Album instead of Artist/Album
+        MPD falls back to Artist if AlbumArtist is not found  (cf. documentation)
         """
-        alb_art_search = self.find('albumartist', artist, 'album', album)
-        if alb_art_search:
-            return alb_art_search
-        return self.find('artist', artist, 'album', album)
+        return self.find('albumartist', artist, 'album', album)
 
     @blacklist(album=True)
     def search_albums(self, artist):
