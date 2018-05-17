@@ -12,4 +12,4 @@ MPD_sima can queue track, top track or whole album for similar artists.
 This client allows you to never run out of music when your queue is getting
 short.
 
-.. _MPD_sima: http://kaliko.me/code/mpd-sima/
+.. _MPD_sima: https://kaliko.me/code/mpd-sima/
