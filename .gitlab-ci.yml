@@ -42,7 +42,8 @@ run:
   - pip install dist/*
   - mpd-sima --help
   cache:
-    paths: dist/
+    paths:
+      - dist/
     policy: pull
   artifacts:
     paths:
