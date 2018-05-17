@@ -29,7 +29,7 @@ before_script:
 test:
   stage: test
   script:
-  - pip install pytest-cov
+  - pip install pytest-cov requests
   - py.test -q --cov=sima tests
   - python setup.py test
   - pip install tox flake8
