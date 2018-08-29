@@ -342,7 +342,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <varlistentry> <!-- lastfm.max_art -->
                     <term><option>max_art=</option><replaceable>10</replaceable></term>
                     <listitem>
-                        <para>Number of similar artist to retrieve from local
+                        <para>Maximum number of similar artist to retrieve from local
                             media library.<sbr />When set to something superior
                             to zero, it tries to get as much similar artists
                             from media library.</para>
@@ -372,7 +372,11 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                     <listitem>
                         <para>How many track(s) to add. Only relevant in
                             <option>top</option> and <option>track</option>
-                            queue modes.</para>
+                            queue modes. This is actually an upper limit,
+                            min(<option>max_art</option>,
+                            <option>track_to_add</option>) will be used, and
+                            <option>max_art</option> might be inferior lower
+                            than value set in config.</para>
                     </listitem>
                 </varlistentry>
                 <varlistentry> <!-- lastfm.album_to_add -->

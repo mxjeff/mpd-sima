@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: Jack Kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: 11/21/2017
+.\"      Date: 08/29/2018
 .\"    Manual: mpd-sima 0.15.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "11/21/2017" "mpd-sima" "mpd-sima 0.15.0 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "08/29/2018" "mpd-sima" "mpd-sima 0.15.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -116,7 +116,7 @@ Configure logging\&.
 .RS 4
 File to log to, usually in d\(aemon mode\&.
 .br
-Defaut (empty or unset) is to log to stdin/stdout\&.
+Default (empty or unset) is to log to stdin/stdout\&.
 .RE
 .PP
 \fBverbosity=\fR\fIinfo\fR
@@ -315,7 +315,7 @@ for info about queue modes)\&.
 .PP
 \fBmax_art=\fR\fI10\fR
 .RS 4
-Number of similar artist to retrieve from local media library\&.
+Maximum number of similar artist to retrieve from local media library\&.
 .br
 When set to something superior to zero, it tries to get as much similar artists from media library\&.
 .RE
@@ -342,7 +342,10 @@ How many track(s) to add\&. Only relevant in
 \fBtop\fR
 and
 \fBtrack\fR
-queue modes\&.
+queue modes\&. This is actually an upper limit, min(\fBmax_art\fR,
+\fBtrack_to_add\fR) will be used, and
+\fBmax_art\fR
+might be inferior lower than value set in config\&.
 .RE
 .PP
 \fBalbum_to_add=\fR\fI1\fR
