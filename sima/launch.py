@@ -39,7 +39,7 @@ from .lib.simadb import SimaDB
 from .utils.config import ConfMan
 from .utils.startopt import StartOpt
 from .utils.utils import exception_log, SigHup
- # core plugins
+# core plugins
 from .plugins.core.history import History
 from .plugins.core.mpdoptions import MpdOptions
 from .plugins.core.uniq import Uniq
@@ -107,6 +107,10 @@ def start(sopt, restart=False):
 
     # required core plugins
     core_plugins = [History, MpdOptions, Uniq]
+    if config.getboolean('sima', 'mopidy_compat'):
+        logger.warning('Running with mopidy compat. mode!')
+        core_plugins = [History, MpdOptions]
+        config['sima']['musicbrainzid'] = 'False'
     for cplgn in core_plugins:
         logger.debug('Register core {name} ({doc})'.format(**cplgn.info()))
         sima.register_core_plugin(cplgn)

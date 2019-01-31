@@ -8,6 +8,9 @@ MPD_sima v0.15.0
  * Client side hardcoded one month caching (ugly workaround for #7)
  * Simplified album search
  * Track search aggregates artist name and MusicBrainzID searches
+ * Add an undocumented mopidy compatibility configuration option
+   Use the boolean option "mopidy_compat" in the sima section
+   cf. https://gitlab.com/kaliko/sima/issues/21#
 
 -- kaliko jack <kaliko@azylum.org> UNRELEASED
 
