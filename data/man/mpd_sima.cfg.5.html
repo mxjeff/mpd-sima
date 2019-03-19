@@ -27,7 +27,7 @@ consume=30
                 Bene:</em></span> inline comment are possible using <em class="parameter"><code>'#'</code></em>).</p><p>The default values are used in the options lists below.</p><div class="refsect2"><a name="MPD"></a><h3>MPD section</h3><p>This section is meant to configure MPD access, MPD host
                 address / port and password if necessary.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">[MPD]</code></span></dt><dd></dd><dt><span class="term"><code class="option">host=</code><em class="replaceable"><code>localhost</code></em></span></dt><dd><p>Set MPD host. Use IP or FQDN.</p></dd><dt><span class="term"><code class="option">port=</code><em class="replaceable"><code>6600</code></em></span></dt><dd><p>Set host port to access MPD to.</p></dd><dt><span class="term"><code class="option">password=</code><em class="replaceable"><code>s3cr3t</code></em></span></dt><dd><p>Set MPD password to use. Do not use this option
                             if you don't have enabled password protected access
-                            on your MPD server.</p></dd></dl></div></div><div class="refsect2"><a name="log"></a><h3>log section</h3><p>Configure logging.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">[log]</code></span></dt><dd><p></p></dd><dt><span class="term"><code class="option">logfile=</code></span></dt><dd><p>File to log to, usually in dæmon mode.<br>Defaut
+                            on your MPD server.</p></dd></dl></div></div><div class="refsect2"><a name="log"></a><h3>log section</h3><p>Configure logging.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">[log]</code></span></dt><dd><p></p></dd><dt><span class="term"><code class="option">logfile=</code></span></dt><dd><p>File to log to, usually in dæmon mode.<br>Default
                             (empty or unset) is to log to stdin/stdout.</p></dd><dt><span class="term"><code class="option">verbosity=</code><em class="replaceable"><code>info</code></em></span></dt><dd><p>Logging verbosity among
                             <em class="replaceable"><code>debug</code></em>,
                             <em class="replaceable"><code>info</code></em>,
@@ -77,7 +77,7 @@ consume=30
                         </p></dd></div><div class="refsect2"><a name="lastfm"></a><h3>LastFm section</h3><p>LastFM plugin's configuration.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">[lastfm]</code></span></dt><dd></dd><dt><span class="term"><code class="option">queue_mode=</code><em class="replaceable"><code>track</code></em></span></dt><dd><p>Queue mode to use among
                             <em class="replaceable"><code>track</code></em>,
                             <em class="replaceable"><code>top</code></em> and
-                            <em class="replaceable"><code>album</code></em> (see <a class="xref" href="#queue_mode" title="QUEUE MODES">the section called &#8220;QUEUE MODES&#8221;</a> for info about queue modes).</p></dd><dt><span class="term"><code class="option">max_art=</code><em class="replaceable"><code>10</code></em></span></dt><dd><p>Number of similar artist to retrieve from local
+                            <em class="replaceable"><code>album</code></em> (see <a class="xref" href="#queue_mode" title="QUEUE MODES">the section called &#8220;QUEUE MODES&#8221;</a> for info about queue modes).</p></dd><dt><span class="term"><code class="option">max_art=</code><em class="replaceable"><code>10</code></em></span></dt><dd><p>Maximum number of similar artist to retrieve from local
                             media library.<br>When set to something superior
                             to zero, it tries to get as much similar artists
                             from media library.</p></dd><dt><span class="term"><code class="option">depth=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many artists to base on similar artists
@@ -89,7 +89,11 @@ consume=30
                             (it often happens with OST).<br>
                             Only relevant in "track" queue mode.</p></dd><dt><span class="term"><code class="option">track_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many track(s) to add. Only relevant in
                             <code class="option">top</code> and <code class="option">track</code>
-                            queue modes.</p></dd><dt><span class="term"><code class="option">album_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many album(s) to add. Only relevant in
+                            queue modes. This is actually an upper limit,
+                            min(<code class="option">max_art</code>,
+                            <code class="option">track_to_add</code>) will be used, and
+                            <code class="option">max_art</code> might be inferior lower
+                            than value set in config.</p></dd><dt><span class="term"><code class="option">album_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many album(s) to add. Only relevant in
                             <code class="option">album</code> queue modes.</p></dd><dt><span class="term"><code class="option">cache=</code><em class="replaceable"><code>True</code></em></span></dt><dd><p>Whether or not to use on-disk persistent http
                             cache.<br>When set to "true", sima will use a
                             persistent cache for its http client. The cache is

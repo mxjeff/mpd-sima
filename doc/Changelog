@@ -1,3 +1,9 @@
+MPD_sima v0.15.1
+
+ * Fixed mopidy compatibility implementation
+
+-- kaliko jack <kaliko@azylum.org> Tue, 19 Mar 2019 15:14:48 +0100
+
 MPD_sima v0.15.0
 
  * Remove EchoNest support (Closes #10)

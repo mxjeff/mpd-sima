@@ -55,6 +55,7 @@ DEFAULT_CONF = {
             'musicbrainzid': "true",
             'repeat_disable_queue': "true",
             'single_disable_queue': "true",
+            'mopidy_compat': "false",
             },
         'daemon':{
             'daemon': False,
