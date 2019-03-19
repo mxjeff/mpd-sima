@@ -30,6 +30,7 @@ classifiers = [
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         ]
 
 setup(name='MPD_sima',
@@ -38,7 +39,7 @@ setup(name='MPD_sima',
       url='http://kaliko.me/code/mpd-sima',
       description='Automagically add titles to MPD playlist',
       author=AUTHOR,
-      author_email= EMAIL,
+      author_email=EMAIL,
       license='GPLv3',
       keywords='MPD',
       long_description=DESCRIPTION,
@@ -52,7 +53,7 @@ setup(name='MPD_sima',
           'console_scripts': ['mpd-sima = sima.launch:main',]
           },
       test_suite="tests",
-)
+      )
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

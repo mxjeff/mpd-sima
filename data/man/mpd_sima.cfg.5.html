@@ -1,0 +1,128 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>mpd_sima.cfg</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="refentry"><a name="idm1"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>mpd_sima.cfg &#8212; mpd-sima will try to maintain some titles ahead in the queue
+            following different policies. This manual document the
+            configuration file for mpd-sima.</p></div><div class="refsect1"><a name="description"></a><h2>DESCRIPTION</h2><p>This manual page documents briefly <span class="command"><strong>mpd-sima</strong></span>
+            configuration options available in user configuration file
+            (see <a class="xref" href="#files" title="FILES">the section called &#8220;FILES&#8221;</a>).</p></div><div class="refsect1"><a name="examples"></a><h2>EXAMPLES</h2><div class="refsect2"><a name="album"></a><h3>Album queue mode.</h3><p>Here is an example of album queue configuration.</p><pre class="programlisting">[MPD]
+host=example.org
+port=8000
+
+[sima]
+history_duration=48  # 2 days
+queue_length=5
+
+[lastfm]
+queue_mode=album
+album_to_add=2
+
+[crop]
+# keep 30 played tracks in playlist
+consume=30
+
+            </pre></div></div><div class="refsect1"><a name="options"></a><h2>Configuration file</h2><p>The configuration file consists of sections, led by a
+            <span class="command"><strong>[section]</strong></span> header and followed by <code class="option">name: value</code>
+            entries, with continuations in the style of RFC 822 (see section
+            3.1.1, &#8220;LONG HEADER FIELDS&#8221;); <code class="option">name=value</code> is also accepted. Lines
+            beginning with <em class="parameter"><code>'#'</code></em> or <em class="parameter"><code>';'</code></em>
+            are ignored and may be used to provide comments (<span class="emphasis"><em>Nota
+                Bene:</em></span> inline comment are possible using <em class="parameter"><code>'#'</code></em>).</p><p>The default values are used in the options lists below.</p><div class="refsect2"><a name="MPD"></a><h3>MPD section</h3><p>This section is meant to configure MPD access, MPD host
+                address / port and password if necessary.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">[MPD]</code></span></dt><dd></dd><dt><span class="term"><code class="option">host=</code><em class="replaceable"><code>localhost</code></em></span></dt><dd><p>Set MPD host. Use IP or FQDN.</p></dd><dt><span class="term"><code class="option">port=</code><em class="replaceable"><code>6600</code></em></span></dt><dd><p>Set host port to access MPD to.</p></dd><dt><span class="term"><code class="option">password=</code><em class="replaceable"><code>s3cr3t</code></em></span></dt><dd><p>Set MPD password to use. Do not use this option
+                            if you don't have enabled password protected access
+                            on your MPD server.</p></dd></dl></div></div><div class="refsect2"><a name="log"></a><h3>log section</h3><p>Configure logging.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">[log]</code></span></dt><dd><p></p></dd><dt><span class="term"><code class="option">logfile=</code></span></dt><dd><p>File to log to, usually in dæmon mode.<br>Defaut
+                            (empty or unset) is to log to stdin/stdout.</p></dd><dt><span class="term"><code class="option">verbosity=</code><em class="replaceable"><code>info</code></em></span></dt><dd><p>Logging verbosity among
+                            <em class="replaceable"><code>debug</code></em>,
+                            <em class="replaceable"><code>info</code></em>,
+                            <em class="replaceable"><code>warning</code></em>,
+                            <em class="replaceable"><code>error</code></em>.</p></dd></dl></div></div><div class="refsect2"><a name="daemon"></a><h3>Process daemonization</h3><p>Configure process daemon.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">[daemon]</code></span></dt><dd><p></p></dd><dt><span class="term"><code class="option">daemon=false</code></span></dt><dd><p>whether to daemonize process or not.</p></dd><dt><span class="term"><code class="option">pidfile=</code></span></dt><dd><p>Where to store process ID.</p></dd></dl></div></div><div class="refsect2"><a name="sima"></a><h3>sima section</h3><p>Core mpd_sima.cfg configuration.</p><div class="variablelist"><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">contrib=</code><em class="replaceable"><code></code></em></span></dt><dd><p></p></dd><dt><span class="term"><code class="option">internal=</code><em class="replaceable"><code>Lastfm, Random, Crop</code></em></span></dt><dd><p>mpd-sima's plugin management for internal source plugin
+                                and contrib (ie. external plugins).<br> Plugins list is a
+                                comma separated string list.<br> Optional plugin's
+                                configuration lays in its own section.<br>For instance a
+                                "AwesomePlugin" declared here gets its configuration from the
+                                corresponding section "[awesomeplugin]".
+                            </p><p>The default list of plugins to load at startup: <code class="option">Lastfm</code>,<code class="option">Random</code>,<code class="option">Crop</code>.<br>
+                                <code class="option">Crop</code> is an utility plugin, it does not queue any tracks (cf. below).<br>
+                                <code class="option">Random</code> will queue a track at random if other plugins did not return any tracks.<br>
+                            </p><p>You can add here as many plugins you want,
+                                currently shipping <code class="option">Lastfm</code> only.<br>
+                                The priority may be used to order them.
+                            </p></dd><dt><span class="term"><code class="option">history_duration=</code><em class="replaceable"><code>8</code></em></span></dt><dd><p>How far to look back in history to avoid to play
+                                twice the same track/title (duration in
+                                hours).<br>
+                                The <code class="option">history_duration</code> is also used to give priority to not recently played artists.
+                            </p></dd><dt><span class="term"><code class="option">queue_length=</code><em class="replaceable"><code>2</code></em></span></dt><dd><p>Threshold value triggering queue process.</p></dd><dt><span class="term"><code class="option">musicbrainzid=</code><em class="replaceable"><code>true</code></em></span></dt><dd><p>Use MusicBrainzIdentifier to search music (mainly
+                                for artists).
+                                Default is True, switch to False if you don't have
+                                MusicBrainzIdentifier set for at least 80% of you
+                                music library.<br> Consider using these metadata as it
+                                enhances a lot artist/album/tracks identification.
+                                Use Picard to tag your file: <a class="ulink" href="https://picard.musicbrainz.org/" target="_top">https://picard.musicbrainz.org/</a>.
+                            </p></dd><dt><span class="term"><code class="option">repeat_disable_queue=</code><em class="replaceable"><code>true</code></em></span></dt><dd><p>Prevent disabling queuing in repeat play mode.
+                            </p></dd><dt><span class="term"><code class="option">single_disable_queue=</code><em class="replaceable"><code>true</code></em></span></dt><dd><p>Prevent disabling queuing in single play mode.
+                            </p></dd></dl></div><dl class="variablelist"><dt><span class="term"><code class="option">[sima]</code></span></dt><dd><p></p></dd></dl></div></div><div class="refsect2"><a name="crop"></a><h3>Crop section</h3><p>crop plugin's configuration:</p><dt><span class="term"><code class="option">[crop]</code></span></dt><dd></dd><dt><span class="term"><code class="option">consume=</code><em class="replaceable"><code>10</code></em></span></dt><dd><p>How many played tracks to keep in the queue.
+                            Allows you to maintain a fixed length queue.
+                            Set to some negative integer to keep all played tracks.
+                        </p></dd><dt><span class="term"><code class="option">priority=</code><em class="replaceable"><code>10</code></em></span></dt><dd><p>
+                            Plugin priority
+                        </p></dd></div><div class="refsect2"><a name="random"></a><h3>Random section</h3><p>Random plugin's configuration:</p><dt><span class="term"><code class="option">[random]</code></span></dt><dd></dd><dt><span class="term"><code class="option">flavour=</code><em class="replaceable"><code>sensible</code></em></span></dt><dd><p>When no similar tracks are found, falling back to
+                            random queuing. Different mode, aka random flavour,
+                            are available:
+                            <em class="replaceable"><code>pure</code></em>,
+                            <em class="replaceable"><code>sensible</code></em>,
+                            <em class="replaceable"><code>genre</code></em>.
+                            </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: bullet; "><li class="listitem" style="list-style-type: disc"><p><em class="replaceable"><code>pure</code></em>, pure random choice, even among recently played track.
+                                    </p></li><li class="listitem" style="list-style-type: disc"><p><em class="replaceable"><code>sensible</code></em>, use play history to filter chosen tracks.
+                                    </p></li><li class="listitem" style="list-style-type: disc"><p><em class="replaceable"><code>genre</code></em>, Not implemented yet.
+                                    </p></li></ul></div><p>
+                        </p></dd><dt><span class="term"><code class="option">priority=</code><em class="replaceable"><code>50</code></em></span></dt><dd><p>
+                            Plugin priority
+                        </p></dd></div><div class="refsect2"><a name="lastfm"></a><h3>LastFm section</h3><p>LastFM plugin's configuration.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">[lastfm]</code></span></dt><dd></dd><dt><span class="term"><code class="option">queue_mode=</code><em class="replaceable"><code>track</code></em></span></dt><dd><p>Queue mode to use among
+                            <em class="replaceable"><code>track</code></em>,
+                            <em class="replaceable"><code>top</code></em> and
+                            <em class="replaceable"><code>album</code></em> (see <a class="xref" href="#queue_mode" title="QUEUE MODES">the section called &#8220;QUEUE MODES&#8221;</a> for info about queue modes).</p></dd><dt><span class="term"><code class="option">max_art=</code><em class="replaceable"><code>10</code></em></span></dt><dd><p>Number of similar artist to retrieve from local
+                            media library.<br>When set to something superior
+                            to zero, it tries to get as much similar artists
+                            from media library.</p></dd><dt><span class="term"><code class="option">depth=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many artists to base on similar artists
+                            search.<br> The first is the last played artist
+                            and so on back in the history. Highter depth
+                            generates wider suggestions, it might help to
+                            reduce looping over same artists.
+                            </p></dd><dt><span class="term"><code class="option">single_album=</code><em class="replaceable"><code>false</code></em></span></dt><dd><p>Prevent from queueing a track from the same album
+                            (it often happens with OST).<br>
+                            Only relevant in "track" queue mode.</p></dd><dt><span class="term"><code class="option">track_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many track(s) to add. Only relevant in
+                            <code class="option">top</code> and <code class="option">track</code>
+                            queue modes.</p></dd><dt><span class="term"><code class="option">album_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many album(s) to add. Only relevant in
+                            <code class="option">album</code> queue modes.</p></dd><dt><span class="term"><code class="option">cache=</code><em class="replaceable"><code>True</code></em></span></dt><dd><p>Whether or not to use on-disk persistent http
+                            cache.<br>When set to "true", sima will use a
+                            persistent cache for its http client. The cache is
+                            written along with the dbfile in:<br>
+                            <code class="filename">$XDG_CONFIG_HOME/mpd_sima/http/WEB_SERVICE</code>.<br>
+                            If set to "false", caching is still done but in memory.
+                        </p></dd><dt><span class="term"><code class="option">priority=</code><em class="replaceable"><code>100</code></em></span></dt><dd><p>
+                            Plugin priority
+                        </p></dd></dl></div></div></div><div class="refsect1"><a name="queue_mode"></a><h2>QUEUE MODES</h2><p>mpd-sima offers different queue modes. All of them pick up
+            tracks from artists similar to the last track in the queue.</p><p>mpd-sima tries preferably to chose among unplayed artists or
+            at least not recently played artist. Concerning track and album
+            queue modes titles are chosen purely at random among unplayed
+            tracks.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">track</code></span></dt><dd><p>Queue a similar track chosen at random from a similar artist.</p></dd><dt><span class="term"><code class="option">top</code></span></dt><dd><p>Queue a track from a similar artist, chosen among
+                        "top tracks" according to last.fm data mining.</p></dd><dt><span class="term"><code class="option">album</code></span></dt><dd><p>Queue a whole album chosen at random from a similar artist.</p><p><span class="emphasis"><em>Nota Bene:</em></span><br> Due to the
+                        track point of view of database build upon tracks tags
+                        an album lookup for a specific artist will return
+                        albums as soon as this artist appears in a single track
+                        of the album.<br>
+                        For instance looking for album from "The Velvet
+                        Underground" will fetch "Last Days" and "Juno" OSTs
+                        because the band appears on the soundtrack of these two
+                        movies.<br>
+                        A solution is for you to set AlbumArtists tag to
+                        something different than the actual artist of the
+                        track. For compilations, OSTs etc. a strong convention
+                        is to use "Various Artists" for this tag.</p><p>mpd-sima is currently looking for AlbumArtists tags
+                        and avoid album where this tag is set with "Various
+                        Artists". If a single track within an album is found
+                        with AlbumArtists:"Various Artists" the complete album
+                        is skipped and won't be queued.</p></dd></dl></div></div><div class="refsect1"><a name="files"></a><h2>FILES</h2><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="filename">${XDG_CONFIG_HOME}/mpd_sima/mpd_sima.cfg</code></span></dt><dd><p>Configuration file.</p></dd><dt><span class="term"><code class="filename">${XDG_DATA_HOME}/mpd_sima/sima.db</code></span></dt><dd><p>SQLite DB file.</p></dd><dt><span class="term"><code class="filename">${XDG_DATA_HOME}/mpd_sima/WEB_SERVICE/</code></span></dt><dd><p>Persistent http cache.</p></dd></dl></div><p>Usually <code class="envar">XDG_DATA_HOME</code> is set to
+            <code class="filename">${HOME}/.local/share</code> and <code class="envar">XDG_CONFIG_HOME</code> to
+            <code class="filename">${HOME}/.config</code>.<br>You may override them using
+            command line option <code class="option">--var-dir</code> and <code class="option">--config</code> (cf.
+            <span class="citerefentry"><span class="refentrytitle">mpd-sima</span>(1)</span>)</p></div><div class="refsect1"><a name="feedback"></a><h2>FEEDBACK/BUGS</h2><p>The maintainer would be more than happy to ear from you, don't hesitate to send feedback, <a class="ulink" href="http://kaliko.me/id/" target="_top">http://kaliko.me/id/</a>.</p><p><acronym class="acronym">XMPP</acronym> users are welcome to join the dedicated chat room at <a class="ulink" href="kaliko.me@conf.azylum.org" target="_top">kaliko.me@conf.azylum.org</a>.</p></div><div class="refsect1"><a name="see_also"></a><h2>SEE ALSO</h2><p><span class="citerefentry"><span class="refentrytitle">mpc</span>(1)</span>, <span class="citerefentry"><span class="refentrytitle">mpd</span>(1)</span></p><p>
+        <code class="filename">/usr/share/doc/mpd-sima/</code>
+    </p></div></div></body></html>

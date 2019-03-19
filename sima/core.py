@@ -31,6 +31,7 @@ from .lib.simadb import SimaDB
 from .lib.daemon import Daemon
 from .utils.utils import SigHup
 
+
 class Sima(Daemon):
     """Main class, plugin and player management
     """

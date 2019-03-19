@@ -12,7 +12,7 @@ MPD_sima v0.15.0
    Use the boolean option "mopidy_compat" in the sima section
    cf. https://gitlab.com/kaliko/sima/issues/21#
 
--- kaliko jack <kaliko@azylum.org> UNRELEASED
+-- kaliko jack <kaliko@azylum.org> Tue, 19 Mar 2019 13:58:49 +0100
 
 MPD_sima v0.14.4
 
