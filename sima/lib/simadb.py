@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2009-2013 Jack Kaliko <jack@azylum.org>
+# Copyright (c) 2009-2013, 2019 Jack Kaliko <jack@azylum.org>
 # Copyright (c) 2009, Eric Casteleijn <thisfred@gmail.com>
 # Copyright (c) 2008 Rick van Hattem
 #
@@ -85,7 +85,7 @@ class SimaDB(object):
     def get_database_connection(self):
         """get database reference"""
         connection = sqlite3.connect(
-            self._db_path, timeout=5.0, isolation_level="immediate")
+            self._db_path, timeout=5.0, isolation_level=None)
         #connection.text_factory = str
         return connection
 

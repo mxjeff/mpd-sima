@@ -1,6 +1,7 @@
 MPD_sima v0.15.2 UNRELEASED
 
- *
+ * Fixed sqlite sqlite3.OperationalError VACUUM Error
+ cf. https://bugs.python.org/issue28518
 
 -- kaliko jack <kaliko@azylum.org>
 
