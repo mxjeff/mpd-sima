@@ -14,7 +14,7 @@ stages:
   - test
   - build
 
-test:
+smoketest:
   stage: test
   script:
   - pip install pytest-cov requests
@@ -33,10 +33,20 @@ test:
     - dist/*.tar.gz
     - dist/*.zip
 
+vinstall:
+  stage: test
+  script:
+  # test virtualenv install
+  - python3 ./vinstall.py
+  # smoke test
+  - ./vmpd-sima --help
+  artifacts:
+    expire_in: 1 hour
+
 tag_release:
   stage: build
   dependencies:
-    - test
+    - smoketest
   script:
     - python -V
   artifacts:
