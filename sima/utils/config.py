@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015, 2019 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2019 sacha <sachahony@gmail.com>
 #
 #  This file is part of sima
 #
@@ -57,7 +58,7 @@ DEFAULT_CONF = {
             'single_disable_queue': "true",
             'mopidy_compat': "false",
             },
-        'daemon':{
+        'daemon': {
             'daemon': False,
             'pidfile': "",
             },
@@ -70,17 +71,19 @@ DEFAULT_CONF = {
             'priority': 0,
             },
         'lastfm': {
-            'queue_mode': "track", #TODO control values
+            'queue_mode': "track",  # TODO control values
             'max_art': 10,
             'single_album': "false",
             'track_to_add': 1,
             'album_to_add': 1,
+            'shuffle_album': False,
+            'track_to_add_from_album': 0,  # <=0 means keep all
             'depth': 1,
             'cache': True,
             'priority': 100,
             },
         'random': {
-            'flavour': "sensible", # in pure, sensible
+            'flavour': "sensible",  # in pure, sensible
             'track_to_add': 1,
             'priority': 50,
             },

@@ -374,9 +374,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                             <option>top</option> and <option>track</option>
                             queue modes. This is actually an upper limit,
                             min(<option>max_art</option>,
-                            <option>track_to_add</option>) will be used, and
-                            <option>max_art</option> might be inferior lower
-                            than value set in config.</para>
+                            <option>track_to_add</option>) will be used.</para>
                     </listitem>
                 </varlistentry>
                 <varlistentry> <!-- lastfm.album_to_add -->
@@ -384,6 +382,14 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                     <listitem>
                         <para>How many album(s) to add. Only relevant in
                             <option>album</option> queue modes.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry> <!-- lastfm.track_to_add_from_album -->
+                    <term><option>track_to_add_from_album=</option><replaceable>0</replaceable></term>
+                    <listitem>
+                        <para>How many track(s) to add from each selected albums. Only relevant in
+                          <option>album</option> queue modes. When set to 0 or lower the whole album is queued.
+                          </para>
                     </listitem>
                 </varlistentry>
                 <varlistentry> <!-- lastfm.cache -->

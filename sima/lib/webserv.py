@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009-2015 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2019 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2019 sacha <sachahony@gmail.com>
 #
 #  This file is part of sima
 #
@@ -344,7 +345,15 @@ class WebService(Plugin):
                 continue
             self.log.info('%s album candidate: %s - %s', self.ws.name, artist, album_to_queue)
             nb_album_add += 1
-            self.to_add.extend(self.player.find_album(artist, album_to_queue))
+            candidates = self.player.find_album(artist, album_to_queue)
+            if self.plugin_conf.getboolean('shuffle_album'):
+                random.shuffle(candidates)
+            # this allows to select a maximum number of track from the album
+            # a value of 0 (default) means keep all
+            nbtracks = self.plugin_conf.getint('track_to_add_from_album')
+            if nbtracks > 0:
+                candidates = candidates[0:nbtracks]
+            self.to_add.extend(candidates)
             if nb_album_add == target_album_to_add:
                 return True
 
