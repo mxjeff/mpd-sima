@@ -1,3 +1,9 @@
+MPD_sima v0.15.3 UNRELEASED
+
+ * …
+
+-- kaliko jack <kaliko@azylum.org>
+
 MPD_sima v0.15.2
 
  * Fixed sqlite sqlite3.OperationalError VACUUM Error
