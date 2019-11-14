@@ -1,11 +1,11 @@
-MPD_sima v0.15.2 UNRELEASED
+MPD_sima v0.15.2
 
  * Fixed sqlite sqlite3.OperationalError VACUUM Error
  cf. https://bugs.python.org/issue28518
  * Add option to queue a chosen number of tracks from an album (closes #28)
  * Add option to shuffle tracks in album mode (Thanks Sacha)
 
--- kaliko jack <kaliko@azylum.org>
+-- kaliko jack <kaliko@azylum.org> Thu, 14 Nov 2019 17:41:22 +0100
 
 MPD_sima v0.15.1
 
