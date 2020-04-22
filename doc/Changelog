@@ -1,6 +1,6 @@
 MPD_sima v0.15.3 UNRELEASED
 
- * …
+ * Improve HTTP client (use persistent connection)
 
 -- kaliko jack <kaliko@azylum.org>
 

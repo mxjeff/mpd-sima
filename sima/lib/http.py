@@ -280,6 +280,7 @@ class HttpClient:
         """
         self.stats = stats
         self.controller = CacheController(cache)
+        self.sess = Session()
 
     def __call__(self, ress, payload):
         req = Request('GET', ress, params=payload,).prepare()
@@ -301,9 +302,8 @@ class HttpClient:
     @Throttle(WAIT_BETWEEN_REQUESTS)
     def fetch_ws(self, prepreq):
         """fetch from web service"""
-        sess = Session()
-        settings = sess.merge_environment_settings(prepreq.url, {}, None, False, None)
-        resp = sess.send(prepreq, timeout=SOCKET_TIMEOUT, **settings)
+        settings = self.sess.merge_environment_settings(prepreq.url, {}, None, False, None)
+        resp = self.sess.send(prepreq, timeout=SOCKET_TIMEOUT, **settings)
         if resp.status_code == 304:
             self.stats.update(etag=self.stats.get('etag')+1)
             resp = self.controller.update_cached_response(prepreq, resp)
