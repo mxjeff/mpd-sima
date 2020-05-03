@@ -272,23 +272,29 @@ class PlayerClient(Player):
     def search_albums(self, artist):
         """
         Fetch all albums for "AlbumArtist"  == artist
-        Filter albums returned for "artist" == artist since MPD returns any
-               album containing at least a single track for artist
+        Then look for albums for "artist" == artist and try to filters
+        multi-artists albums
+
+        NB: Running "client.list('album', 'artist', name)" MPD returns any album
+            containing at least a track with "artist" == name
+        TODO: Use MusicBrainzID here cf. #30 @gitlab
         """
         albums = []
         for name in artist.names:
-            if len(artist.names) > 1:
+            if artist.aliases:
                 self.log.debug('Searching album for aliase: "%s"', name)
             kwalbart = {'albumartist':name, 'artist':name}
-            for album in self.list('album', 'albumartist', artist):
+            for album in self.list('album', 'albumartist', name):
                 if album and album not in albums:
                     albums.append(Album(name=album, **kwalbart))
-            for album in self.list('album', 'artist', artist):
+            for album in self.list('album', 'artist', name):
                 album_trks = [trk for trk in self.find('album', album)]
                 if 'Various Artists' in [tr.albumartist for tr in album_trks]:
                     self.log.debug('Discarding %s ("Various Artists" set)', album)
                     continue
                 arts = set([trk.artist for trk in album_trks])
+                # Avoid selecting album where artist is credited for a single
+                # track of the album
                 if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
                     if album not in albums:
                         albums.append(Album(name=album, **kwalbart))
