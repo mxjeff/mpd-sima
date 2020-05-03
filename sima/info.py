@@ -12,7 +12,7 @@ short.
 """
 
 
-__version__ = '0.15.3'
+__version__ = '0.15.4'
 __author__ = 'kaliko jack'
 __email__ = 'kaliko@azylum.org'
 __url__ = 'git://git.kaliko.me/sima.git'
