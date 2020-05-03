@@ -1,11 +1,11 @@
-MPD_sima v0.15.3 UNRELEASED
+MPD_sima v0.15.3
 
  * Improve HTTP client (use persistent connection)
  * Fixed a serious bug in PlayerClient().search_albums()
    "search_albums" method was ignoring some albums when Artist object had
    aliases.
 
--- kaliko jack <kaliko@azylum.org>
+-- kaliko jack <kaliko@azylum.org> Sun, 03 May 2020 16:30:36 +0200
 
 MPD_sima v0.15.2
 
