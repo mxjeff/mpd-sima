@@ -108,7 +108,7 @@ class Sima(Daemon):
     def queue(self):
         to_add = list()
         for plugin in self.plugins:
-            self.log.info('running %s', plugin)
+            self.log.info('callback_need_track: %s', plugin)
             pl_candidates = getattr(plugin, 'callback_need_track')()
             if pl_candidates:
                 to_add.extend(pl_candidates)
@@ -177,8 +177,8 @@ class Sima(Daemon):
                 #TODO: unhandled Player exceptions
                 self.log.warning('Unhandled player exception: %s', err)
                 del self.player
-                self.player = PlayerClient()
-                time.sleep(10)
+                self.player = self.__get_player()
+                time.sleep(5)
             except PlayerError as err:
                 self.log.warning('Player error: %s', err)
                 self.reconnect_player()

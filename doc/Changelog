@@ -1,7 +1,7 @@
 MPD_sima v0.15.4 UNRELEASED
 
  * Refactored random plugin
- * …
+ * Fixed bug in MPD client reconnection
 
 -- kaliko jack <kaliko@azylum.org>
 
