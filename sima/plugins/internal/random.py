@@ -33,73 +33,65 @@ from ...lib.meta import Artist
 
 class Random(Plugin):
     """Add random track
-    TODO: refactor, this plugin does not look good to me.
-          callback_need_track_fb/get_trk articulation is not elegant at all
     """
 
     def __init__(self, daemon):
         super().__init__(daemon)
         self.daemon = daemon
-        if not self.plugin_conf:
-            return
         self.mode = self.plugin_conf.get('flavour', None)
         if self.mode not in ['pure', 'sensible']:
             self.log.warning('Bad value for flavour, '
                              '"%s" not in ["pure", "sensible"]', self.mode)
             self.mode = 'pure'
         self.log.debug('Random flavour: %s', self.mode)
+        self.candidates = []
 
     def get_played_artist(self,):
         """Constructs list of already played artists.
         """
         duration = self.daemon.config.getint('sima', 'history_duration')
         tracks_from_db = self.daemon.sdb.get_history(duration=duration)
-        # Construct Track() objects list from database history
         artists = [tr[0] for tr in tracks_from_db]
         return set(artists)
 
-    def callback_need_track(self):
-        trks = list()
-        target = self.plugin_conf.getint('track_to_add')
-        limit = 0
-        while len(trks) < target:
-            trk = self.get_trk()
-            if trk:
-                trks.append(trk)
-            else:
-                limit += 1
-                if limit > 3:
-                    return trks
-        return trks
+    def filtered_artist(self, artist):
+        """Filters artists:
+         * not already queued
 
-    def get_trk(self):
-        """Get a single track according to random flavour
+        If sensible random is set:
+         * not in recent history
+         * not blacklisted
         """
-        trk = None
-        art = None
-        artists = list(self.player.artists)
         if self.mode == 'sensible':
-            played_art = self.get_played_artist()
-            while artists:
-                art = random.choice(artists)
-                if self.daemon.sdb.get_bl_artist(art, add_not=True):
-                    self.log.debug('Random: Blacklisted "%s"', art)
-                    continue
-                if art not in played_art:
-                    break
-                artists.remove(art)
-        elif self.mode == 'pure':
-            art = random.choice(artists)
-        if art is None:
-            return None
-        self.log.debug('Random art: {}'.format(art))
-        trks = self.player.find_track(Artist(art))
-        if trks:
-            trk = random.choice(trks)
-            self.log.info('Random candidate ({}): {}'.format(self.mode, trk))
-        return trk
+            if self.daemon.sdb.get_bl_artist(artist, add_not=True):
+                self.log.debug('Random: Blacklisted "%s"', artist)
+                return True
+            if artist in self.get_played_artist():
+                return True
+        if artist in self.player.queue:
+            return True
+        if artist in self.candidates:
+            return True
+        return False
 
-
+    def callback_need_track(self):
+        self.candidates = []
+        trks = []
+        target = self.plugin_conf.getint('track_to_add')
+        artists = list(self.player.artists)
+        random.shuffle(artists)
+        for art in artists:
+            if self.filtered_artist(art):
+                continue
+            self.log.debug('Random art: {}'.format(art))
+            trks = self.player.find_track(Artist(art))
+            if trks:
+                trk = random.choice(trks)
+                self.candidates.append(trk)
+                self.log.info('Random candidate ({}): {}'.format(self.mode, trk))
+            if len(self.candidates) >= target:
+                break
+        return self.candidates
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
