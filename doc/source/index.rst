@@ -18,7 +18,6 @@ Development documentation
 
    dev/meta
    dev/lastfm
-   dev/echonest
    dev/cache
 
 
