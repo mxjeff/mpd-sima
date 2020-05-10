@@ -233,7 +233,7 @@ class MPD(MPDClient):
         if self._skipped_track(curr):
             ret.append('skipped')
         if 'database' in ret:
-            self._flush_cache()
+            self._reset_cache()
         return ret
 
     def clean(self):
