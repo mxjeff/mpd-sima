@@ -315,28 +315,29 @@ class MPD(MPDClient):
 
     def _find_art(self, artist):
         tracks = set()
-        if artist.mbid:
+        if self.use_mbid and artist.mbid:
             tracks |= set(self.find('musicbrainz_artistid', artist.mbid))
         for name in artist.names:
             tracks |= set(self.find('artist', name))
         return list(tracks)
 
     def _find_alb(self, album):
-        albums = set()
         if album.mbid and self.use_mbid:
             filt = f'(MUSICBRAINZ_ALBUMID == {album.mbid})'
-            albums |= set(self.find(filt))
+            return self.find(filt)
         # Now look for album with no MusicBrainzIdentifier
         if album.artist.mbid and self.use_mbid:  # Use album artist MBID if possible
             filt = f"((MUSICBRAINZ_ALBUMARTISTID == '{album.artist.mbid}') AND (album == '{album!s}'))"
-            albums |= set(self.find(filt))
-        if not albums:  # Falls back to albumartist/album name
-            filt = f"((albumartist == '{album.artist!s}') AND (album == '{album!s}'))"
-            albums |= set(self.find(filt))
-        if not albums:  # Falls back to artist/album name
+            return self.find(filt)
+        tracks = []
+        # Falls back to albumartist/album name
+        filt = f"((albumartist == '{album.artist!s}') AND (album == '{album!s}'))"
+        tracks = self.find(filt)
+        # Falls back to artist/album name
+        if not tracks:
             filt = f"((artist == '{album.artist!s}') AND (album == '{album!s}'))"
-            albums |= set(self.find(filt))
-        return list(albums)
+            tracks = self.find(filt)
+        return tracks
 # #### / find_tracks ##
 
 # #### Search Methods #####
