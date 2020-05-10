@@ -316,21 +316,21 @@ class MPD(MPDClient):
         return list(tracks)
 
     def _find_alb(self, album):
-        albums = set()
-        if album.mbid and self.use_mbid:
+        albums = []
+        if self.use_mbid and album.mbid:
             filt = f'(MUSICBRAINZ_ALBUMID == {album.mbid})'
-            albums |= set(self.find(filt))
+            albums = self.find(filt)
         # Now look for album with no MusicBrainzIdentifier
-        if album.artist.mbid and self.use_mbid:  # Use album artist MBID if possible
+        if not albums and album.artist.mbid and self.use_mbid:  # Use album artist MBID if possible
             filt = f"((MUSICBRAINZ_ALBUMARTISTID == '{album.artist.mbid}') AND (album == '{album!s}'))"
-            albums |= set(self.find(filt))
+            albums = self.find(filt)
         if not albums:  # Falls back to albumartist/album name
             filt = f"((albumartist == '{album.artist!s}') AND (album == '{album!s}'))"
-            albums |= set(self.find(filt))
+            albums = self.find(filt)
         if not albums:  # Falls back to artist/album name
             filt = f"((artist == '{album.artist!s}') AND (album == '{album!s}'))"
-            albums |= set(self.find(filt))
-        return list(albums)
+            albums = self.find(filt)
+        return albums
 # #### / find_tracks ##
 
 # #### Search Methods #####
@@ -345,13 +345,16 @@ class MPD(MPDClient):
 
         Returns an Artist object
         """
+        self.log.trace('Looking for "%r" in library', artist)
         found = False
         if self.use_mbid and artist.mbid:
             # look for exact search w/ musicbrainz_artistid
             exact_m = self.list('artist', f"(MUSICBRAINZ_ARTISTID == '{artist.mbid}')")
             if exact_m:
-                _ = [artist.add_alias(name) for name in exact_m]
                 found = True
+                # Looking for "Esthero" adds "DJ Krush feat. Esthero" to aliases
+                # This seems wrong, disables it for now
+                #_ = [artist.add_alias(name) for name in exact_m]
         # then complete with fuzzy search on artist with no musicbrainz_artistid
         if artist.mbid:
             # we already performed a lookup on artists with mbid set
@@ -438,9 +441,15 @@ class MPD(MPDClient):
                 if album and album not in albums:
                     albums.append(Album(name=album, **kwalbart))
             for album in self.list('album', 'artist', name):
+                if not album:  # list can return "" as an album
+                    continue
                 album_trks = self.find_tracks(Album(name=album, artist=Artist(name=name)))
+                album_artists = [tr.albumartist for tr in album_trks if tr.albumartist]
                 if 'Various Artists' in [tr.albumartist for tr in album_trks]:
                     self.log.debug('Discarding %s ("Various Artists" set)', album)
+                    continue
+                if name not in album_artists:
+                    self.log.debug('Discarding "%s", "%s" not set as albumartist', album, name)
                     continue
                 arts = {trk.artist for trk in album_trks}
                 # Avoid selecting album where artist is credited for a single
