@@ -241,11 +241,11 @@ class WebService(Plugin):
         if not self.player.playlist:
             return []
         tolookfor = self.player.playlist[-1].Artist
-        self.log.info('Looking for artist similar to "{}"'.format(tolookfor))
+        self.log.info('Looking for artist similar to "%s"', tolookfor)
         self.log.debug(repr(tolookfor))
         similar = self.ws_similar_artists(tolookfor)
         if not similar:
-            self.log.info('Got nothing from {0}!'.format(self.ws.name))
+            self.log.info('Got nothing from %s!', self.ws.name)
             return []
         self.log.info('First five similar artist(s): %s...',
                       ' / '.join(map(str, list(similar)[:5])))
@@ -280,15 +280,16 @@ class WebService(Plugin):
             queued_artists = MetaContainer([trk.Artist for trk in self.player.playlist])
         else:
             queued_artists = MetaContainer([trk.Artist for trk in self.player.queue])
-        self.log.trace('Already queued: {}'.format(queued_artists))
-        self.log.trace('Candidate: {}'.format(ret))
+        self.log.trace('Already queued: %s', queued_artists)
+        self.log.trace('Candidate: %s', ret)
         if ret & queued_artists:
             self.log.debug('Removing already queued artists: '
-                           '{0}'.format('/'.join(map(str, ret & queued_artists))))
+                           '%s', '/'.join(map(str, ret & queued_artists)))
             ret = ret - queued_artists
-        if self.player.current and self.player.current.Artist in ret:
-            self.log.debug('Removing current artist: {0}'.format(self.player.current.Artist))
-            ret = ret -  MetaContainer([self.player.current.Artist])
+        current = self.player.current
+        if current and current.Artist in ret:
+            self.log.debug('Removing current artist: %s', current.Artist)
+            ret = ret - MetaContainer([current.Artist])
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         self.log.info('Got {} artists in library'.format(len(ret)))
@@ -343,7 +344,8 @@ class WebService(Plugin):
             if not album_to_queue:
                 self.log.info('No album found for "%s"', artist)
                 continue
-            self.log.info('%s album candidate: %s - %s', self.ws.name, artist, album_to_queue)
+            self.log.info('%s album candidate: %s - %s', self.ws.name,
+                          artist, album_to_queue)
             nb_album_add += 1
             candidates = self.player.find_tracks(Album(name=album_to_queue,
                                                        artist=artist))
