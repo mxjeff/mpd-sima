@@ -249,8 +249,10 @@ class MPD(MPDClient):
         if isinstance(payload, Track):
             super().__getattr__('add')(payload.file)
         elif isinstance(payload, list):
+            self.command_list_ok_begin()
             for tr in payload:  # TODO: use send command here
                 self.add(tr)
+            results = client.command_list_end()
         else:
             self.log.error('Cannot add %s', payload)
 
