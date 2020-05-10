@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015, 2020 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -78,13 +78,13 @@ class Random(Plugin):
         self.candidates = []
         trks = []
         target = self.plugin_conf.getint('track_to_add')
-        artists = list(self.player.artists)
+        artists = self.player.list('artist')
         random.shuffle(artists)
         for art in artists:
             if self.filtered_artist(art):
                 continue
             self.log.debug('Random art: {}'.format(art))
-            trks = self.player.find_track(Artist(art))
+            trks = self.player.find_tracks(Artist(art))
             if trks:
                 trk = random.choice(trks)
                 self.candidates.append(trk)

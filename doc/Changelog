@@ -1,5 +1,6 @@
-MPD_sima v0.15.4 UNRELEASED
+MPD_sima v0.16.0 UNRELEASED
 
+ * Major MPD client refactoring
  * Refactored random plugin
  * Fixed bug in MPD client reconnection
 

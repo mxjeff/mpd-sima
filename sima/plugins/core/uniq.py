@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2014, 2020 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -30,7 +30,7 @@ from socket import getfqdn
 # third parties components
 
 # local import
-from ...client import PlayerError
+from ...mpdclient import PlayerError
 from ...lib.plugin import Plugin
 
 

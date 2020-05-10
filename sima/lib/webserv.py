@@ -33,7 +33,7 @@ from hashlib import md5
 # local import
 from .plugin import Plugin
 from .track import Track
-from .meta import Artist, MetaContainer
+from .meta import Artist, Album, MetaContainer
 from ..utils.utils import WSError, WSNotFound
 
 def cache(func):
@@ -345,7 +345,8 @@ class WebService(Plugin):
                 continue
             self.log.info('%s album candidate: %s - %s', self.ws.name, artist, album_to_queue)
             nb_album_add += 1
-            candidates = self.player.find_album(artist, album_to_queue)
+            candidates = self.player.find_tracks(Album(name=album_to_queue,
+                                                       artist=artist))
             if self.plugin_conf.getboolean('shuffle_album'):
                 random.shuffle(candidates)
             # this allows to select a maximum number of track from the album
@@ -373,7 +374,7 @@ class WebService(Plugin):
             except WSError as err:
                 self.log.warning('%s: %s', self.ws.name, err)
             for trk in titles:
-                found = self.player.fuzzy_find_track(artist, trk.title)
+                found = self.player.search_track(artist, trk.title)
                 random.shuffle(found)
                 if found:
                     self.log.debug('%s', found[0])

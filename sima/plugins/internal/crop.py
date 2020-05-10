@@ -31,7 +31,6 @@ from ...lib.plugin import Plugin
 class Crop(Plugin):
     """
     Crop playlist on next track
-    kinda MPD's consume
     """
     def __init__(self, daemon):
         super().__init__(daemon)
@@ -63,7 +62,7 @@ class Crop(Plugin):
         if player.currentsong().pos > self.target:
             self.log.debug('cropping playlist')
         while player.currentsong().pos > self.target:
-            player.remove()
+            player.delete(0)
 
 
 # VIM MODLINE

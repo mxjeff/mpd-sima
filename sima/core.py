@@ -25,8 +25,8 @@ import time
 from collections import deque
 from logging import getLogger
 
-from .client import PlayerClient
-from .client import PlayerError, PlayerUnHandledError
+from .mpdclient import MPD as PlayerClient
+from .mpdclient import PlayerError, MPDError
 from .lib.simadb import SimaDB
 from .lib.daemon import Daemon
 from .utils.utils import SigHup
@@ -46,15 +46,8 @@ class Sima(Daemon):
         self.log = getLogger('sima')
         self._plugins = list()
         self._core_plugins = list()
-        self.player = self.__get_player()  # Player client
+        self.player = PlayerClient(self)  # Player client
         self.short_history = deque(maxlen=60)
-
-    def __get_player(self):
-        """Instanciate the player"""
-        host = self.config.get('MPD', 'host')
-        port = self.config.get('MPD', 'port')
-        pswd = self.config.get('MPD', 'password', fallback=None)
-        return PlayerClient(host, port, pswd)
 
     def add_history(self):
         """Handle local, in memory, short history"""
@@ -132,7 +125,7 @@ class Sima(Daemon):
             except PlayerError as err:
                 self.log.debug(err)
                 continue
-            except PlayerUnHandledError as err:
+            except MPDError as err:
                 #TODO: unhandled Player exceptions
                 self.log.warning('Unhandled player exception: %s', err)
             self.log.info('Got reconnected')
@@ -164,22 +157,16 @@ class Sima(Daemon):
         """
         """
         try:
-            self.log.info('Connecting MPD: {0}:{1}'.format(*self.player._mpd))
+            self.log.info('Connecting MPD: %(host)s:%(port)s', self.config['MPD'])
             self.player.connect()
             self.foreach_plugin('start')
-        except (PlayerError, PlayerUnHandledError) as err:
+        except (PlayerError, MPDError) as err:
             self.log.warning('Player: %s', err)
             self.reconnect_player()
         while 42:
             try:
                 self.loop()
-            except PlayerUnHandledError as err:
-                #TODO: unhandled Player exceptions
-                self.log.warning('Unhandled player exception: %s', err)
-                del self.player
-                self.player = self.__get_player()
-                time.sleep(5)
-            except PlayerError as err:
+            except (PlayerError, MPDError) as err:
                 self.log.warning('Player error: %s', err)
                 self.reconnect_player()
                 del self.changed
@@ -187,7 +174,7 @@ class Sima(Daemon):
     def loop(self):
         """Dispatching callbacks to plugins
         """
-        # hanging here untill a monitored event is raised in the player
+        # hanging here until a monitored event is raised in the player
         if getattr(self, 'changed', False): # first iteration exception
             self.changed = self.player.monitor()
         else:  # first iteration goes through else
