@@ -317,9 +317,9 @@ class WebService(Plugin):
             albums = self.player.search_albums(artist)
             # str conversion while Album type is not propagated
             albums = [str(album) for album in albums]
-            if albums:
-                self.log.debug('Albums candidate: %s', ' / '.join(albums))
-            else: continue
+            if not albums:
+                continue
+            self.log.debug('Albums candidate: %s', ' / '.join(albums))
             # albums yet in history for this artist
             albums = set(albums)
             albums_yet_in_hist = albums & self._get_album_history(artist=artist)
@@ -387,13 +387,13 @@ class WebService(Plugin):
         """Get some tracks for track queue mode
         """
         artists = self.get_local_similar_artists()
-        nbtracks_target = self.plugin_conf.getint('track_to_add') # pylint: disable=no-member
+        nbtracks_target = self.plugin_conf.getint('track_to_add')  # pylint: disable=no-member
         for artist in artists:
             self.log.debug('Trying to find titles to add for "%r"', artist)
-            found = self.player.find_track(artist)
+            found = self.player.find_tracks(artist)
             random.shuffle(found)
             if not found:
-                self.log.debug('Found nothing to queue for {0}'.format(artist))
+                self.log.debug('Found nothing to queue for %s', artist)
                 continue
             # find tracks not in history for artist
             self.filter_track(found)
@@ -403,7 +403,7 @@ class WebService(Plugin):
             self.log.debug('Found no tracks to queue!')
             return None
         for track in self.to_add:
-            self.log.info('{1} candidates: {0!s}'.format(track, self.ws.name))
+            self.log.info('%s candidates: %s', track, self.ws.name)
 
     def _album(self):
         """Get albums for album queue mode

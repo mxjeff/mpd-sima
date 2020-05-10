@@ -289,14 +289,6 @@ class MPD(MPDClient):
     # ######### / Properties ###################
 
 # #### find_tracks ####
-    def find_album(self, artist, album_name):
-        self.log.warning('update call to find_album→find_tracks(<Album object>)')
-        return self.find_tracks(Album(name=album_name, artist=artist))
-
-    def find_track(self, *args, **kwargs):
-        self.log.warning('update call to find_track→find_tracks')
-        return self.find_tracks(*args, **kwargs)
-
     def find_tracks(self, what):
         """Find tracks for a specific artist or album
             >>> player.find_tracks(Artist('Nirvana'))
@@ -351,12 +343,11 @@ class MPD(MPDClient):
             >>> ['The Beatles', 'Beatles', 'the beatles']
 
         Returns an Artist object
-        TODO: Re-use find method here!!!
         """
         found = False
-        if artist.mbid:
+        if self.use_mbid and artist.mbid:
             # look for exact search w/ musicbrainz_artistid
-            exact_m = self.list('artist', 'musicbrainz_artistid', artist.mbid)
+            exact_m = self.list('artist', f"(MUSICBRAINZ_ARTISTID == '{artist.mbid}')")
             if exact_m:
                 _ = [artist.add_alias(name) for name in exact_m]
                 found = True
@@ -446,7 +437,7 @@ class MPD(MPDClient):
                 if album and album not in albums:
                     albums.append(Album(name=album, **kwalbart))
             for album in self.list('album', 'artist', name):
-                album_trks = [trk for trk in self.find('album', album)]
+                album_trks = self.find_tracks(Album(name=album, artist=Artist(name=name)))
                 if 'Various Artists' in [tr.albumartist for tr in album_trks]:
                     self.log.debug('Discarding %s ("Various Artists" set)', album)
                     continue
