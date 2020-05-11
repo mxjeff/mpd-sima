@@ -312,23 +312,23 @@ class MPD(MPDClient):
         tracks = set()
         if artist.mbid:
             tracks |= set(self.find('musicbrainz_artistid', artist.mbid))
-        for name in artist.names:
+        for name in artist.names_sz:
             tracks |= set(self.find('artist', name))
         return list(tracks)
 
     def _find_alb(self, album):
         if not hasattr(album, 'artist'):
-            PlayerError('Album object have no artist attribute')
+            raise PlayerError('Album object have no artist attribute')
         albums = []
         if self.use_mbid and album.mbid:
             filt = f'(MUSICBRAINZ_ALBUMID == {album.mbid})'
             albums = self.find(filt)
         # Now look for album with no MusicBrainzIdentifier
         if not albums and album.artist.mbid and self.use_mbid:  # Use album artist MBID if possible
-            filt = f"((MUSICBRAINZ_ARTISTID == '{album.artist.mbid}') AND (album == '{album!s}'))"
+            filt = f"((MUSICBRAINZ_ARTISTID == '{album.artist.mbid}') AND (album == '{album.name_sz}'))"
             albums = self.find(filt)
         if not albums:  # Falls back to (album)?artist/album name
-            filt = f"((albumartist == '{album.artist!s}') AND (album == '{album!s}'))"
+            filt = f"((albumartist == '{album.artist!s}') AND (album == '{album.name_sz}'))"
             albums = self.find(filt)
         return albums
 # #### / find_tracks ##
@@ -429,7 +429,7 @@ class MPD(MPDClient):
         TODO: Use MusicBrainzID here cf. #30 @gitlab
         """
         albums = []
-        for name in artist.names:
+        for name in artist.names_sz:
             if artist.aliases:
                 self.log.debug('Searching album for aliase: "%s"', name)
             kwalbart = {'albumartist': name, 'artist': name}
