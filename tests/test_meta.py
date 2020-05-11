@@ -2,7 +2,7 @@
 
 import unittest
 
-from sima.lib.meta import Meta, Artist, MetaContainer, is_uuid4
+from sima.lib.meta import Meta, Artist, Album, MetaContainer, is_uuid4
 from sima.lib.meta import MetaException, SEPARATOR
 
 VALID = '110e8100-e29b-41d1-a716-116655250000'
@@ -101,6 +101,22 @@ class TestMetaObject(unittest.TestCase):
         # Testing name/None == name/None
         art10._Meta__mbid = None
         self.assertTrue(art01 == art10, 'wrong: %r != %r' % (art00, art01))
+
+    def test_mpd_serialization(self):
+        """Controls serialization of names"""
+        name = "Heaven's Door"
+        heavens_door = Meta(name=name)
+        target = r"Heaven\'s Door"
+        self.assertEqual(heavens_door.name_sz, target)
+        self.assertEqual(heavens_door.name, name)
+        self.assertEqual(heavens_door.names_sz, {target})
+        heavens_door.add_alias(name+" LP")
+        self.assertEqual(heavens_door.aliases_sz, {target+" LP"})
+        # Controls inheritance
+        heavens_door = Album(name=name)
+        self.assertEqual(heavens_door.name_sz, target)
+        heavens_door = Artist(name=name)
+        self.assertEqual(heavens_door.name_sz, target)
 
 
 class TestArtistObject(unittest.TestCase):

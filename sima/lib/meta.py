@@ -58,6 +58,14 @@ def mbidfilter(func):
         func(*args, **kwargs)
     return wrapper
 
+def serialize(func):
+    def wrapper(*args, **kwargs):
+        ans = func(*args, **kwargs)
+        if isinstance(ans, set):
+            return {s.replace("'", r"\'") for s in ans}
+        return ans.replace("'", r"\'")
+    return wrapper
+
 
 class Meta:
     """
@@ -77,7 +85,7 @@ class Meta:
 
     def __init__(self, **kwargs):
         """Meta(name=<str>[, mbid=UUID4])"""
-        self.__name = None #TODO: should be immutable
+        self.__name = None  # TODO: should be immutable
         self.__mbid = None
         self.__aliases = set()
         self.log = logging.getLogger(__name__)
@@ -143,6 +151,11 @@ class Meta:
         return self.__name
 
     @property
+    @serialize
+    def name_sz(self):
+        return self.name
+
+    @property
     def mbid(self):
         return self.__mbid
 
@@ -151,17 +164,32 @@ class Meta:
         return self.__aliases
 
     @property
+    @serialize
+    def aliases_sz(self):
+        return self.aliases
+
+    @property
     def names(self):
         """aliases + name"""
         return self.__aliases | {self.__name,}
+
+    @property
+    @serialize
+    def names_sz(self):
+        return self.names
 
 
 class Album(Meta):
     """Album object"""
 
+    @mbidfilter
+    def __init__(self, name=None, mbid=None, **kwargs):
+        super().__init__(name=name, mbid=mbid, **kwargs)
+
     @property
     def album(self):
         return self.name
+
 
 class Artist(Meta):
     """Artist object deriving from :class:`Meta`.
