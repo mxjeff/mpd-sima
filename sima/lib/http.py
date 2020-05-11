@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014-2015 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2014-2015, 2020 kaliko <kaliko@azylum.org>
 # Copyright (c) 2012, 2013 Eric Larson <eric@ionrock.org>
 #
 #   This program is free software: you can redistribute it and/or modify

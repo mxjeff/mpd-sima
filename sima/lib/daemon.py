@@ -4,7 +4,7 @@
 # Copyright 2007, 2009 Sander Marechal <s.marechal@jejik.com>
 # http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/
 #
-# Copyright 2010, 2011 Jack Kaliko <efrim@azylum.org>
+# Copyright 2010, 2011 kaliko <kaliko@azylum.org>
 # https://gitorious.org/python-daemon
 #
 #  This file is part of MPD_sima

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009, 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2015, 2020 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #

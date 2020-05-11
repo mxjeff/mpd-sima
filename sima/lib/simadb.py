@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2009-2013, 2019 Jack Kaliko <jack@azylum.org>
+# Copyright (c) 2009-2013, 2019 kaliko <kaliko@azylum.org>
 # Copyright (c) 2009, Eric Casteleijn <thisfred@gmail.com>
 # Copyright (c) 2008 Rick van Hattem
 #

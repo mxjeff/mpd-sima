@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2009, 2010, 2013 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2013 kaliko <kaliko@azylum.org>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as
