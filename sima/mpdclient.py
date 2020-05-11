@@ -442,7 +442,7 @@ class MPD(MPDClient):
                 if 'Various Artists' in [tr.albumartist for tr in album_trks]:
                     self.log.debug('Discarding %s ("Various Artists" set)', album)
                     continue
-                if name not in album_artists:
+                if album_artists and name not in album_artists:
                     self.log.debug('Discarding "%s", "%s" not set as albumartist', album, name)
                     continue
                 arts = {trk.artist for trk in album_trks}
