@@ -205,7 +205,8 @@ class MPD(MPDClient):
                        'nombid_artists': frozenset()}
         self._cache['artists'] = frozenset(filter(None, self.list('artist')))
         if Artist.use_mbid:
-            self._cache['nombid_artists'] = frozenset(filter(None, self.list('artist', 'musicbrainz_artistid', '')))
+            artists = self.list('artist', "(MUSICBRAINZ_ARTISTID == '')")
+            self._cache['nombid_artists'] = frozenset(filter(None, artists))
 
     def _skipped_track(self, previous):
         if (self.state == 'stop'
@@ -316,19 +317,18 @@ class MPD(MPDClient):
         return list(tracks)
 
     def _find_alb(self, album):
+        if not hasattr(album, 'artist'):
+            PlayerError('Album object have no artist attribute')
         albums = []
         if self.use_mbid and album.mbid:
             filt = f'(MUSICBRAINZ_ALBUMID == {album.mbid})'
             albums = self.find(filt)
         # Now look for album with no MusicBrainzIdentifier
         if not albums and album.artist.mbid and self.use_mbid:  # Use album artist MBID if possible
-            filt = f"((MUSICBRAINZ_ALBUMARTISTID == '{album.artist.mbid}') AND (album == '{album!s}'))"
+            filt = f"((MUSICBRAINZ_ARTISTID == '{album.artist.mbid}') AND (album == '{album!s}'))"
             albums = self.find(filt)
-        if not albums:  # Falls back to albumartist/album name
+        if not albums:  # Falls back to (album)?artist/album name
             filt = f"((albumartist == '{album.artist!s}') AND (album == '{album!s}'))"
-            albums = self.find(filt)
-        if not albums:  # Falls back to artist/album name
-            filt = f"((artist == '{album.artist!s}') AND (album == '{album!s}'))"
             albums = self.find(filt)
         return albums
 # #### / find_tracks ##
@@ -343,58 +343,54 @@ class MPD(MPDClient):
             >>> print(bea.names)
             >>> ['The Beatles', 'Beatles', 'the beatles']
 
+        :param Artist artist: Artist to look for in MPD music library
+
         Returns an Artist object
         """
-        self.log.trace('Looking for "%r" in library', artist)
         found = False
         if self.use_mbid and artist.mbid:
             # look for exact search w/ musicbrainz_artistid
-            exact_m = self.list('artist', f"(MUSICBRAINZ_ARTISTID == '{artist.mbid}')")
-            if exact_m:
-                found = True
-                # Looking for "Esthero" adds "DJ Krush feat. Esthero" to aliases
-                # This seems wrong, disables it for now
-                #_ = [artist.add_alias(name) for name in exact_m]
-        # then complete with fuzzy search on artist with no musicbrainz_artistid
-        if artist.mbid:
-            # we already performed a lookup on artists with mbid set
-            # search through remaining artists
-            artists = self._cache.get('nombid_artists')
-        else:
-            artists = self._cache.get('artists')
+            found = bool(self.list('artist', f"(MUSICBRAINZ_ARTISTID == '{artist.mbid}')"))
+            if found:
+                self.log.trace('Found mbid "%r" in library', artist)
+            # Fetches remaining artists for potential match
+            artists = self._cache['nombid_artists']
+        else:  # not using MusicBrainzIDs
+            artists = self._cache['artists']
         match = get_close_matches(artist.name, artists, 50, 0.73)
         if not match and not found:
             return None
         if len(match) > 1:
             self.log.debug('found close match for "%s": %s', artist, '/'.join(match))
+        # Forst lowercased comparison
+        for close_art in match:
+            # Regular lowered string comparison
+            if artist.name.lower() == close_art.lower():
+                artist.add_alias(close_art)
+                found = True
+                if artist.name != close_art:
+                    self.log.debug('"%s" matches "%s".', close_art, artist)
         # Does not perform fuzzy matching on short and single word strings
         # Only lowercased comparison
         if ' ' not in artist.name and len(artist.name) < 8:
-            for close_art in match:
-                # Regular lowered string comparison
-                if artist.name.lower() == close_art.lower():
-                    artist.add_alias(close_art)
-                    return artist
-                else:
-                    return None
-        for fuzz_art in match:
-            # Regular lowered string comparison
-            if artist.name.lower() == fuzz_art.lower():
-                found = True
-                artist.add_alias(fuzz_art)
-                if artist.name != fuzz_art:
-                    self.log.debug('"%s" matches "%s".', fuzz_art, artist)
+            self.log.trace('no fuzzy matching for %r', artist)
+            if found:
+                return artist
+        # Now perform fuzzy search
+        for fuzz in match:
+            if fuzz in artist.names:  # Already found in lower cased comparison
                 continue
             # SimaStr string __eq__ (not regular string comparison here)
-            if SimaStr(artist.name) == fuzz_art:
+            if SimaStr(artist.name) == fuzz:
                 found = True
-                artist.add_alias(fuzz_art)
+                artist.add_alias(fuzz)
                 self.log.info('"%s" quite probably matches "%s" (SimaStr)',
-                              fuzz_art, artist)
+                              fuzz, artist)
         if found:
             if artist.aliases:
                 self.log.debug('Found: %s', '/'.join(list(artist.names)[:4]))
             return artist
+        return None
 
     @blacklist(track=True)
     def search_track(self, artist, title):
@@ -437,10 +433,8 @@ class MPD(MPDClient):
             if artist.aliases:
                 self.log.debug('Searching album for aliase: "%s"', name)
             kwalbart = {'albumartist': name, 'artist': name}
-            for album in self.list('album', 'albumartist', name):
-                if album and album not in albums:
-                    albums.append(Album(name=album, **kwalbart))
-            for album in self.list('album', 'artist', name):
+            # MPD falls back to artist if albumartist is not available
+            for album in self.list('album', f"( albumartist == '{name}')"):
                 if not album:  # list can return "" as an album
                     continue
                 album_trks = self.find_tracks(Album(name=album, artist=Artist(name=name)))
@@ -457,7 +451,7 @@ class MPD(MPDClient):
                 if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
                     if album not in albums:
                         albums.append(Album(name=album, **kwalbart))
-                elif album and album not in albums:
+                elif album not in albums:
                     self.log.debug('"{0}" probably not an album of "{1}"'.format(
                         album, artist) + '({0})'.format('/'.join(arts)))
         return albums
