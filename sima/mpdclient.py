@@ -92,7 +92,7 @@ def blacklist(artist=False, album=False, track=False):
                 if track and cls.database.get_bl_album(elem, add_not=True):
                     # filter album as well in track mode
                     # (artist have already been)
-                    cls.log.debug('Blacklisted alb. "{0.album}"'.format(elem))
+                    cls.log.debug('Blacklisted alb. "%s"', elem)
                     continue
                 results.append(elem)
             return results
@@ -251,9 +251,9 @@ class MPD(MPDClient):
             super().__getattr__('add')(payload.file)
         elif isinstance(payload, list):
             self.command_list_ok_begin()
-            for tr in payload:  # TODO: use send command here
+            for tr in payload:
                 self.add(tr)
-            results = client.command_list_end()
+            self.command_list_end()
         else:
             self.log.error('Cannot add %s', payload)
 
@@ -388,7 +388,7 @@ class MPD(MPDClient):
                               fuzz, artist)
         if found:
             if artist.aliases:
-                self.log.debug('Found: %s', '/'.join(list(artist.names)[:4]))
+                self.log.debug('Found aliases: %s', '/'.join(artist.names))
             return artist
         return None
 
