@@ -325,7 +325,7 @@ class MPD(MPDClient):
             albums = self.find(filt)
         # Now look for album with no MusicBrainzIdentifier
         if not albums and album.artist.mbid and self.use_mbid:  # Use album artist MBID if possible
-            filt = f"((MUSICBRAINZ_ARTISTID == '{album.artist.mbid}') AND (album == '{album.name_sz}'))"
+            filt = f"((MUSICBRAINZ_ALBUMARTISTID == '{album.artist.mbid}') AND (album == '{album.name_sz}'))"
             albums = self.find(filt)
         if not albums:  # Falls back to (album)?artist/album name
             filt = f"((albumartist == '{album.artist!s}') AND (album == '{album.name_sz}'))"
@@ -419,42 +419,49 @@ class MPD(MPDClient):
 
     @blacklist(album=True)
     def search_albums(self, artist):
-        """
-        Fetch all albums for "AlbumArtist"  == artist
-        Then look for albums for "artist" == artist and try to filters
-        multi-artists albums
+        """Find potential albums for "artist"
 
-        NB: Running "client.list('album', 'artist', name)" MPD returns any album
-            containing at least a track with "artist" == name
-        TODO: Use MusicBrainzID here cf. #30 @gitlab
+        * Fetch all albums for "AlbumArtist" == artist
+          → falls back to "Artist" == artist when no "AlbumArtist" tag is set
+        * Tries to filter some mutli-artists album
+          For instance an album by Artist_A may have a track by Artist_B. Then
+          looking for albums for Artist_B returns wrongly this album.
         """
-        albums = []
-        for name in artist.names_sz:
-            if artist.aliases:
-                self.log.debug('Searching album for aliase: "%s"', name)
-            kwalbart = {'albumartist': name, 'artist': name}
-            # MPD falls back to artist if albumartist is not available
-            for album in self.list('album', f"( albumartist == '{name}')"):
-                if not album:  # list can return "" as an album
-                    continue
-                album_trks = self.find_tracks(Album(name=album, artist=Artist(name=name)))
-                album_artists = [tr.albumartist for tr in album_trks if tr.albumartist]
-                if 'Various Artists' in [tr.albumartist for tr in album_trks]:
-                    self.log.debug('Discarding %s ("Various Artists" set)', album)
-                    continue
-                if album_artists and name not in album_artists:
-                    self.log.debug('Discarding "%s", "%s" not set as albumartist', album, name)
-                    continue
-                arts = {trk.artist for trk in album_trks}
-                # Avoid selecting album where artist is credited for a single
-                # track of the album
-                if len(set(arts)) < 2:  # TODO: better heuristic, use a ratio instead
-                    if album not in albums:
-                        albums.append(Album(name=album, **kwalbart))
-                elif album not in albums:
-                    self.log.debug('"{0}" probably not an album of "{1}"'.format(
-                        album, artist) + '({0})'.format('/'.join(arts)))
-        return albums
+        # First, look for all potential albums
+        self.log.debug('Searching album for "%s"', artist)
+        if artist.aliases:
+            self.log.debug('Searching album for %s aliases: "%s"',
+                           artist, artist.aliases)
+        for name_sz in artist.names_sz:
+            raw_albums = self.list('album', f"( albumartist == '{name_sz}')")
+            albums = [Album(a, albumartist=artist.name, artist=artist) for a in raw_albums if a]
+        candidates = []
+        for album in albums:
+            album_trks = self.find_tracks(album)
+            album_artists = {tr.albumartist for tr in album_trks if tr.albumartist}
+            if album.artist.names & album_artists:
+                candidates.append(album)
+                continue
+            if 'Various Artists' in album_artists:
+                self.log.debug('Discarding %s ("Various Artists" set)', album)
+                continue
+            if album_artists and album.artist.name not in album_artists:
+                self.log.debug('Discarding "%s", "%s" not set as albumartist', album, album.artist)
+                continue
+            # Attempt to detect false positive
+            # Avoid selecting albums where artist is credited for a single
+            # track of the album
+            album_trks = self.find(f"(album == '{album.name_sz}')")
+            arts = [trk.artist for trk in album_trks]  # Artists in the album
+            # count artist occurences
+            ratio = arts.count(album.artist.name)/len(arts)
+            if ratio >= 0.8:
+                candidates.append(album)
+            else:
+                self.log.debug('"%s" probably not an album of "%s" (ratio=%.2f)',
+                               album, artist, ratio)
+            continue
+        return candidates
 # #### / Search Methods ###
 
 # VIM MODLINE

@@ -33,7 +33,7 @@ from hashlib import md5
 # local import
 from .plugin import Plugin
 from .track import Track
-from .meta import Artist, Album, MetaContainer
+from .meta import Artist, MetaContainer
 from ..utils.utils import WSError, WSNotFound
 
 def cache(func):
@@ -298,7 +298,7 @@ class WebService(Plugin):
             self.log.info(' / '.join(map(str, candidates)))
         return candidates
 
-    def _get_album_history(self, artist=None):
+    def _get_album_history(self, artist):
         """Retrieve album history"""
         duration = self.daemon_conf.getint('sima', 'history_duration')
         albums_list = set()
@@ -311,24 +311,20 @@ class WebService(Plugin):
         """
         self.to_add = list()
         nb_album_add = 0
-        target_album_to_add = self.plugin_conf.getint('album_to_add') # pylint: disable=no-member
+        target_album_to_add = self.plugin_conf.getint('album_to_add')  # pylint: disable=no-member
         for artist in artists:
             self.log.info('Looking for an album to add for "%s"...' % artist)
             albums = self.player.search_albums(artist)
-            # str conversion while Album type is not propagated
-            albums = [str(album) for album in albums]
             if not albums:
                 continue
-            self.log.debug('Albums candidate: %s', ' / '.join(albums))
-            # albums yet in history for this artist
-            albums = set(albums)
-            albums_yet_in_hist = albums & self._get_album_history(artist=artist)
-            albums_not_in_hist = list(albums - albums_yet_in_hist)
+            self.log.debug('Albums candidate: %s', albums)
+            albums_hist = self._get_album_history(artist)
+            albums_not_in_hist = [a for a in albums if a.name not in albums_hist]
             # Get to next artist if there are no unplayed albums
             if not albums_not_in_hist:
                 self.log.info('No unplayed album found for "%s"' % artist)
                 continue
-            album_to_queue = str()
+            album_to_queue = []
             random.shuffle(albums_not_in_hist)
             for album in albums_not_in_hist:
                 # Controls the album found is not already queued
@@ -347,8 +343,7 @@ class WebService(Plugin):
             self.log.info('%s album candidate: %s - %s', self.ws.name,
                           artist, album_to_queue)
             nb_album_add += 1
-            candidates = self.player.find_tracks(Album(name=album_to_queue,
-                                                       artist=artist))
+            candidates = self.player.find_tracks(album)
             if self.plugin_conf.getboolean('shuffle_album'):
                 random.shuffle(candidates)
             # this allows to select a maximum number of track from the album
