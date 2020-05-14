@@ -34,7 +34,6 @@ from os.path import isfile
 # local import
 from . import core, info
 from .lib.logger import set_logger
-from .lib.meta import Meta
 from .lib.simadb import SimaDB
 from .utils.config import ConfMan
 from .utils.startopt import StartOpt
@@ -121,11 +120,7 @@ def start(sopt, restart=False):
 
     #  Loading contrib plugins
     load_plugins(sima, 'contrib')
-    logger.info('plugins loaded, prioriy: {}'.format(' > '.join(map(str, sima.plugins))))
-    #  Set use of MusicBrainzIdentifier
-    if not config.getboolean('sima', 'musicbrainzid'):
-        logger.info('Disabling MusicBrainzIdentifier')
-        Meta.use_mbid = False
+    logger.info('plugins loaded, prioriy: %s', ' > '.join(map(str, sima.plugins)))
 
     # Run as a daemon
     if config.getboolean('daemon', 'daemon'):

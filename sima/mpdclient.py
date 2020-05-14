@@ -26,7 +26,7 @@ from musicpd import MPDClient, MPDError
 
 
 # local import
-from .lib.meta import Artist, Album
+from .lib.meta import Meta, Artist, Album
 from .lib.track import Track
 from .lib.simastr import SimaStr
 from .utils.leven import levenshtein_ratio
@@ -115,6 +115,10 @@ class MPD(MPDClient):
     """
     needed_cmds = ['status', 'stats', 'add', 'find',
                    'search', 'currentsong', 'ping']
+    needed_mbid_tags = {'Artist', 'Album', 'AlbumArtist',
+                        'Title', 'Track', 'Genre',
+                        'MUSICBRAINZ_ARTISTID', 'MUSICBRAINZ_ALBUMID',
+                        'MUSICBRAINZ_ALBUMARTISTID', 'MUSICBRAINZ_TRACKID'}
     database = None
 
     def __init__(self, daemon):
@@ -176,20 +180,24 @@ class MPD(MPDClient):
                                   'but command "%s" not available' %
                                   (host, cmd))
         # Controls use of MusicBrainzIdentifier
-        # TODO: Use config instead of Artist object attibute?
-        if self.use_mbid:
-            tt = self.tagtypes()
-            if 'MUSICBRAINZ_ARTISTID' not in tt:
-                self.log.warning('Use of MusicBrainzIdentifier is set but MPD is '
-                                 'not providing related metadata')
+        self.tagtypes('clear')
+        for tag in MPD.needed_mbid_tags:
+            self.tagtypes('enable', tag)
+        if self.daemon.config.get('sima', 'musicbrainzid'):
+            tt = set(self.tagtypes())
+            if len(MPD.needed_mbid_tags & tt) != len(MPD.needed_mbid_tags):
+                self.log.warning('Use of MusicBrainzIdentifier is set but MPD '
+                                 'is not providing related metadata')
                 self.log.info(tt)
                 self.log.warning('Disabling MusicBrainzIdentifier')
-                self.use_mbid = False
+                self.use_mbid = Meta.use_mbid = False
             else:
-                self.log.debug('Available metadata: %s', tt)  # pylint: disable=no-member
+                self.log.debug('Available metadata: %s', tt)
+                self.use_mbid = Meta.use_mbid = True
         else:
             self.log.warning('Use of MusicBrainzIdentifier disabled!')
             self.log.info('Consider using MusicBrainzIdentifier for your music library')
+            self.use_mbid = Meta.use_mbid = False
         self._reset_cache()
     # ######### / Overriding MPDClient #########
 
