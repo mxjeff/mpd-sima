@@ -44,7 +44,7 @@ def bl_artist(func):
             return func(*args, **kwargs)
         result = func(*args, **kwargs)
         if not result:
-            return
+            return None
         names = list()
         for art in result.names:
             if cls.database.get_bl_artist(art, add_not=True):
@@ -52,27 +52,32 @@ def bl_artist(func):
                 continue
             names.append(art)
         if not names:
-            return
+            return None
         resp = Artist(name=names.pop(), mbid=result.mbid)
         for name in names:
             resp.add_alias(name)
         return resp
     return wrapper
 
+
 def tracks_wrapper(func):
+    """Convert plain track mapping as returned by MPDClient into :py:obj:Track
+    objects. This decorator accepts single track or list of tracks as input.
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         ret = func(*args, **kwargs)
         if isinstance(ret, dict):
             return Track(**ret)
-        elif isinstance(ret, list):
-            return [Track(**t) for t in ret]
+        return [Track(**t) for t in ret]
     return wrapper
 # / decorators
 
+
 def blacklist(artist=False, album=False, track=False):
-    #pylint: disable=C0111,W0212
+    # pylint: disable=C0111,W0212
     field = (album, track)
+
     def decorated(func):
         def wrapper(*args, **kwargs):
             if not args[0].database:
@@ -110,7 +115,8 @@ class MPD(MPDClient):
 
     .. note::
 
-        * find methods are looking for exact match of the object provided attributes in MPD music library
+        * find methods are looking for exact match of the object provided
+          attributes in MPD music library
         * search methods are looking for exact match + fuzzy match.
     """
     needed_cmds = ['status', 'stats', 'add', 'find',
@@ -132,11 +138,7 @@ class MPD(MPDClient):
     # ######### Overriding MPDClient ###########
     def __getattr__(self, cmd):
         """Wrapper around MPDClient calls for abstract overriding"""
-        track_wrapped = {
-                         'currentsong',
-                         'find',
-                         'playlistinfo',
-                         }
+        track_wrapped = {'currentsong', 'find', 'playlistinfo', }
         if cmd in track_wrapped:
             return tracks_wrapper(super().__getattr__(cmd))
         return super().__getattr__(cmd)
@@ -170,7 +172,7 @@ class MPD(MPDClient):
             try:
                 self.password(password)
             except (MPDError, IOError) as err:
-                raise PlayerError("Could not connect to '%s': %s", (host, err))
+                raise PlayerError("Could not connect to '%s': %s" % (host, err))
         # Controls we have sufficient rights
         available_cmd = self.commands()
         for cmd in MPD.needed_cmds:
@@ -259,8 +261,7 @@ class MPD(MPDClient):
             super().__getattr__('add')(payload.file)
         elif isinstance(payload, list):
             self.command_list_ok_begin()
-            for tr in payload:
-                self.add(tr)
+            map(self.add, payload)
             self.command_list_end()
         else:
             self.log.error('Cannot add %s', payload)
@@ -311,10 +312,11 @@ class MPD(MPDClient):
         """
         if isinstance(what, Artist):
             return self._find_art(what)
-        elif isinstance(what, Album):
+        if isinstance(what, Album):
             return self._find_alb(what)
-        elif isinstance(what, str):
+        if isinstance(what, str):
             return self.find_tracks(Artist(name=what))
+        raise PlayerError('Bad input argument')
 
     def _find_art(self, artist):
         tracks = set()
@@ -347,7 +349,7 @@ class MPD(MPDClient):
         """
         Search artists based on a fuzzy search in the media library
             >>> art = Artist(name='the beatles', mbid=<UUID4>) # mbid optional
-            >>> bea = player.search_artist(art)c
+            >>> bea = player.search_artist(art)
             >>> print(bea.names)
             >>> ['The Beatles', 'Beatles', 'the beatles']
 

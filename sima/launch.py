@@ -111,9 +111,9 @@ def start(sopt, restart=False):
         core_plugins = [History, MpdOptions]
         config['sima']['musicbrainzid'] = 'False'
     for cplgn in core_plugins:
-        logger.debug('Register core {name} ({doc})'.format(**cplgn.info()))
+        logger.debug('Register core %(name)s (%(doc)s)', cplgn.info())
         sima.register_core_plugin(cplgn)
-    logger.debug('core loaded, prioriy: {}'.format(' > '.join(map(str, sima.core_plugins))))
+    logger.debug('core loaded, prioriy: %s', ' > '.join(map(str, sima.core_plugins)))
 
     #  Loading internal plugins
     load_plugins(sima, 'internal')
