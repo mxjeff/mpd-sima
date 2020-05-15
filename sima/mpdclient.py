@@ -421,20 +421,21 @@ class MPD(MPDClient):
         all_artist_titles = frozenset([tr.title for tr in all_tracks
                                        if tr.title is not None])
         match = get_close_matches(title, all_artist_titles, 50, 0.78)
+        tracks = []
         if not match:
             return []
         for mtitle in match:
-            leven = levenshtein_ratio(title.lower(), mtitle.lower())
+            leven = levenshtein_ratio(title, mtitle)
             if leven == 1:
-                pass
-            elif leven >= 0.79:  # PARAM
+                tracks.extend([t for t in all_tracks if t.title == mtitle])
+            elif leven >= 0.77:
                 self.log.debug('title: "%s" should match "%s" (lr=%1.3f)',
                                mtitle, title, leven)
+                tracks.extend([t for t in all_tracks if t.title == mtitle])
             else:
                 self.log.debug('title: "%s" does not match "%s" (lr=%1.3f)',
                                mtitle, title, leven)
-                return []
-            return self.find('artist', artist, 'title', mtitle)
+        return tracks
 
     @blacklist(album=True)
     def search_albums(self, artist):
