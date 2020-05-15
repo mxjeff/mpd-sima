@@ -16,11 +16,10 @@ Development documentation
    :maxdepth: 2
    :titlesonly:
 
+   dev/mpdclient
    dev/meta
    dev/lastfm
    dev/cache
-
-
 
 
 Indices and tables
