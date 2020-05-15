@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009-2015, 2019 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2015, 2019-2020 kaliko <kaliko@azylum.org>
 # Copyright (c) 2019 sacha <sachahony@gmail.com>
 #
 #  This file is part of sima
@@ -130,7 +130,7 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         # Create directories
         data_dir = self.config['sima']['var_dir']
         if not isdir(data_dir):
-            self.log.trace('Creating "{}"'.format(data_dir))
+            self.log.trace('Creating "%s"', data_dir)
             makedirs(data_dir)
             chmod(data_dir, 0o700)
 

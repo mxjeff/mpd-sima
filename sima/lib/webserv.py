@@ -71,7 +71,7 @@ class WebService(Plugin):
         self._flush_cache()
         wrapper = {'track': self._track,
                    'top': self._top,
-                   'album': self._album,}
+                   'album': self._album}
         self.queue_mode = wrapper.get(self.plugin_conf.get('queue_mode'))
         self.ws = None
 
@@ -81,11 +81,11 @@ class WebService(Plugin):
         """
         name = self.__class__.__name__
         if isinstance(self._cache, dict):
-            self.log.info('{0}: Flushing cache!'.format(name))
+            self.log.info('%s: Flushing cache!', name)
         else:
-            self.log.info('{0}: Initialising cache!'.format(name))
+            self.log.info('%s: Initialising cache!', name)
         self._cache = {'asearch': dict(),
-                       'tsearch': dict(),}
+                       'tsearch': dict()}
 
     def _cleanup_cache(self):
         """Avoid bloated cache
@@ -111,6 +111,7 @@ class WebService(Plugin):
             * not in history
             * not already in the queue
             * not blacklisted
+        Then add to candidates in self.to_add
         """
         artist = tracks[0].artist
         # In random play mode use complete playlist to filter
@@ -125,7 +126,7 @@ class WebService(Plugin):
         candidate = []
         for trk in [_ for _ in not_in_hist if _ not in black_list]:
             # Should use albumartist heuristic as well
-            if self.plugin_conf.getboolean('single_album'): # pylint: disable=no-member
+            if self.plugin_conf.getboolean('single_album'):  # pylint: disable=no-member
                 if (trk.album == self.player.current.album or
                         trk.album in [tr.album for tr in black_list]):
                     self.log.debug('Found unplayed track ' +
@@ -177,21 +178,21 @@ class WebService(Plugin):
         # initialize artists deque list to construct from DB
         as_art = deque()
         as_artists = self.ws.get_similar(artist=artist)
-        self.log.debug('Requesting {} for {!r}'.format(self.ws.name, artist))
+        self.log.debug('Requesting %s for %r', self.ws.name, artist)
         try:
             [as_art.append(art) for art in as_artists]
         except WSNotFound as err:
-            self.log.warning('{}: {}'.format(self.ws.name, err))
+            self.log.warning('%s: %s', self.ws.name, err)
             if artist.mbid:
                 self.log.debug('Trying without MusicBrainzID')
                 try:
                     return self.ws_similar_artists(Artist(name=artist.name))
                 except WSNotFound as err:
-                    self.log.debug('{}: {}'.format(self.ws.name, err))
+                    self.log.debug('%s: %s', self.ws.name, err)
         except WSError as err:
-            self.log.warning('{}: {}'.format(self.ws.name, err))
+            self.log.warning('%s: %s', self.ws.name, err)
         if as_art:
-            self.log.debug('Fetched {} artist(s)'.format(len(as_art)))
+            self.log.debug('Fetched %d artist(s)', len(as_art))
         return as_art
 
     def get_recursive_similar_artist(self):
@@ -222,7 +223,7 @@ class WebService(Plugin):
         self.log.debug('EXTRA ARTS: %s', '/'.join(map(str, extra_arts)))
         for artist in extra_arts:
             self.log.debug('Looking for artist similar '
-                           'to "{}" as well'.format(artist))
+                           'to "%s" as well', artist)
             similar = self.ws_similar_artists(artist=artist)
             if not similar:
                 continue
@@ -292,7 +293,7 @@ class WebService(Plugin):
             ret = ret - MetaContainer([current.Artist])
         # Move around similars items to get in unplayed|not recently played
         # artist first.
-        self.log.info('Got {} artists in library'.format(len(ret)))
+        self.log.info('Got %d artists in library', len(ret))
         candidates = self._get_artists_list_reorg(list(ret))
         if candidates:
             self.log.info(' / '.join(map(str, candidates)))
@@ -363,8 +364,8 @@ class WebService(Plugin):
         nbtracks_target = self.plugin_conf.getint('track_to_add') # pylint: disable=no-member
         for artist in artists:
             if len(self.to_add) == nbtracks_target:
-                return True
-            self.log.info('Looking for a top track for {0}'.format(artist))
+                return
+            self.log.info('Looking for a top track for %s', artist)
             titles = deque()
             try:
                 titles = [t for t in self.ws.get_toptrack(artist)]
@@ -372,9 +373,8 @@ class WebService(Plugin):
                 self.log.warning('%s: %s', self.ws.name, err)
             for trk in titles:
                 found = self.player.search_track(artist, trk.title)
-                random.shuffle(found)
                 if found:
-                    self.log.debug('%s', found[0])
+                    random.shuffle(found)
                     if self.filter_track(found):
                         break
 
@@ -412,7 +412,7 @@ class WebService(Plugin):
         artists = self.get_local_similar_artists()
         self.find_top(artists)
         for track in self.to_add:
-            self.log.info('{1} candidates: {0!s}'.format(track, self.ws.name))
+            self.log.info('%s candidates: %s', self.ws.name, track)
 
     def callback_need_track(self):
         self._cleanup_cache()

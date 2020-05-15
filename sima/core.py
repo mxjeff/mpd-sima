@@ -118,7 +118,7 @@ class Sima(Daemon):
         while True:
             tmp = sleepfor.pop(0)
             sleepfor.append(tmp)
-            self.log.info('Trying to reconnect in {:>4d} seconds'.format(tmp))
+            self.log.info('Trying to reconnect in %4d seconds', tmp)
             time.sleep(tmp)
             try:
                 self.player.connect()

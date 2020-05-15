@@ -71,7 +71,7 @@ class Uniq(Plugin):
             self.log.warning(' '.join(channels))
 
     def sub_chan(self):
-        self.log.debug('Registering as {}'.format(self.chan))
+        self.log.debug('Registering as %s', self.chan)
         try:
             self.player.subscribe(self.chan)
             self._registred = True

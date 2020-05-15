@@ -50,7 +50,7 @@ class Crop(Plugin):
                              'expecting an integer, not "%s"', target)
         else:
             self.target = int(target)
-            self.log.debug('Cropping at 15')
+            self.log.debug('Cropping at %s', self.target)
 
     def callback_next_song(self):
         if not self.target:

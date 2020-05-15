@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2020 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -34,7 +34,7 @@ class PlaceHolder(Plugin):
 
     def callback_player(self):
         #self.log.info(self.plugin_conf)
-        #self.log.debug('{0} contrib plugin!!!'.format(self))
+        #self.log.debug('%s contrib plugin!!!', self)
         pass
 
 

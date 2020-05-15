@@ -83,12 +83,12 @@ class Random(Plugin):
         for art in artists:
             if self.filtered_artist(art):
                 continue
-            self.log.debug('Random art: {}'.format(art))
+            self.log.debug('Random art: %s', art)
             trks = self.player.find_tracks(Artist(art))
             if trks:
                 trk = random.choice(trks)
                 self.candidates.append(trk)
-                self.log.info('Random candidate ({}): {}'.format(self.mode, trk))
+                self.log.info('Random candidate (%s): %s', self.mode, trk)
             if len(self.candidates) >= target:
                 break
         return self.candidates

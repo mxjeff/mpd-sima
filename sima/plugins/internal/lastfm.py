@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2020 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -44,7 +44,7 @@ class Lastfm(WebService):
         persitent_cache = daemon.config.getboolean('lastfm', 'cache')
         if persitent_cache:
             CacheController.CACHE_ANYWAY = True
-            self.log.debug('Persistant cache enabled in {}'.format(join(vardir, 'http', 'LastFM')))
+            self.log.debug('Persistant cache enabled in %s', join(vardir, 'http', 'LastFM'))
             SimaFM.cache = FileCache(join(vardir, 'http', 'LastFM'))
         self.ws = SimaFM()
 
