@@ -361,9 +361,16 @@ class MPD(MPDClient):
         found = False
         if self.use_mbid and artist.mbid:
             # look for exact search w/ musicbrainz_artistid
-            found = bool(self.list('artist', f"(MUSICBRAINZ_ARTISTID == '{artist.mbid}')"))
-            if found:
+            library = self.list('artist', f"(MUSICBRAINZ_ARTISTID == '{artist.mbid}')")
+            if library:
+                found = True
                 self.log.trace('Found mbid "%r" in library', artist)
+                # library could fetch several artist name for a single MUSICBRAINZ_ARTISTID
+                if len(library) > 1:
+                    self.log.warning('I got "%s" searching for %r', library, artist)
+                elif len(library) == 1 and library[0] != artist.name:
+                    self.log.debug('Update artist name %s->%s', artist, library[0])
+                    artist = Artist(name=library[0], mbid=artist.mbid)
             # Fetches remaining artists for potential match
             artists = self._cache['nombid_artists']
         else:  # not using MusicBrainzIDs
@@ -387,6 +394,7 @@ class MPD(MPDClient):
             self.log.trace('no fuzzy matching for %r', artist)
             if found:
                 return artist
+            return None
         # Now perform fuzzy search
         for fuzz in match:
             if fuzz in artist.names:  # Already found in lower cased comparison
