@@ -370,6 +370,7 @@ class WebService(Plugin):
                 titles = [t for t in self.ws.get_toptrack(artist)]
             except WSError as err:
                 self.log.warning('%s: %s', self.ws.name, err)
+                continue
             for trk in titles:
                 found = self.player.search_track(artist, trk.title)
                 if found:
