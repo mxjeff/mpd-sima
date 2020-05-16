@@ -206,19 +206,22 @@ class MPD(MPDClient):
     def _reset_cache(self):
         """
         Both flushes and instantiates _cache
+
+        * artists: all artists
+        * nombid_artists: artists with no mbid (set only when self.use_mbid is True)
+        * artist_tracks: caching last artist tracks, used in search_track
         """
         if isinstance(self._cache, dict):
             self.log.info('Player: Flushing cache!')
         else:
             self.log.info('Player: Initialising cache!')
         self._cache = {'artists': frozenset(),
-                       'nombid_artists': frozenset()}
-        self._cache['artist_tracks'] = {}
+                       'nombid_artists': frozenset(),
+                       'artist_tracks': {}}
+        self._cache['artists'] = frozenset(filter(None, self.list('artist')))
         if self.use_mbid:
             artists = self.list('artist', "(MUSICBRAINZ_ARTISTID == '')")
             self._cache['nombid_artists'] = frozenset(filter(None, artists))
-        else:
-            self._cache['artists'] = frozenset(filter(None, self.list('artist')))
 
     def _skipped_track(self, previous):
         if (self.state == 'stop'
