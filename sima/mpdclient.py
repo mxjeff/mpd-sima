@@ -213,10 +213,12 @@ class MPD(MPDClient):
             self.log.info('Player: Initialising cache!')
         self._cache = {'artists': frozenset(),
                        'nombid_artists': frozenset()}
-        self._cache['artists'] = frozenset(filter(None, self.list('artist')))
-        if Artist.use_mbid:
+        self._cache['artist_tracks'] = {}
+        if self.use_mbid:
             artists = self.list('artist', "(MUSICBRAINZ_ARTISTID == '')")
             self._cache['nombid_artists'] = frozenset(filter(None, artists))
+        else:
+            self._cache['artists'] = frozenset(filter(None, self.list('artist')))
 
     def _skipped_track(self, previous):
         if (self.state == 'stop'
@@ -226,8 +228,7 @@ class MPD(MPDClient):
         return self.current.id != previous.id  # pylint: disable=no-member
 
     def monitor(self):
-        """OLD socket Idler
-        Monitor player for change
+        """Monitor player for change
         Returns a list a events among:
 
             * database  player media library has changed
@@ -256,7 +257,10 @@ class MPD(MPDClient):
             self.log.warning('pending commands: %s', self._pending)
 
     def add(self, payload):
-        """Overriding MPD's add method to accept Track objects"""
+        """Overriding MPD's add method to accept Track objects
+
+        :param Track,list payload: Either a single :py:obj:`Track` or a list of it
+        """
         if isinstance(payload, Track):
             super().__getattr__('add')(payload.file)
         elif isinstance(payload, list):
@@ -367,9 +371,9 @@ class MPD(MPDClient):
                 self.log.trace('Found mbid "%r" in library', artist)
                 # library could fetch several artist name for a single MUSICBRAINZ_ARTISTID
                 if len(library) > 1:
-                    self.log.warning('I got "%s" searching for %r', library, artist)
+                    self.log.debug('I got "%s" searching for %r', library, artist)
                 elif len(library) == 1 and library[0] != artist.name:
-                    self.log.debug('Update artist name %s->%s', artist, library[0])
+                    self.log.info('Update artist name %s->%s', artist, library[0])
                     artist = Artist(name=library[0], mbid=artist.mbid)
             # Fetches remaining artists for potential match
             artists = self._cache['nombid_artists']
@@ -379,8 +383,9 @@ class MPD(MPDClient):
         if not match and not found:
             return None
         if len(match) > 1:
-            self.log.debug('found close match for "%s": %s', artist, '/'.join(match))
-        # Forst lowercased comparison
+            self.log.debug('found close match for "%s": %s',
+                           artist, '/'.join(match))
+        # First lowercased comparison
         for close_art in match:
             # Regular lowered string comparison
             if artist.name.lower() == close_art.lower():
@@ -415,8 +420,12 @@ class MPD(MPDClient):
     def search_track(self, artist, title):
         """Fuzzy search of title by an artist
         """
+        cache = self._cache.get('artist_tracks').get(artist)
         # Retrieve all tracks from artist
-        all_tracks = self.find_tracks(artist)
+        all_tracks = cache or self.find_tracks(artist)
+        if not cache:
+            self._cache['artist_tracks'] = {}  # clean up
+            self._cache.get('artist_tracks')[artist] = all_tracks
         # Get all titles (filter missing titles set to 'None')
         all_artist_titles = frozenset([tr.title for tr in all_tracks
                                        if tr.title is not None])
