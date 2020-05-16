@@ -301,9 +301,8 @@ class WebService(Plugin):
 
     def _get_album_history(self, artist):
         """Retrieve album history"""
-        duration = self.daemon_conf.getint('sima', 'history_duration')
         albums_list = set()
-        for trk in self.sdb.get_history(artist=artist.name, duration=duration):
+        for trk in self.get_history(artist=artist.name):
             albums_list.add(trk[1])
         return albums_list
 
