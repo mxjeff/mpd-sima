@@ -303,7 +303,9 @@ class WebService(Plugin):
         """Retrieve album history"""
         albums_list = set()
         for trk in self.get_history(artist=artist.name):
-            albums_list.add(trk[1])
+            if not trk.album:
+                continue
+            albums_list.add(trk.album)
         return albums_list
 
     def find_album(self, artists):
