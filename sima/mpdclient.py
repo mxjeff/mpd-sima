@@ -411,11 +411,11 @@ class MPD(MPDClient):
             if SimaStr(artist.name) == fuzz:
                 found = True
                 artist.add_alias(fuzz)
-                self.log.info('"%s" quite probably matches "%s" (SimaStr)',
-                              fuzz, artist)
+                self.log.debug('"%s" quite probably matches "%s" (SimaStr)',
+                               fuzz, artist)
         if found:
             if artist.aliases:
-                self.log.debug('Found aliases: %s', '/'.join(artist.names))
+                self.log.info('Found aliases: %s', '/'.join(artist.names))
             return artist
         return None
 
