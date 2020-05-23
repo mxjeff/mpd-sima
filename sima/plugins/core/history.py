@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2020 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -21,6 +21,7 @@
 """
 
 # standard library import
+from time import time
 
 # third parties components
 
@@ -34,18 +35,26 @@ class History(Plugin):
     def __init__(self, daemon):
         Plugin.__init__(self, daemon)
         self.sdb = daemon.sdb
+        self._last_clean = time()
 
     def shutdown(self):
         self.log.info('Cleaning database')
         self.sdb.purge_history()
         self.sdb.clean_database()
 
-    def callback_next_song(self):
+    def callback_player(self):
         current = self.player.current
-        self.log.debug('add history: "%s"', current)
+        last_hist = next(self.sdb.get_history(), None)
+        if last_hist[3] == current.file:
+            return
         if not current:
-            self.log.warning('Cannot add "%s" to history (empty or missing file)', current)
+            self.log.debug('Cannot add "%s" to history (empty or missing file)', current)
+            return
+        self.log.debug('add history: "%s"', current)
         self.sdb.add_history(current)
+        if self._last_clean - time() > 86400:
+            self.shutdown()
+            self._last_clean = time()
 
 
 # VIM MODLINE
