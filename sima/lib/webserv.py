@@ -34,7 +34,7 @@ from hashlib import md5
 from .plugin import Plugin
 from .track import Track
 from .meta import Artist, MetaContainer
-from ..utils.utils import WSError, WSNotFound
+from ..utils.utils import WSError, WSNotFound, WSTimeout
 
 def cache(func):
     """Caching decorator"""
@@ -74,6 +74,7 @@ class WebService(Plugin):
                    'album': self._album}
         self.queue_mode = wrapper.get(self.plugin_conf.get('queue_mode'))
         self.ws = None
+        self.ws_retry = 0
 
     def _flush_cache(self):
         """
@@ -189,6 +190,15 @@ class WebService(Plugin):
                     return self.ws_similar_artists(Artist(name=artist.name))
                 except WSNotFound as err:
                     self.log.debug('%s: %s', self.ws.name, err)
+        except WSTimeout as err:
+            self.log.warning('%s: %s', self.ws.name, err)
+            if self.ws_retry < 3:
+                self.ws_retry += 1
+                self.log.warning('%s: retrying', self.ws.name)
+                as_art = self.ws_similar_artists(artist)
+            else:
+                self.log.warning('%s: stop retrying', self.ws.name)
+            self.ws_retry = 0
         except WSError as err:
             self.log.warning('%s: %s', self.ws.name, err)
         if as_art:
@@ -199,7 +209,7 @@ class WebService(Plugin):
         """Check against local player for similar artists (recursive w/ history)
         """
         if not self.player.playlist:
-            return
+            return []
         history = list(self.history)
         # In random play mode use complete playlist to filter
         if self.player.playmode.get('random'):
