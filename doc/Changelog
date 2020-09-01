@@ -1,3 +1,9 @@
+MPD_sima v0.16.0
+
+ * Update vinstall.py (closes #34)
+
+ -- kaliko <kaliko@azylum.org>  UNRELEASED
+
 MPD_sima v0.16.0.dev0
 
  * Major MPD client refactoring

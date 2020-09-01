@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # Copyright (C) 2013 Vinay Sajip. New BSD License.
-# Copyright (C) 2014 Kaliko Jack
+# Copyright (C) 2014, 2020 kaliko <kaliko@azylum.org>
 #
 from __future__ import print_function
 
-REQ_VER = (3,3)
+REQ_VER = (3,4)
 import sys
 if sys.version_info < REQ_VER:
     print('Need at least python {0}.{1} to run this script'.format(*REQ_VER), file=sys.stderr)
@@ -39,8 +39,6 @@ class ExtendedEnvBuilder(venv.EnvBuilder):
                         being processed.
         """
         os.environ['VIRTUAL_ENV'] = context.env_dir
-        self.install_setuptools(context)
-        self.install_pip(context)
         setup = os.path.abspath(os.path.join(context.env_dir, '../setup.py'))
         self.install_script(context, 'sima', setup=setup)
 
@@ -93,42 +91,11 @@ class ExtendedEnvBuilder(venv.EnvBuilder):
             # Clean up - no longer needed
             os.unlink(distpath)
 
-    def install_setuptools(self, context):
-        """
-        Install setuptools in the environment.
-
-        :param context: The information for the environment creation request
-                        being processed.
-        """
-        url = 'https://bitbucket.org/pypa/setuptools/downloads/ez_setup.py'
-        self.install_script(context, 'setuptools', url)
-        # clear up the setuptools archive which gets downloaded
-        pred = lambda o: o.startswith('setuptools-') and o.endswith('.tar.gz')
-        files = filter(pred, os.listdir(context.bin_path))
-        for f in files:
-            f = os.path.join(context.bin_path, f)
-            os.unlink(f)
-
-    def install_pip(self, context):
-        """
-        Install pip in the environment.
-
-        :param context: The information for the environment creation request
-                        being processed.
-        """
-        url = 'https://bootstrap.pypa.io/get-pip.py'
-        self.install_script(context, 'pip', url)
-        # pip installs to "local/bin" on Linux, but it needs to be accessible
-        # from "bin" since the "activate" script prepends "bin" to $PATH
-        pip_path = os.path.join(context.env_dir, 'local', 'bin', 'pip')
-        if sys.platform != 'win32' and os.path.exists(pip_path):
-            self.symlink_or_copy(pip_path, os.path.join(context.bin_path, 'pip'))
-
 
 def main(args=None):
     root = os.path.dirname(os.path.abspath(__file__))
     vdir = os.path.join(root, 'venv')
-    builder = ExtendedEnvBuilder(clear=True, verbose=False)
+    builder = ExtendedEnvBuilder(clear=True, verbose=False, with_pip=True)
     builder.create(vdir)
     # clean up
     for residu in ['MPD_sima.egg-info', 'dist', 'build']:
@@ -140,6 +107,7 @@ def main(args=None):
         fd.write('. "{}/venv/bin/activate"\n'.format(root))
         fd.write('"{}/venv/bin/mpd-sima" "$@"'.format(root))
     os.chmod(os.path.join(root, 'vmpd-sima'), 0o744)
+
 
 if __name__ == '__main__':
     rc = 1
