@@ -45,7 +45,7 @@ class History(Plugin):
     def callback_player(self):
         current = self.player.current
         last_hist = next(self.sdb.get_history(), None)
-        if last_hist[3] == current.file:
+        if last_hist and last_hist[3] == current.file:
             return
         if not current:
             self.log.debug('Cannot add "%s" to history (empty or missing file)', current)
