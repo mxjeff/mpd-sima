@@ -100,8 +100,13 @@ class SimaFM:
         payload = self._forge_payload(artist)
         # Construct URL
         ans = self.http(self.root_url, payload)
+        try:
+            ans.json()
+        except ValueError as err:
+            # Corrupted/malformed cache? cf. gitlab issue #35
+            raise WSError('Malformed json, try purging the cache: %s')
         self._controls_answer(ans.json()) # pylint: disable=no-member
-        # Artist might be found be return no 'artist' list…
+        # Artist might be found but return no 'artist' list…
         # cf. "Mulatu Astatqe" vs. "Mulatu Astatqé" with autocorrect=0
         # json format is broken IMHO, xml is more consistent IIRC
         # Here what we got:

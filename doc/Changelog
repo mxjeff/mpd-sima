@@ -1,6 +1,7 @@
 MPD_sima v0.16.0
 
  * Update vinstall.py (closes #34)
+ * Fixed bug when http client fetches a corrupted cached entry (closes #35)
 
  -- kaliko <kaliko@azylum.org>  UNRELEASED
 
