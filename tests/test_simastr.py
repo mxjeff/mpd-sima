@@ -19,6 +19,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertFalse(fuzzystr('eeee', 'éééé'))
         tests = [
                 ('eeee', 'éééé', self.assertTrue),
+                ('éééé', 'eeee', self.assertTrue),
                 ('The Doors', 'Doors', self.assertTrue),
                 ('Tigres Del Norte', 'Los Tigres Del Norte', self.assertTrue),
                 (   'The Desert Sessions & PJ Harvey',
@@ -29,6 +30,8 @@ class TestSequenceFunctions(unittest.TestCase):
                     'Smells Like Teen Spirits (live)',
                     self.assertTrue
                     ),
+                ('Touché Amoré', 'TOUCHE AMORE', self.assertTrue),
+                ('TOUCHE AMORE', 'Touché Amoré', self.assertTrue),
                 ]
         sima.lib.simastr.SimaStr.diafilter = True
         for sta, stb, assertfunc in tests:
