@@ -121,9 +121,8 @@ class MPD(MPDClient):
     """
     needed_cmds = ['status', 'stats', 'add', 'find',
                    'search', 'currentsong', 'ping']
-    needed_mbid_tags = {'Artist', 'Album', 'AlbumArtist',
-                        'Title', 'Track', 'Genre',
-                        'MUSICBRAINZ_ARTISTID', 'MUSICBRAINZ_ALBUMID',
+    needed_tags = {'Artist', 'Album', 'AlbumArtist', 'Title', 'Track'}
+    needed_mbid_tags = {'MUSICBRAINZ_ARTISTID', 'MUSICBRAINZ_ALBUMID',
                         'MUSICBRAINZ_ALBUMARTISTID', 'MUSICBRAINZ_TRACKID'}
     database = None
 
@@ -181,10 +180,18 @@ class MPD(MPDClient):
                 raise PlayerError('Could connect to "%s", '
                                   'but command "%s" not available' %
                                   (host, cmd))
-        # Controls use of MusicBrainzIdentifier
         self.tagtypes('clear')
+        for tag in MPD.needed_tags:
+            self.tagtypes('enable', tag)
+        tt = set(map(str.lower, self.tagtypes()))
+        needed_tags = set(map(str.lower, MPD.needed_tags))
+        if len(needed_tags & tt) != len(MPD.needed_tags):
+            self.log.warning('MPD exposes: %s', tt)
+            self.log.warning('Tags needed: %s', needed_tags)
+            raise PlayerError('Missing mandatory metadata!')
         for tag in MPD.needed_mbid_tags:
             self.tagtypes('enable', tag)
+        # Controls use of MusicBrainzIdentifier
         if self.daemon.config.get('sima', 'musicbrainzid'):
             tt = set(self.tagtypes())
             if len(MPD.needed_mbid_tags & tt) != len(MPD.needed_mbid_tags):
