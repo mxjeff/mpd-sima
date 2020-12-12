@@ -91,7 +91,7 @@ DEFAULT_CONF = {
 #
 
 
-class ConfMan(object):  # CONFIG MANAGER CLASS
+class ConfMan:  # CONFIG MANAGER CLASS
     """
     Configuration manager.
     Default configuration is stored in DEFAULT_CONF dictionnary.
@@ -185,7 +185,6 @@ class ConfMan(object):  # CONFIG MANAGER CLASS
         # honor MPD_HOST format as in mpc(1)  for command line option --host
         if self.startopt.get('host'):
             if '@' in self.startopt.get('host'):
-                print(self.startopt.get('host').split('@'))
                 passwd, host = self.startopt.get('host').split('@')
                 self.config.set('MPD', 'password', passwd)
                 self.config.set('MPD', 'host', host)

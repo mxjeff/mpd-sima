@@ -54,11 +54,10 @@ class Uniq(Plugin):
             self.sub_chan()
 
     def is_capable(self):
-        if {'channels', 'subscribe'}.issubset(set(self.player.commands())):
-            # Groove Basin compatibility
-            # For some reason Groove Basin have channels command but no
-            # subscribe command‽
-            return True
+        # Groove Basin compatibility
+        # For some reason Groove Basin have channels command but no
+        # subscribe command‽
+        return {'channels', 'subscribe'}.issubset(set(self.player.commands()))
 
     def get_channels(self):
         return [chan for chan in self.player.channels() if
