@@ -37,7 +37,7 @@ from .lib.logger import set_logger
 from .lib.simadb import SimaDB
 from .utils.config import ConfMan
 from .utils.startopt import StartOpt
-from .utils.utils import exception_log, SigHup
+from .utils.utils import exception_log, SigHup, PluginConfException
 # core plugins
 from .plugins.core.history import History
 from .plugins.core.mpdoptions import MpdOptions
@@ -72,7 +72,11 @@ def load_plugins(sima, source):
             sys.exit(1)
         logger.info('Loading {0} plugin: {name} ({doc})'.format(
             source, **plugin_obj.info()))
-        sima.register_plugin(plugin_obj)
+        try:
+            sima.register_plugin(plugin_obj)
+        except PluginConfException as err:
+            logger.error(err)
+            sys.exit(2)
 
 
 def start(sopt, restart=False):
@@ -117,7 +121,6 @@ def start(sopt, restart=False):
 
     #  Loading internal plugins
     load_plugins(sima, 'internal')
-
     #  Loading contrib plugins
     load_plugins(sima, 'contrib')
     logger.info('plugins loaded, prioriy: %s', ' > '.join(map(str, sima.plugins)))

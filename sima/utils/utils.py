@@ -179,6 +179,11 @@ class WSTimeout(WSError):
 class WSHTTPError(WSError):
     pass
 
+class MPDSimaException(Exception):
+    pass
+
+class PluginConfException(MPDSimaException):
+    pass
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
