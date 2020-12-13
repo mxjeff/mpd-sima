@@ -38,8 +38,10 @@ def forge_filter(cfg):
     if cfg_filter:
         mpd_filter.append(cfg_filter)
     for tag in tags:
+        if not cfg[tag]:  # avoid empty tags entries in config
+            continue
         if ',' in cfg[tag]:
-            patt = '|'.join(cfg[tag].split(','))
+            patt = '|'.join(map(str.strip, cfg[tag].split(',')))
             mpd_filter.append(f"({tag} =~ '({patt})')")
         else:
             mpd_filter.append(f"({tag} == '{cfg[tag].strip()}')")
