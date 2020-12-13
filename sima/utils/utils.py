@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, 2011, 2013, 2014, 2015 kaliko <kaliko@azylum.org>
+# Copyright (c) 2010, 2011, 2013, 2014, 2015, 2020 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -180,6 +180,9 @@ class WSHTTPError(WSError):
     pass
 
 class MPDSimaException(Exception):
+    pass
+
+class PluginException(MPDSimaException):
     pass
 
 class PluginConfException(MPDSimaException):

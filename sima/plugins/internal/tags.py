@@ -29,7 +29,7 @@ import random
 # local import
 from ...lib.plugin import Plugin
 from ...lib.track import Track
-from ...utils.utils import PluginConfException
+from ...utils.utils import PluginConfException, PluginException
 
 def forge_filter(cfg):
     tags = set(cfg.keys()) & Tags.supported_tags
@@ -58,7 +58,6 @@ class Tags(Plugin):
         super().__init__(daemon)
         self.daemon = daemon
         self._control_conf()
-        #self._control_server()
         self._setup_tagsneeded()
         self.mpd_filter = forge_filter(self.plugin_conf)
         self.log.debug('mpd filter: %s', self.mpd_filter)
@@ -72,13 +71,9 @@ class Tags(Plugin):
             self.log.info('Supported Tags are : %s', ', '.join(sup_tags))
             raise PluginConfException('plugin misconfiguration')
 
-    def _control_server(self):
-        #TODO:
-        # * control tags used are available
-        # * filters are available mpd version >= 0.21
-        raise NotImplemented
-
     def _setup_tagsneeded(self):
+        self.log.debug('%s plugin needs the followinng metadata: %s',
+                self, set(self.plugin_conf.keys()) & Tags.supported_tags)
         tags = set(self.plugin_conf.keys()) & Tags.supported_tags
         self.player.needed_tags |= tags
 
@@ -89,6 +84,14 @@ class Tags(Plugin):
         tracks_from_db = self.daemon.sdb.get_history(duration=duration)
         hist = [Track(file=tr[3], artist=tr[0]) for tr in tracks_from_db]
         return hist
+
+    def start(self):
+        if (0, 21, 0) > tuple(map(int, self.player.mpd_version.split('.'))):
+            self.log.warning('MPD protocol version: %s < 0.21.0',
+                    self.player.mpd_version)
+            self.log.error('Need at least MPD 0.21 to use Tags plugin (filters required)')
+            self.player.disconnect()
+            raise PluginException('MPD >= 0.21 required')
 
     def callback_need_track(self):
         candidates = []
