@@ -65,7 +65,7 @@ class Plugin:
         if not self.plugin_conf:
             self.plugin_conf = {'priority': '80'}
         #if self.plugin_conf:
-        #    self.log.debug('Got config for %s: ùs', self, self.plugin_conf)
+        #    self.log.debug('Got config for %s: %s', self, self.plugin_conf)
 
     @property
     def priority(self):
