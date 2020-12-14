@@ -87,6 +87,14 @@ DEFAULT_CONF = {
             'track_to_add': 1,
             'priority': 50,
             },
+        'tags': {
+            'comment': "",
+            'date': "",
+            'genre': "",
+            'label': "",
+            'originaldate': "",
+            'priority': 80,
+            }
         }
 #
 
