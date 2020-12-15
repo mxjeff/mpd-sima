@@ -68,7 +68,7 @@ class Tags(Plugin):
     def _control_conf(self):
         sup_tags = Tags.supported_tags
         config_tags = {k for k, v in self.plugin_conf.items()
-                       if (v and k not in ['filter', 'priority'])}
+                       if (v and k not in ['filter', 'priority', 'track_to_add'])}
         if not self.plugin_conf.get('filter', None) and \
                 config_tags.isdisjoint(sup_tags):
             self.log.error('Found no config for %s plugin! '
