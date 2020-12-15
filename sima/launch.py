@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014, 2015 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015, 2020 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -37,7 +37,7 @@ from .lib.logger import set_logger
 from .lib.simadb import SimaDB
 from .utils.config import ConfMan
 from .utils.startopt import StartOpt
-from .utils.utils import exception_log, SigHup, PluginConfException
+from .utils.utils import exception_log, SigHup, MPDSimaException
 # core plugins
 from .plugins.core.history import History
 from .plugins.core.mpdoptions import MpdOptions
@@ -72,11 +72,7 @@ def load_plugins(sima, source):
             sys.exit(1)
         logger.info('Loading {0} plugin: {name} ({doc})'.format(
             source, **plugin_obj.info()))
-        try:
-            sima.register_plugin(plugin_obj)
-        except PluginConfException as err:
-            logger.error(err)
-            sys.exit(2)
+        sima.register_plugin(plugin_obj)
 
 
 def start(sopt, restart=False):
@@ -146,10 +142,14 @@ def run(sopt, restart=False):
     Catches Unhandled exception
     """
     # pylint: disable=broad-except
+    logger = logging.getLogger('sima')
     try:
         start(sopt, restart)
     except SigHup:  # SigHup inherit from Exception
         run(sopt, True)
+    except MPDSimaException as err:
+        logger.error(err)
+        sys.exit(2)
     except Exception:  # Unhandled exception
         exception_log()
 

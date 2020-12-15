@@ -25,11 +25,12 @@ Add titles based on tags
 import random
 
 # third parties components
+from musicpd import CommandError
 
 # local import
 from ...lib.plugin import Plugin
 from ...lib.track import Track
-from ...utils.utils import PluginConfException, PluginException
+from ...utils.utils import PluginException
 
 def forge_filter(cfg):
     tags = set(cfg.keys()) & Tags.supported_tags
@@ -66,17 +67,24 @@ class Tags(Plugin):
 
     def _control_conf(self):
         sup_tags = Tags.supported_tags
+        config_tags = {k for k, v in self.plugin_conf.items()
+                       if (v and k not in ['filter', 'priority'])}
         if not self.plugin_conf.get('filter', None) and \
-                self.plugin_conf.keys().isdisjoint(sup_tags):
-            self.log.error(
-                'Found no config for %s plugin! Need at least "filter" or a supported tag' % self)
+                config_tags.isdisjoint(sup_tags):
+            self.log.error('Found no config for %s plugin! '
+                           'Need at least "filter" or a supported tag', self)
             self.log.info('Supported Tags are : %s', ', '.join(sup_tags))
-            raise PluginConfException('plugin misconfiguration')
+            raise PluginException('plugin misconfiguration')
+        if config_tags.difference(sup_tags):
+            self.log.error('Found unsupported tag in config: %s',
+                           config_tags.difference(sup_tags))
+            raise PluginException('plugin misconfiguration')
 
     def _setup_tagsneeded(self):
+        config_tags = {k for k, v in self.plugin_conf.items() if v}
         self.log.debug('%s plugin needs the followinng metadata: %s',
-                self, set(self.plugin_conf.keys()) & Tags.supported_tags)
-        tags = set(self.plugin_conf.keys()) & Tags.supported_tags
+                self, config_tags & Tags.supported_tags)
+        tags = config_tags & Tags.supported_tags
         self.player.needed_tags |= tags
 
     def _get_history(self):
@@ -94,6 +102,12 @@ class Tags(Plugin):
             self.log.error('Need at least MPD 0.21 to use Tags plugin (filters required)')
             self.player.disconnect()
             raise PluginException('MPD >= 0.21 required')
+        # Check filter is valid
+        try:
+            self.player.find(self.plugin_conf['filter'])
+        except CommandError:
+            raise PluginException('Badly formated filter in tags plugin configuration: "%s"'
+                                  % self.plugin_conf['filter'])
 
     def callback_need_track(self):
         candidates = []

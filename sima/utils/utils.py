@@ -165,9 +165,11 @@ class Throttle:
             return result
         return wrapper
 
-# http client exceptions (for webservices)
+class MPDSimaException(Exception):
+    pass
 
-class WSError(Exception):
+# http client exceptions (for webservices)
+class WSError(MPDSimaException):
     pass
 
 class WSNotFound(WSError):
@@ -179,13 +181,7 @@ class WSTimeout(WSError):
 class WSHTTPError(WSError):
     pass
 
-class MPDSimaException(Exception):
-    pass
-
 class PluginException(MPDSimaException):
-    pass
-
-class PluginConfException(MPDSimaException):
     pass
 
 # VIM MODLINE
