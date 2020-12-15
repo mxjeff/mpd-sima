@@ -93,6 +93,8 @@ DEFAULT_CONF = {
             'genre': "",
             'label': "",
             'originaldate': "",
+            'filter': "",
+            'track_to_add': 1,
             'priority': 80,
             }
         }
