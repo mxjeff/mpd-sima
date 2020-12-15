@@ -104,7 +104,8 @@ class Tags(Plugin):
             raise PluginException('MPD >= 0.21 required')
         # Check filter is valid
         try:
-            self.player.find(self.plugin_conf['filter'])
+            if self.plugin_conf['filter']:
+                self.player.find(self.plugin_conf['filter'])
         except CommandError:
             raise PluginException('Badly formated filter in tags plugin configuration: "%s"'
                                   % self.plugin_conf['filter'])
