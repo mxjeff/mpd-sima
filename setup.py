@@ -48,7 +48,10 @@ setup(name='MPD_sima',
       data_files=data_files,
       scripts=['simadb_cli'],
       entry_points={
-          'console_scripts': ['mpd-sima = sima.launch:main',]
+          'console_scripts': [
+              'mpd-sima = sima.launch:main',
+              'test-tags-config = sima.utils.testtags:main'
+              ]
           },
       test_suite="tests",
       )

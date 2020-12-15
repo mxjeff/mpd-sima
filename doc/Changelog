@@ -1,6 +1,7 @@
 MPD_sima v0.16.0
 
  * New offline autoqueue plugin based on file tags only
+ * Expose a new executable "test-tags-config"
  * Update vinstall.py (closes #34)
  * Fixed bug when http client fetches a corrupted cached entry (closes #35)
  * Need at least python 3.6
