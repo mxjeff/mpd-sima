@@ -6,7 +6,7 @@ MPD_sima v0.16.0
  * Fixed bug when http client fetches a corrupted cached entry (closes #35)
  * Need at least python 3.6
 
- -- kaliko <kaliko@azylum.org>  UNRELEASED
+ -- kaliko <kaliko@azylum.org>  Tue, 15 Dec 2020 16:17:05 +0100
 
 MPD_sima v0.16.0.dev0
 

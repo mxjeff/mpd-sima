@@ -493,43 +493,43 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         <para>&dhpackage; tries preferably to chose among unplayed artists or
         at least not recently played artist.</para>
         <variablelist>
-            <varlistentry>
-                <term><option>track</option></term>
-                <listitem>
-                    <para>Queue a similar track chosen at random from a similar artist.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term><option>top</option></term>
-                <listitem>
-                    <para>Queue a track from a similar artist, chosen among
-                        "top tracks" according to last.fm data mining.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term><option>album</option></term>
-                <listitem>
-                    <para>Queue a whole album chosen at random from a similar artist.</para>
-                    <para><emphasis>Nota Bene:</emphasis><sbr /> Due to the
-                        track point of view of database build upon tracks tags
-                        an album lookup for a specific artist will return
-                        albums as soon as this artist appears in a single track
-                        of the album.<sbr />
-                        For instance looking for album from "The Velvet
-                        Underground" will fetch "Last Days" and "Juno" OSTs
-                        because the band appears on the soundtrack of these two
-                        movies.<sbr />
-                        A solution is for you to set AlbumArtists tag to
-                        something different than the actual artist of the
-                        track. For compilations, OSTs etc. a strong convention
-                        is to use "Various Artists" for this tag.</para>
-                    <para>&dhpackage; is currently looking for AlbumArtists tags
-                        and avoid album where this tag is set with "Various
-                        Artists". If a single track within an album is found
-                        with AlbumArtists:"Various Artists" the complete album
-                        is skipped and won't be queued.</para>
-                </listitem>
-            </varlistentry>
+          <varlistentry>
+            <term><option>track</option></term>
+            <listitem>
+              <para>Queue a similar track chosen at random from a similar artist.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><option>top</option></term>
+            <listitem>
+              <para>Queue a track from a similar artist, chosen among
+                "top tracks" according to last.fm data mining.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><option>album</option></term>
+            <listitem>
+              <para>Queue a whole album chosen at random from a similar artist.</para>
+              <para><emphasis>Nota Bene:</emphasis><sbr /> Due to the
+                track point of view of database build upon tracks tags
+                an album lookup for a specific artist will return
+                albums as soon as this artist appears in a single track
+                of the album.<sbr />
+                For instance looking for album from "The Velvet
+                Underground" will fetch "Last Days" and "Juno" OSTs
+                because the band appears on the soundtrack of these two
+                movies.<sbr />
+                A solution is for you to set AlbumArtists tag to
+                something different than the actual artist of the
+                track. For compilations, OSTs etc. a strong convention
+                is to use "Various Artists" for this tag.</para>
+              <para>&dhpackage; is currently looking for AlbumArtists tags
+                and avoid album where this tag is set with "Various
+                Artists". If a single track within an album is found
+                with AlbumArtists:"Various Artists" the complete album
+                is skipped and won't be queued.</para>
+            </listitem>
+          </varlistentry>
         </variablelist>
     </refsect1>
   <xi:include href="files.xml" />

@@ -2,7 +2,25 @@
             following different policies. This manual document the
             configuration file for mpd-sima.</p></div><div class="refsect1"><a name="description"></a><h2>DESCRIPTION</h2><p>This manual page documents briefly <span class="command"><strong>mpd-sima</strong></span>
             configuration options available in user configuration file
-            (see <a class="xref" href="#files" title="FILES">the section called &#8220;FILES&#8221;</a>).</p></div><div class="refsect1"><a name="examples"></a><h2>EXAMPLES</h2><div class="refsect2"><a name="album"></a><h3>Album queue mode.</h3><p>Here is an example of album queue configuration.</p><pre class="programlisting">[MPD]
+            (see <a class="xref" href="#files" title="FILES">the section called &#8220;FILES&#8221;</a>).</p></div><div class="refsect1"><a name="examples"></a><h2>EXAMPLES</h2><div class="refsect2"><a name="tags"></a><h3>File tags queue mode (offline mode).</h3><p>Here is an example of autoqueue using file tags only.</p><pre class="programlisting">[MPD]
+host=example.org
+port=6601
+
+[sima]
+# Setup internal plugins
+internal = Tags, Crop
+history_duration=48  # 2 days
+queue_length=2
+
+[tags]
+# Look for files with tagged with genre "electonica" OR "IDM" OR "glitch"
+genre = electonica, IDM, glitch
+
+[crop]
+# keep 30 played tracks in playlist
+consume=30
+
+            </pre></div><div class="refsect2"><a name="album"></a><h3>Album queue mode using last.fm recommendations (online mode).</h3><p>Here is an example of album queue configuration using online recommendations system.</p><pre class="programlisting">[MPD]
 host=example.org
 port=8000
 
@@ -41,8 +59,7 @@ consume=30
                             </p><p>The default list of plugins to load at startup: <code class="option">Lastfm</code>,<code class="option">Random</code>,<code class="option">Crop</code>.<br>
                                 <code class="option">Crop</code> is an utility plugin, it does not queue any tracks (cf. below).<br>
                                 <code class="option">Random</code> will queue a track at random if other plugins did not return any tracks.<br>
-                            </p><p>You can add here as many plugins you want,
-                                currently shipping <code class="option">Lastfm</code> only.<br>
+                            </p><p>You can add, combine here as many plugins you want.<br>
                                 The priority may be used to order them.
                             </p></dd><dt><span class="term"><code class="option">history_duration=</code><em class="replaceable"><code>8</code></em></span></dt><dd><p>How far to look back in history to avoid to play
                                 twice the same track/title (duration in
@@ -62,7 +79,7 @@ consume=30
                             Set to some negative integer to keep all played tracks.
                         </p></dd><dt><span class="term"><code class="option">priority=</code><em class="replaceable"><code>10</code></em></span></dt><dd><p>
                             Plugin priority
-                        </p></dd></div><div class="refsect2"><a name="random"></a><h3>Random section</h3><p>Random plugin's configuration:</p><dt><span class="term"><code class="option">[random]</code></span></dt><dd></dd><dt><span class="term"><code class="option">flavour=</code><em class="replaceable"><code>sensible</code></em></span></dt><dd><p>When no similar tracks are found, falling back to
+                        </p></dd></div><div class="refsect2"><a name="random"></a><h3>Random section</h3><p>Random plugin's configuration:</p><dt><span class="term"><code class="option">[random]</code></span></dt><dd></dd><dt><span class="term"><code class="option">track_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many track(s) to add.</p></dd><dt><span class="term"><code class="option">flavour=</code><em class="replaceable"><code>sensible</code></em></span></dt><dd><p>When no similar tracks are found, falling back to
                             random queuing. Different mode, aka random flavour,
                             are available:
                             <em class="replaceable"><code>pure</code></em>,
@@ -91,10 +108,10 @@ consume=30
                             <code class="option">top</code> and <code class="option">track</code>
                             queue modes. This is actually an upper limit,
                             min(<code class="option">max_art</code>,
-                            <code class="option">track_to_add</code>) will be used, and
-                            <code class="option">max_art</code> might be inferior lower
-                            than value set in config.</p></dd><dt><span class="term"><code class="option">album_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many album(s) to add. Only relevant in
-                            <code class="option">album</code> queue modes.</p></dd><dt><span class="term"><code class="option">cache=</code><em class="replaceable"><code>True</code></em></span></dt><dd><p>Whether or not to use on-disk persistent http
+                            <code class="option">track_to_add</code>) will be used.</p></dd><dt><span class="term"><code class="option">album_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many album(s) to add. Only relevant in
+                            <code class="option">album</code> queue modes.</p></dd><dt><span class="term"><code class="option">track_to_add_from_album=</code><em class="replaceable"><code>0</code></em></span></dt><dd><p>How many track(s) to add from each selected albums. Only relevant in
+                          <code class="option">album</code> queue modes. When set to 0 or lower the whole album is queued.
+                          </p></dd><dt><span class="term"><code class="option">cache=</code><em class="replaceable"><code>True</code></em></span></dt><dd><p>Whether or not to use on-disk persistent http
                             cache.<br>When set to "true", sima will use a
                             persistent cache for its http client. The cache is
                             written along with the dbfile in:<br>
@@ -102,31 +119,49 @@ consume=30
                             If set to "false", caching is still done but in memory.
                         </p></dd><dt><span class="term"><code class="option">priority=</code><em class="replaceable"><code>100</code></em></span></dt><dd><p>
                             Plugin priority
-                        </p></dd></dl></div></div></div><div class="refsect1"><a name="queue_mode"></a><h2>QUEUE MODES</h2><p>mpd-sima offers different queue modes. All of them pick up
-            tracks from artists similar to the last track in the queue.</p><p>mpd-sima tries preferably to chose among unplayed artists or
-            at least not recently played artist. Concerning track and album
-            queue modes titles are chosen purely at random among unplayed
-            tracks.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">track</code></span></dt><dd><p>Queue a similar track chosen at random from a similar artist.</p></dd><dt><span class="term"><code class="option">top</code></span></dt><dd><p>Queue a track from a similar artist, chosen among
-                        "top tracks" according to last.fm data mining.</p></dd><dt><span class="term"><code class="option">album</code></span></dt><dd><p>Queue a whole album chosen at random from a similar artist.</p><p><span class="emphasis"><em>Nota Bene:</em></span><br> Due to the
-                        track point of view of database build upon tracks tags
-                        an album lookup for a specific artist will return
-                        albums as soon as this artist appears in a single track
-                        of the album.<br>
-                        For instance looking for album from "The Velvet
-                        Underground" will fetch "Last Days" and "Juno" OSTs
-                        because the band appears on the soundtrack of these two
-                        movies.<br>
-                        A solution is for you to set AlbumArtists tag to
-                        something different than the actual artist of the
-                        track. For compilations, OSTs etc. a strong convention
-                        is to use "Various Artists" for this tag.</p><p>mpd-sima is currently looking for AlbumArtists tags
-                        and avoid album where this tag is set with "Various
-                        Artists". If a single track within an album is found
-                        with AlbumArtists:"Various Artists" the complete album
-                        is skipped and won't be queued.</p></dd></dl></div></div><div class="refsect1"><a name="files"></a><h2>FILES</h2><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="filename">${XDG_CONFIG_HOME}/mpd_sima/mpd_sima.cfg</code></span></dt><dd><p>Configuration file.</p></dd><dt><span class="term"><code class="filename">${XDG_DATA_HOME}/mpd_sima/sima.db</code></span></dt><dd><p>SQLite DB file.</p></dd><dt><span class="term"><code class="filename">${XDG_DATA_HOME}/mpd_sima/WEB_SERVICE/</code></span></dt><dd><p>Persistent http cache.</p></dd></dl></div><p>Usually <code class="envar">XDG_DATA_HOME</code> is set to
+                        </p></dd></dl></div></div><div class="refsect2"><a name="tags"></a><h3>Tags section</h3><p>Tags plugin's configuration. There is no default configuration for this plugin, it does not work out of the box.</p><p>
+                This plugin permits offline autoqueuing based on files tags only. Supported tags are
+              <code class="option">'comment'</code>, <code class="option">'date'</code>, <code class="option">'genre'</code>, <code class="option">'label'</code> and
+              <code class="option">'originaldate'</code>. It currently supports single track queuing only, no album mode for this plugin.
+              </p><p>
+              In addition to supported tags above you can use an MPD filter. Please refer to MPD protocol documentation for more.
+            </p><p>
+              All entries in this section are ANDed as a single MPD filter to look for titles
+              in the library. Moreover, with tags, comma separated values are also ANDed.<br>
+              For instance setting "<code class="option">genre=rock</code>" and
+              "<code class="option">date=1982,1983,1984,1985,1986,1987,1988,1989</code>"
+              will end up looking for track tagged with genre <code class="option">rock</code>
+              and date within 1985 through 1990.<br>
+              Using an MPD filter to replace <code class="option">date</code> you can achieve
+              the same with the following setting: "<code class="option">genre=rock</code>" and
+              "<code class="option">filter=(date =~ '198[2-9]')</code>" (provided your MPD server
+              was compiled with libpcre).
+            </p><dt><span class="term"><code class="option">[tags]</code></span></dt><dd></dd><dt><span class="term"><code class="option">filter=</code></span></dt><dd><p>You can use here any valid MPD filter as defined in MPD protocol documentation.</p></dd><dt><span class="term"><code class="option">comment=</code></span></dt><dd></dd><dt><span class="term"><code class="option">date=</code></span></dt><dd></dd><dt><span class="term"><code class="option">genre=</code></span></dt><dd></dd><dt><span class="term"><code class="option">label=</code></span></dt><dd></dd><dt><span class="term"><code class="option">priority=</code><em class="replaceable"><code>80</code></em></span></dt><dd><p>
+                            Plugin priority
+                        </p></dd><dt><span class="term"><code class="option">track_to_add=</code><em class="replaceable"><code>1</code></em></span></dt><dd><p>How many track(s) to add.</p></dd></div></div><div class="refsect1"><a name="queue_mode"></a><h2>QUEUE MODES</h2><p>Different queue modes are available with some plugins (check for
+        <code class="option">queue_mode</code> presence in plugin config).
+        </p><p>mpd-sima tries preferably to chose among unplayed artists or
+        at least not recently played artist.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="option">track</code></span></dt><dd><p>Queue a similar track chosen at random from a similar artist.</p></dd><dt><span class="term"><code class="option">top</code></span></dt><dd><p>Queue a track from a similar artist, chosen among
+                "top tracks" according to last.fm data mining.</p></dd><dt><span class="term"><code class="option">album</code></span></dt><dd><p>Queue a whole album chosen at random from a similar artist.</p><p><span class="emphasis"><em>Nota Bene:</em></span><br> Due to the
+                track point of view of database build upon tracks tags
+                an album lookup for a specific artist will return
+                albums as soon as this artist appears in a single track
+                of the album.<br>
+                For instance looking for album from "The Velvet
+                Underground" will fetch "Last Days" and "Juno" OSTs
+                because the band appears on the soundtrack of these two
+                movies.<br>
+                A solution is for you to set AlbumArtists tag to
+                something different than the actual artist of the
+                track. For compilations, OSTs etc. a strong convention
+                is to use "Various Artists" for this tag.</p><p>mpd-sima is currently looking for AlbumArtists tags
+                and avoid album where this tag is set with "Various
+                Artists". If a single track within an album is found
+                with AlbumArtists:"Various Artists" the complete album
+                is skipped and won't be queued.</p></dd></dl></div></div><div class="refsect1"><a name="files"></a><h2>FILES</h2><div class="variablelist"><dl class="variablelist"><dt><span class="term"><code class="filename">${XDG_CONFIG_HOME}/mpd_sima/mpd_sima.cfg</code></span></dt><dd><p>Configuration file.</p></dd><dt><span class="term"><code class="filename">${XDG_DATA_HOME}/mpd_sima/sima.db</code></span></dt><dd><p>SQLite DB file.</p></dd><dt><span class="term"><code class="filename">${XDG_DATA_HOME}/mpd_sima/WEB_SERVICE/</code></span></dt><dd><p>Persistent http cache.</p></dd></dl></div><p>Usually <code class="envar">XDG_DATA_HOME</code> is set to
             <code class="filename">${HOME}/.local/share</code> and <code class="envar">XDG_CONFIG_HOME</code> to
             <code class="filename">${HOME}/.config</code>.<br>You may override them using
             command line option <code class="option">--var-dir</code> and <code class="option">--config</code> (cf.
-            <span class="citerefentry"><span class="refentrytitle">mpd-sima</span>(1)</span>)</p></div><div class="refsect1"><a name="feedback"></a><h2>FEEDBACK/BUGS</h2><p>The maintainer would be more than happy to ear from you, don't hesitate to send feedback, <a class="ulink" href="http://kaliko.me/id/" target="_top">http://kaliko.me/id/</a>.</p><p><acronym class="acronym">XMPP</acronym> users are welcome to join the dedicated chat room at <a class="ulink" href="kaliko.me@conf.azylum.org" target="_top">kaliko.me@conf.azylum.org</a>.</p></div><div class="refsect1"><a name="see_also"></a><h2>SEE ALSO</h2><p><span class="citerefentry"><span class="refentrytitle">mpc</span>(1)</span>, <span class="citerefentry"><span class="refentrytitle">mpd</span>(1)</span></p><p>
+            <span class="citerefentry"><span class="refentrytitle">mpd-sima</span>(1)</span>)</p></div><div class="refsect1"><a name="feedback"></a><h2>FEEDBACK/BUGS</h2><p>The maintainer would be more than happy to ear from you, don't hesitate to send feedback, <a class="ulink" href="https://kaliko.me/contact/" target="_top">https://kaliko.me/contact/</a>.</p><p><acronym class="acronym">XMPP</acronym> users are welcome to join the dedicated chat room at <a class="ulink" href="kaliko.me@conf.azylum.org" target="_top">kaliko.me@conf.azylum.org</a>.</p></div><div class="refsect1"><a name="see_also"></a><h2>SEE ALSO</h2><p><span class="citerefentry"><span class="refentrytitle">mpc</span>(1)</span>, <span class="citerefentry"><span class="refentrytitle">mpd</span>(1)</span></p><p>
         <code class="filename">/usr/share/doc/mpd-sima/</code>
     </p></div></div></body></html>

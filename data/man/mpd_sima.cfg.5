@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: 12/14/2020
+.\"      Date: 12/15/2020
 .\"    Manual: mpd-sima 0.16.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "12/14/2020" "mpd-sima" "mpd-sima 0.16.0 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "12/15/2020" "mpd-sima" "mpd-sima 0.16.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -276,6 +276,11 @@ Random plugin\*(Aqs configuration:
 .RS 4
 .RE
 .PP
+\fBtrack_to_add=\fR\fI1\fR
+.RS 4
+How many track(s) to add\&.
+.RE
+.PP
 \fBflavour=\fR\fIsensible\fR
 .RS 4
 When no similar tracks are found, falling back to random queuing\&. Different mode, aka random flavour, are available:
@@ -461,11 +466,18 @@ You can use here any valid MPD filter as defined in MPD protocol documentation\&
 .RS 4
 Plugin priority
 .RE
+.PP
+\fBtrack_to_add=\fR\fI1\fR
+.RS 4
+How many track(s) to add\&.
+.RE
 .SH "QUEUE MODES"
 .PP
-mpd\-sima offers different queue modes with lastfm plugin\&. All of them pick up tracks from artists similar to the last track in the queue\&.
+Different queue modes are available with some plugins (check for
+\fBqueue_mode\fR
+presence in plugin config)\&.
 .PP
-mpd\-sima tries preferably to chose among unplayed artists or at least not recently played artist\&. Concerning track and album queue modes titles are chosen purely at random among unplayed tracks\&.
+mpd\-sima tries preferably to chose among unplayed artists or at least not recently played artist\&.
 .PP
 \fBtrack\fR
 .RS 4
