@@ -293,6 +293,12 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <varlistentry> <!-- random -->
                     <term><option>[random]</option></term>
                 </varlistentry>
+                <varlistentry> <!-- random.track_to_add -->
+                    <term><option>track_to_add=</option><replaceable>1</replaceable></term>
+                    <listitem>
+                        <para>How many track(s) to add.</para>
+                    </listitem>
+                </varlistentry>
                 <varlistentry> <!-- random.flavour -->
                     <term><option>flavour=</option><replaceable>sensible</replaceable></term>
                     <listitem>
@@ -471,16 +477,21 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                         </para>
                     </listitem>
                 </varlistentry>
+                <varlistentry> <!-- tags.track_to_add -->
+                    <term><option>track_to_add=</option><replaceable>1</replaceable></term>
+                    <listitem>
+                        <para>How many track(s) to add.</para>
+                    </listitem>
+                </varlistentry>
         </refsect2>
     </refsect1>
     <refsect1 id="queue_mode">
         <title>QUEUE MODES</title>
-        <para>&dhpackage; offers different queue modes with lastfm plugin. All of them pick up
-            tracks from artists similar to the last track in the queue.</para>
+        <para>Different queue modes are available with some plugins (check for
+        <option>queue_mode</option> presence in plugin config).
+        </para>
         <para>&dhpackage; tries preferably to chose among unplayed artists or
-            at least not recently played artist. Concerning track and album
-            queue modes titles are chosen purely at random among unplayed
-            tracks.</para>
+        at least not recently played artist.</para>
         <variablelist>
             <varlistentry>
                 <term><option>track</option></term>
