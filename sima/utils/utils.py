@@ -43,7 +43,8 @@ def getws(dic):
     """
     aka = push(bytes(dic.get('apikey') + '=', 'utf-8'))
     aka = getencoder('rot-13')(str((aka), 'utf-8'))[0]
-    dic.update({'apikey':aka})
+    dic.update({'apikey': aka})
+
 
 def get_mpd_environ():
     """
@@ -61,12 +62,14 @@ def get_mpd_environ():
             passwd = mpd_host_env[1]
     return (host, environ.get('MPD_PORT', None), passwd)
 
+
 def normalize_path(path):
     """Get absolute path
     """
     if not isabs(path):
         return normpath(join(getcwd(), path))
     return path
+
 
 def exception_log():
     """Log unknown exceptions"""
@@ -82,7 +85,7 @@ def exception_log():
 
 class SigHup(Exception):
     """SIGHUP raises this Exception"""
-    pass
+
 
 # ArgParse Callbacks
 class Obsolete(Action):
@@ -91,6 +94,7 @@ class Obsolete(Action):
     """
     def __call__(self, parser, namespace, values, option_string=None):
         raise ArgumentError(self, 'obsolete argument')
+
 
 class FileAction(Action):
     """Generic class to inherit from for ArgParse action on file/dir
@@ -107,6 +111,7 @@ class FileAction(Action):
         """control method
         """
         pass
+
 
 class Wfile(FileAction):
     # pylint: disable=R0903
@@ -126,6 +131,7 @@ class Wfile(FileAction):
             if not access(self._file, W_OK):
                 self.parser.error('no write access to "{0}"'.format(self._file))
 
+
 class Rfile(FileAction):
     # pylint: disable=R0903
     """Is file readable
@@ -138,6 +144,7 @@ class Rfile(FileAction):
         if not access(self._file, R_OK):
             self.parser.error('no read access to "{0}"'.format(self._file))
 
+
 class Wdir(FileAction):
     # pylint: disable=R0903
     """Is directory writable
@@ -149,6 +156,7 @@ class Wdir(FileAction):
             self.parser.error('not a directory: {0}'.format(self._file))
         if not access(self._file, W_OK):
             self.parser.error('no write access to "{0}"'.format(self._file))
+
 
 class Throttle:
     """throttle decorator"""
@@ -165,21 +173,27 @@ class Throttle:
             return result
         return wrapper
 
+
 class MPDSimaException(Exception):
-    pass
+    """Generic MPD_sima Exception"""
+
 
 # http client exceptions (for webservices)
 class WSError(MPDSimaException):
     pass
 
+
 class WSNotFound(WSError):
     pass
+
 
 class WSTimeout(WSError):
     pass
 
+
 class WSHTTPError(WSError):
     pass
+
 
 class PluginException(MPDSimaException):
     pass

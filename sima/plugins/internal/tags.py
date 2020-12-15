@@ -32,6 +32,7 @@ from ...lib.plugin import Plugin
 from ...lib.track import Track
 from ...utils.utils import PluginException
 
+
 def forge_filter(cfg):
     tags = set(cfg.keys()) & Tags.supported_tags
     cfg_filter = cfg.get('filter', None)
@@ -83,7 +84,7 @@ class Tags(Plugin):
     def _setup_tagsneeded(self):
         config_tags = {k for k, v in self.plugin_conf.items() if v}
         self.log.debug('%s plugin needs the followinng metadata: %s',
-                self, config_tags & Tags.supported_tags)
+                       self, config_tags & Tags.supported_tags)
         tags = config_tags & Tags.supported_tags
         self.player.needed_tags |= tags
 
@@ -98,8 +99,9 @@ class Tags(Plugin):
     def start(self):
         if (0, 21, 0) > tuple(map(int, self.player.mpd_version.split('.'))):
             self.log.warning('MPD protocol version: %s < 0.21.0',
-                    self.player.mpd_version)
-            self.log.error('Need at least MPD 0.21 to use Tags plugin (filters required)')
+                             self.player.mpd_version)
+            self.log.error(
+                'Need at least MPD 0.21 to use Tags plugin (filters required)')
             self.player.disconnect()
             raise PluginException('MPD >= 0.21 required')
         # Check filter is valid
