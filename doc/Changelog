@@ -1,3 +1,9 @@
+MPD_sima v0.16.1
+
+ * 
+
+ -- kaliko <kaliko@azylum.org>  UNRELEASED
+
 MPD_sima v0.16.0
 
  * New offline autoqueue plugin based on file tags only
