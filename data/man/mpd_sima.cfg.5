@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: 12/15/2020
-.\"    Manual: mpd-sima 0.16.0 User Manual
+.\"      Date: 12/16/2020
+.\"    Manual: mpd-sima 0.16.1 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "12/15/2020" "mpd-sima" "mpd-sima 0.16.0 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "12/16/2020" "mpd-sima" "mpd-sima 0.16.1 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -425,7 +425,7 @@ and
 .PP
 In addition to supported tags above you can use an MPD filter\&. Please refer to MPD protocol documentation for more\&.
 .PP
-All entries in this section are ANDed as a single MPD filter to look for titles in the library\&. Moreover, with tags, comma separated values are also ANDed\&.
+All entries in this section are ANDed as a single MPD filter to look for titles in the library\&. Moreover, with tags, comma separated values are also ORed\&.
 .br
 
 For instance setting "\fBgenre=rock\fR" and "\fBdate=1982,1983,1984,1985,1986,1987,1988,1989\fR" will end up looking for track tagged with genre
@@ -435,7 +435,7 @@ and date within 1985 through 1990\&.
 
 Using an MPD filter to replace
 \fBdate\fR
-you can achieve the same with the following setting: "\fBgenre=rock\fR" and "\fBfilter=(date =~ \*(Aq198[2\-9]\*(Aq)\fR" (provided your MPD server was compiled with libpcre)\&.
+you can achieve the same with the following setting: "\fBgenre=rock\fR" and "\fBfilter=(date =~ \*(Aq198[2\-9]+\*(Aq)\fR" (provided your MPD server was compiled with libpcre)\&.
 .PP
 \fB[tags]\fR
 .RS 4

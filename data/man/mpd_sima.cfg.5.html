@@ -119,22 +119,20 @@ consume=30
                             If set to "false", caching is still done but in memory.
                         </p></dd><dt><span class="term"><code class="option">priority=</code><em class="replaceable"><code>100</code></em></span></dt><dd><p>
                             Plugin priority
-                        </p></dd></dl></div></div><div class="refsect2"><a name="tags"></a><h3>Tags section</h3><p>Tags plugin's configuration. There is no default configuration for this plugin, it does not work out of the box.</p><p>
-                This plugin permits offline autoqueuing based on files tags only. Supported tags are
-              <code class="option">'comment'</code>, <code class="option">'date'</code>, <code class="option">'genre'</code>, <code class="option">'label'</code> and
-              <code class="option">'originaldate'</code>. It currently supports single track queuing only, no album mode for this plugin.
-              </p><p>
-              In addition to supported tags above you can use an MPD filter. Please refer to MPD protocol documentation for more.
-            </p><p>
-              All entries in this section are ANDed as a single MPD filter to look for titles
-              in the library. Moreover, with tags, comma separated values are also ANDed.<br>
+                        </p></dd></dl></div></div><div class="refsect2"><a name="tags"></a><h3>Tags section</h3><p>Tags plugin's configuration. There is no default configuration for this plugin,
+              it does not work out of the box.</p><p>  This plugin permits offline autoqueuing based on files tags only. Supported tags are
+              <code class="option">'comment'</code>, <code class="option">'date'</code>, <code class="option">'genre'</code>,
+              <code class="option">'label'</code> and <code class="option">'originaldate'</code>. It currently
+              supports single track queuing only, no album mode for this plugin.</p><p>In addition to supported tags above you can use an MPD filter. Please refer to
+              MPD protocol documentation for more.</p><p>All entries in this section are ANDed as a single MPD filter to look for titles
+              in the library. Moreover, with tags, comma separated values are also ORed.<br>
               For instance setting "<code class="option">genre=rock</code>" and
               "<code class="option">date=1982,1983,1984,1985,1986,1987,1988,1989</code>"
               will end up looking for track tagged with genre <code class="option">rock</code>
               and date within 1985 through 1990.<br>
               Using an MPD filter to replace <code class="option">date</code> you can achieve
               the same with the following setting: "<code class="option">genre=rock</code>" and
-              "<code class="option">filter=(date =~ '198[2-9]')</code>" (provided your MPD server
+              "<code class="option">filter=(date =~ '198[2-9]+')</code>" (provided your MPD server
               was compiled with libpcre).
             </p><dt><span class="term"><code class="option">[tags]</code></span></dt><dd></dd><dt><span class="term"><code class="option">filter=</code></span></dt><dd><p>You can use here any valid MPD filter as defined in MPD protocol documentation.</p></dd><dt><span class="term"><code class="option">comment=</code></span></dt><dd></dd><dt><span class="term"><code class="option">date=</code></span></dt><dd></dd><dt><span class="term"><code class="option">genre=</code></span></dt><dd></dd><dt><span class="term"><code class="option">label=</code></span></dt><dd></dd><dt><span class="term"><code class="option">priority=</code><em class="replaceable"><code>80</code></em></span></dt><dd><p>
                             Plugin priority

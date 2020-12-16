@@ -427,25 +427,23 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         </refsect2>
         <refsect2 id="tags">
             <title>Tags section</title>
-              <para>Tags plugin's configuration. There is no default configuration for this plugin, it does not work out of the box.</para>
-              <para>
-                This plugin permits offline autoqueuing based on files tags only. Supported tags are
-              <option>'comment'</option>, <option>'date'</option>, <option>'genre'</option>, <option>'label'</option> and
-              <option>'originaldate'</option>. It currently supports single track queuing only, no album mode for this plugin.
-              </para>
-            <para>
-              In addition to supported tags above you can use an MPD filter. Please refer to MPD protocol documentation for more.
-            </para>
-            <para>
-              All entries in this section are ANDed as a single MPD filter to look for titles
-              in the library. Moreover, with tags, comma separated values are also ANDed.<sbr />
+            <para>Tags plugin's configuration. There is no default configuration for this plugin,
+              it does not work out of the box.</para>
+            <para>  This plugin permits offline autoqueuing based on files tags only. Supported tags are
+              <option>'comment'</option>, <option>'date'</option>, <option>'genre'</option>,
+              <option>'label'</option> and <option>'originaldate'</option>. It currently
+              supports single track queuing only, no album mode for this plugin.</para>
+            <para>In addition to supported tags above you can use an MPD filter. Please refer to
+              MPD protocol documentation for more.</para>
+            <para>All entries in this section are ANDed as a single MPD filter to look for titles
+              in the library. Moreover, with tags, comma separated values are also ORed.<sbr />
               For instance setting "<option>genre=rock</option>" and
               "<option>date=1982,1983,1984,1985,1986,1987,1988,1989</option>"
               will end up looking for track tagged with genre <option>rock</option>
               and date within 1985 through 1990.<sbr />
               Using an MPD filter to replace <option>date</option> you can achieve
               the same with the following setting: "<option>genre=rock</option>" and
-              "<option>filter=(date =~ '198[2-9]')</option>" (provided your MPD server
+              "<option>filter=(date =~ '198[2-9]+')</option>" (provided your MPD server
               was compiled with libpcre).
             </para>
                 <varlistentry> <!-- tags -->
