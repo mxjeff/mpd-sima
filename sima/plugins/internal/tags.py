@@ -112,7 +112,8 @@ class Tags(Plugin):
         # Check filter is valid
         try:
             if self.plugin_conf['filter']:
-                self.player.find(self.plugin_conf['filter'])
+                # Use window to limit response size
+                self.player.find(self.plugin_conf['filter'], "window", (0, 1))
         except CommandError:
             raise PluginException('Badly formated filter in tags plugin configuration: "%s"'
                                   % self.plugin_conf['filter'])
