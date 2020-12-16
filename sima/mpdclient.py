@@ -33,7 +33,7 @@ from .utils.leven import levenshtein_ratio
 
 
 class PlayerError(Exception):
-    """Fatal error in poller."""
+    """Fatal error in the player."""
 
 
 # Some decorators

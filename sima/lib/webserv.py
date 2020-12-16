@@ -253,7 +253,7 @@ class WebService(Plugin):
             return []
         tolookfor = self.player.playlist[-1].Artist
         self.log.info('Looking for artist similar to "%s"', tolookfor)
-        self.log.debug(repr(tolookfor))
+        self.log.debug('%r', tolookfor)
         similar = self.ws_similar_artists(tolookfor)
         if not similar:
             self.log.info('Got nothing from %s!', self.ws.name)

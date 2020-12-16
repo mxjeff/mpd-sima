@@ -21,12 +21,12 @@
 """
 
 # standard library import
-#from select import select
 
 # third parties components
 
 # local import
 from ...lib.plugin import Plugin
+
 
 class Crop(Plugin):
     """
@@ -57,7 +57,7 @@ class Crop(Plugin):
             return
         if not self.daemon.enabled:
             self.log.debug('Queueing disabled, not cropping')
-            return False
+            return
         player = self.daemon.player
         if player.currentsong().pos > self.target:
             self.log.debug('cropping playlist')
