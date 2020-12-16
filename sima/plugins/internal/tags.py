@@ -62,8 +62,8 @@ class Tags(Plugin):
         super().__init__(daemon)
         self.daemon = daemon
         self._control_conf()
-        self._setup_tagsneeded()
         self.mpd_filter = forge_filter(self.plugin_conf)
+        self._setup_tagsneeded()
         self.log.debug('mpd filter: %s', self.mpd_filter)
 
     def _control_conf(self):
@@ -82,9 +82,14 @@ class Tags(Plugin):
             raise PluginException('plugin misconfiguration')
 
     def _setup_tagsneeded(self):
-        config_tags = {k for k, v in self.plugin_conf.items() if v}
-        self.log.debug('%s plugin needs the followinng metadata: %s',
-                       self, config_tags & Tags.supported_tags)
+        """Ensure needed tags are exposed by MPD"""
+        # At this point mpd_filter concatenetes {tags}+filter
+        config_tags = set()
+        for mpd_supp_tags in self.player.MPD_supported_tags:
+            if mpd_supp_tags.lower() in self.mpd_filter.lower():
+                config_tags.add(mpd_supp_tags.lower())
+        self.log.debug('%s plugin needs the following metadata: %s',
+                       self, config_tags)
         tags = config_tags & Tags.supported_tags
         self.player.needed_tags |= tags
 

@@ -124,6 +124,13 @@ class MPD(MPDClient):
     needed_tags = {'Artist', 'Album', 'AlbumArtist', 'Title', 'Track'}
     needed_mbid_tags = {'MUSICBRAINZ_ARTISTID', 'MUSICBRAINZ_ALBUMID',
                         'MUSICBRAINZ_ALBUMARTISTID', 'MUSICBRAINZ_TRACKID'}
+    MPD_supported_tags = {'Artist', 'ArtistSort', 'Album', 'AlbumSort', 'AlbumArtist',
+                          'AlbumArtistSort', 'Title', 'Track', 'Name', 'Genre',
+                          'Date', 'OriginalDate', 'Composer', 'Performer',
+                          'Conductor', 'Work', 'Grouping', 'Disc', 'Label',
+                          'MUSICBRAINZ_ARTISTID', 'MUSICBRAINZ_ALBUMID',
+                          'MUSICBRAINZ_ALBUMARTISTID', 'MUSICBRAINZ_TRACKID',
+                          'MUSICBRAINZ_RELEASETRACKID', 'MUSICBRAINZ_WORKID'}
     database = None
 
     def __init__(self, daemon):
