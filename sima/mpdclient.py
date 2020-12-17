@@ -390,8 +390,11 @@ class MPD(MPDClient):
                 if len(library) > 1:
                     self.log.debug('I got "%s" searching for %r', library, artist)
                 elif len(library) == 1 and library[0] != artist.name:
+                    new_alias = artist.name
                     self.log.info('Update artist name %s->%s', artist, library[0])
+                    self.log.debug('Also add alias for %s: %s', artist, new_alias)
                     artist = Artist(name=library[0], mbid=artist.mbid)
+                    artist.add_alias(new_alias)
             # Fetches remaining artists for potential match
             artists = self._cache['nombid_artists']
         else:  # not using MusicBrainzIDs
