@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: 12/16/2020
+.\"      Date: 12/17/2020
 .\"    Manual: mpd-sima 0.16.1 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "12/16/2020" "mpd-sima" "mpd-sima 0.16.1 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "12/17/2020" "mpd-sima" "mpd-sima 0.16.1 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -441,6 +441,16 @@ you can achieve the same with the following setting: "\fBgenre=rock\fR" and "\fB
 .RS 4
 .RE
 .PP
+\fBqueue_mode=\fR\fItrack\fR
+.RS 4
+Queue mode to use among
+\fItrack\fR,
+\fIalbum\fR
+(see
+the section called \(lqQUEUE MODES\(rq
+for info about queue modes)\&.
+.RE
+.PP
 \fBfilter=\fR
 .RS 4
 You can use here any valid MPD filter as defined in MPD protocol documentation\&.
@@ -470,6 +480,13 @@ Plugin priority
 \fBtrack_to_add=\fR\fI1\fR
 .RS 4
 How many track(s) to add\&.
+.RE
+.PP
+\fBalbum_to_add=\fR\fI1\fR
+.RS 4
+How many album(s) to add\&. Only relevant in
+\fBalbum\fR
+queue mode\&.
 .RE
 .SH "QUEUE MODES"
 .PP

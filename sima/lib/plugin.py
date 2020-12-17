@@ -21,6 +21,11 @@
 Plugin object to derive from
 """
 
+import random
+
+from .track import Track
+from .meta import Album, Artist
+
 
 class Plugin:
     """
@@ -121,6 +126,129 @@ class Plugin:
         """Called on application shutdown"""
         pass
 
+
+class AdvancedLookUp:
+    """Object to derive from for plugins
+    Exposes advanced music library look up with use of play history
+    """
+
+    def __init__(self, daemon):
+        self.log = daemon.log
+        self.daemon = daemon
+        self.player = daemon.player
+
+    # Query History
+    def get_history(self, artist=False):
+        """Constructs list of already played artists.
+        """
+        duration = self.daemon.config.getint('sima', 'history_duration')
+        name = None
+        if artist:
+            name = artist.name
+        from_db = self.daemon.sdb.get_history(duration=duration, artist=name)
+        hist = [Track(artist=tr[0], album=tr[1], title=tr[2],
+                      file=tr[3]) for tr in from_db]
+        return hist
+
+    def get_album_history(self, artist):
+        """Retrieve album history"""
+        hist = []
+        tracks_from_db = self.get_history(artist=artist)
+        for trk in tracks_from_db:
+            if trk.album and trk.album in hist:
+                continue
+            hist.append(Album(name=trk.album, artist=Artist(trk.artist)))
+        return hist
+
+    def get_reorg_artists_list(self, alist):
+        """
+        Move around items in artists_list in order to play first not recently
+        played artists
+
+        :param list(str) alist:
+        """
+        hist = list()
+        duration = self.daemon.config.getint('sima', 'history_duration')
+        for art in self.daemon.sdb.get_artists_history(alist, duration=duration):
+            if art not in hist:
+                hist.insert(0, art)
+        reorg = [art for art in alist if art not in hist]
+        reorg.extend(hist)
+        return reorg
+    # /Query History
+
+    # Find not recently played/unplayed
+    def album_candidate(self, artist, unplayed=True):
+        """
+        :param Artist artist: Artist to fetch an album for
+        :param bool unplayed: Fetch only unplayed album
+        """
+        self.log.info('Searching an album for "%s"...' % artist)
+        albums = self.player.search_albums(artist)
+        if not albums:
+            return []
+        self.log.debug('Albums candidate: %s', albums)
+        albums_hist = self.get_album_history(artist)
+        self.log.debug('Albums history: %s', albums_hist)
+        albums_not_in_hist = [a for a in albums if a.name not in albums_hist]
+        # Get to next artist if there are no unplayed albums
+        if not albums_not_in_hist:
+            self.log.info('No unplayed album found for "%s"' % artist)
+            if unplayed:
+                return []
+        random.shuffle(albums_not_in_hist)
+        albums_not_in_hist.extend(albums_hist)
+        album_to_queue = []
+        for album in albums_not_in_hist:
+            # Controls the album found is not already queued
+            if album in {t.album for t in self.player.queue}:
+                self.log.debug('"%s" already queued, skipping!', album)
+                return []
+            # In random play mode use complete playlist to filter
+            if self.player.playmode.get('random'):
+                if album in {t.album for t in self.player.playlist}:
+                    self.log.debug('"%s" already in playlist, skipping!',
+                                   album)
+                    return []
+            album_to_queue = album
+        if not album_to_queue:
+            self.log.info('No album found for "%s"', artist)
+            return []
+        self.log.info('%s album candidate: %s - %s', self.__class__.__name__,
+                      artist, album_to_queue)
+        return album_to_queue
+
+    def filter_track(self, tracks, unplayed=False):
+        """
+        Extract one unplayed track from a Track object list.
+            * not in history
+            * not already in the queue
+        """
+        artist = tracks[0].Artist
+        # In random play mode use complete playlist to filter
+        if self.player.playmode.get('random'):
+            deny_list = self.player.playlist
+        else:
+            deny_list = self.player.queue
+        not_in_hist = list(set(tracks) - set(self.get_history(artist=artist)))
+        if not not_in_hist:
+            self.log.debug('All tracks already played for "%s"', artist)
+            if unplayed:
+                return None
+        random.shuffle(not_in_hist)
+        candidates = [_ for _ in not_in_hist if _ not in deny_list]
+        # for trk in [_ for _ in not_in_hist if _ not in deny_list]:
+        #     # Should use albumartist heuristic as well
+        #     if self.plugin_conf.getboolean('single_album'):  # pylint: disable=no-member
+        #         if (trk.album == self.player.current.album or
+        #                 trk.album in [tr.album for tr in black_list]):
+        #             self.log.debug('Found unplayed track ' +
+        #                            'but from an album already queued: %s', trk)
+        #             continue
+        #     candidates.append(trk)
+        if not candidates:
+            return None
+        return random.choice(candidates)
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab

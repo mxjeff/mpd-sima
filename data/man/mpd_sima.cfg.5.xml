@@ -449,6 +449,14 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <varlistentry> <!-- tags -->
                    <term><option>[tags]</option></term>
                 </varlistentry>
+                <varlistentry> <!-- tags.queue_mode -->
+                    <term><option>queue_mode=</option><replaceable>track</replaceable></term>
+                    <listitem>
+                        <para>Queue mode to use among
+                            <replaceable>track</replaceable>,
+                            <replaceable>album</replaceable> (see <xref linkend="queue_mode"/> for info about queue modes).</para>
+                    </listitem>
+                </varlistentry>
                 <varlistentry> <!-- tags.filter -->
                     <term><option>filter=</option></term>
                     <listitem>
@@ -479,6 +487,13 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                     <term><option>track_to_add=</option><replaceable>1</replaceable></term>
                     <listitem>
                         <para>How many track(s) to add.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry> <!-- tags.album_to_add -->
+                    <term><option>album_to_add=</option><replaceable>1</replaceable></term>
+                    <listitem>
+                        <para>How many album(s) to add. Only relevant in
+                            <option>album</option> queue mode.</para>
                     </listitem>
                 </varlistentry>
         </refsect2>

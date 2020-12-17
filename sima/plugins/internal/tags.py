@@ -28,8 +28,8 @@ import random
 from musicpd import CommandError
 
 # local import
-from ...lib.plugin import Plugin
-from ...lib.track import Track
+from ...lib.plugin import Plugin, AdvancedLookUp
+from ...lib.meta import Artist, Album
 from ...utils.utils import PluginException
 
 
@@ -53,10 +53,11 @@ def forge_filter(cfg):
     return mpd_filter
 
 
-class Tags(Plugin):
+class Tags(Plugin, AdvancedLookUp):
     """Add track based on tags content
     """
     supported_tags = {'comment', 'date', 'genre', 'label', 'originaldate'}
+    options = {'queue_mode', 'priority', 'filter', 'track_to_add', 'album_to_add'}
 
     def __init__(self, daemon):
         super().__init__(daemon)
@@ -69,7 +70,7 @@ class Tags(Plugin):
     def _control_conf(self):
         sup_tags = Tags.supported_tags
         config_tags = {k for k, v in self.plugin_conf.items()
-                       if (v and k not in ['filter', 'priority', 'track_to_add'])}
+                       if (v and k not in Tags.options)}
         if not self.plugin_conf.get('filter', None) and \
                 config_tags.isdisjoint(sup_tags):
             self.log.error('Found no config for %s plugin! '
@@ -93,14 +94,6 @@ class Tags(Plugin):
         tags = config_tags & Tags.supported_tags
         self.player.needed_tags |= tags
 
-    def _get_history(self):
-        """Constructs list of already played artists.
-        """
-        duration = self.daemon.config.getint('sima', 'history_duration')
-        tracks_from_db = self.daemon.sdb.get_history(duration=duration)
-        hist = [Track(file=tr[3], artist=tr[0]) for tr in tracks_from_db]
-        return hist
-
     def start(self):
         if (0, 21, 0) > tuple(map(int, self.player.mpd_version.split('.'))):
             self.log.warning('MPD protocol version: %s < 0.21.0',
@@ -118,12 +111,13 @@ class Tags(Plugin):
             raise PluginException('Badly formated filter in tags plugin configuration: "%s"'
                                   % self.plugin_conf['filter'])
 
-    def callback_need_track(self):
+    def callback_need_track_(self):
         candidates = []
-        target = self.plugin_conf.getint('track_to_add')
+        queue_mode = self.plugin_conf.get('queue_mode', 'track')
+        target = self.plugin_conf.getint(f'{queue_mode}_to_add')
         tracks = self.player.find(self.mpd_filter)
         random.shuffle(tracks)
-        history = self._get_history()
+        history = self.get_history()
         while tracks:
             trk = tracks.pop()
             if trk in self.player.queue or \
@@ -137,8 +131,44 @@ class Tags(Plugin):
             self.log.info('Tags candidate: {}'.format(trk))
             if len(candidates) >= target:
                 break
+        if queue_mode == 'track':
+            return candidates
+        if queue_mode == 'album':
+            for trk in candidates:
+                self.log.info(trk.Artist)
+                _ = self.album_candidate(trk.Artist)
         if not candidates:
             self.log.info('Tags plugin failed to find some tracks')
+        return candidates
+
+    def callback_need_track(self):
+        candidates = []
+        queue_mode = self.plugin_conf.get('queue_mode', 'track')
+        target = self.plugin_conf.getint(f'{queue_mode}_to_add')
+        # look for artists acording to filter
+        artists = self.player.list('artist', self.mpd_filter)
+        random.shuffle(artists)
+        artists = self.get_reorg_artists_list(artists)
+        self.log.debug('Tags candidates: %s', ' / '.join(artists))
+        for artist in artists:
+            if artist in {t.Artist for t in self.player.queue}:
+                continue
+            self.log.debug('looking for %s', artist)
+            trk = self.filter_track(self.player.find_tracks(Artist(name=artist)))
+            if not trk:
+                continue
+            if queue_mode == 'track':
+                self.log.info('Tags candidate: {}'.format(trk))
+                candidates.append(trk)
+                if len(candidates) == target:
+                    break
+            else:
+                album = self.album_candidate(trk.Artist, unplayed=True)
+                if not album:
+                    continue
+                candidates.extend(self.player.find_tracks(album))
+                if len({t.album for t in candidates}) == target:
+                    break
         return candidates
 
 # VIM MODLINE

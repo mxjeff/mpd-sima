@@ -94,7 +94,9 @@ DEFAULT_CONF = {
             'label': "",
             'originaldate': "",
             'filter': "",
+            'queue_mode': "track",
             'track_to_add': 1,
+            'album_to_add': 1,
             'priority': 80,
             }
         }
