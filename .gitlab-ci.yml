@@ -2,6 +2,10 @@
 # https://hub.docker.com/_/python
 image: python:3
 
+include:
+  - local: .gitlab/gitlab-templates.yml
+  - local: .gitlab/pylint.yml
+
 variables:
   #XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
