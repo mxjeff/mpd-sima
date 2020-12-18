@@ -50,9 +50,10 @@ class Plugin:
 
     def __init__(self, daemon):
         self.log = daemon.log
-        self.__daemon = daemon
         self.player = daemon.player
         self.plugin_conf = None
+        self.main_conf = daemon.config
+        self.sdb = daemon.sdb
         self.__get_config()
 
     def __str__(self):
@@ -61,7 +62,7 @@ class Plugin:
     def __get_config(self):
         """Get plugin's specific configuration from global applications's config
         """
-        conf = self.__daemon.config
+        conf = self.main_conf
         for sec in conf.sections():  # Discovering plugin conf
             if sec == self.__class__.__name__.lower():
                 self.plugin_conf = conf[sec]
@@ -70,7 +71,7 @@ class Plugin:
         if not self.plugin_conf:
             self.plugin_conf = {'priority': '80'}
         #if self.plugin_conf:
-        #    self.log.debug('Got config for %s: %s', self, self.plugin_conf)
+        #   self.log.debug('Got config for %s: %s', self, self.plugin_conf)
 
     @property
     def priority(self):
@@ -127,25 +128,22 @@ class Plugin:
         pass
 
 
-class AdvancedLookUp:
+class AdvancedPlugin(Plugin):
     """Object to derive from for plugins
     Exposes advanced music library look up with use of play history
     """
 
-    def __init__(self, daemon):
-        self.log = daemon.log
-        self.daemon = daemon
-        self.player = daemon.player
-
     # Query History
     def get_history(self, artist=False):
-        """Constructs list of already played artists.
+        """Constructs Track list of already played artists.
+
+        :param Artist artist: Artist object to look history for
         """
-        duration = self.daemon.config.getint('sima', 'history_duration')
+        duration = self.main_conf.getint('sima', 'history_duration')
         name = None
         if artist:
             name = artist.name
-        from_db = self.daemon.sdb.get_history(duration=duration, artist=name)
+        from_db = self.sdb.get_history(duration=duration, artist=name)
         hist = [Track(artist=tr[0], album=tr[1], title=tr[2],
                       file=tr[3]) for tr in from_db]
         return hist
@@ -168,8 +166,8 @@ class AdvancedLookUp:
         :param list(str) alist:
         """
         hist = list()
-        duration = self.daemon.config.getint('sima', 'history_duration')
-        for art in self.daemon.sdb.get_artists_history(alist, duration=duration):
+        duration = self.main_conf.getint('sima', 'history_duration')
+        for art in self.sdb.get_artists_history(alist, duration=duration):
             if art not in hist:
                 hist.insert(0, art)
         reorg = [art for art in alist if art not in hist]
@@ -179,7 +177,8 @@ class AdvancedLookUp:
 
     # Find not recently played/unplayed
     def album_candidate(self, artist, unplayed=True):
-        """
+        """Search an album for artist
+
         :param Artist artist: Artist to fetch an album for
         :param bool unplayed: Fetch only unplayed album
         """
@@ -189,7 +188,7 @@ class AdvancedLookUp:
             return []
         self.log.debug('Albums candidate: %s', albums)
         albums_hist = self.get_album_history(artist)
-        self.log.debug('Albums history: %s', albums_hist)
+        self.log.debug('Albums history: %s', [a.name for a in albums_hist])
         albums_not_in_hist = [a for a in albums if a.name not in albums_hist]
         # Get to next artist if there are no unplayed albums
         if not albums_not_in_hist:
@@ -236,16 +235,16 @@ class AdvancedLookUp:
             if unplayed:
                 return None
         random.shuffle(not_in_hist)
-        candidates = [_ for _ in not_in_hist if _ not in deny_list]
-        # for trk in [_ for _ in not_in_hist if _ not in deny_list]:
-        #     # Should use albumartist heuristic as well
-        #     if self.plugin_conf.getboolean('single_album'):  # pylint: disable=no-member
-        #         if (trk.album == self.player.current.album or
-        #                 trk.album in [tr.album for tr in black_list]):
-        #             self.log.debug('Found unplayed track ' +
-        #                            'but from an album already queued: %s', trk)
-        #             continue
-        #     candidates.append(trk)
+        candidates = []
+        for trk in [_ for _ in not_in_hist if _ not in deny_list]:
+            # Should use albumartist heuristic as well
+            if self.plugin_conf.getboolean('single_album', False):  # pylint: disable=no-member
+                if (trk.album == self.player.current.album or
+                        trk.album in [tr.album for tr in deny_list]):
+                    self.log.debug('Found unplayed track ' +
+                                   'but from an album already queued: %s', trk)
+                    continue
+            candidates.append(trk)
         if not candidates:
             return None
         return random.choice(candidates)

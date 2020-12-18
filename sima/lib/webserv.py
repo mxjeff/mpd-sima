@@ -31,8 +31,7 @@ from hashlib import md5
 # third parties components
 
 # local import
-from .plugin import Plugin
-from .track import Track
+from .plugin import AdvancedPlugin
 from .meta import Artist, MetaContainer
 from ..utils.utils import WSError, WSNotFound, WSTimeout
 
@@ -55,15 +54,13 @@ def cache(func):
     return wrapper
 
 
-class WebService(Plugin):
+class WebService(AdvancedPlugin):
     """similar artists webservice
     """
     # pylint: disable=bad-builtin
 
     def __init__(self, daemon):
-        Plugin.__init__(self, daemon)
-        self.daemon_conf = daemon.config
-        self.sdb = daemon.sdb
+        super().__init__(daemon)
         self.history = daemon.short_history
         ##
         self.to_add = list()
@@ -95,63 +92,6 @@ class WebService(Plugin):
             if isinstance(val, dict):
                 while len(val) > 150:
                     val.popitem()
-
-    def get_history(self, artist):
-        """Constructs list of Track for already played titles for an artist.
-        """
-        duration = self.daemon_conf.getint('sima', 'history_duration')
-        tracks_from_db = self.sdb.get_history(duration=duration, artist=artist)
-        # Construct Track() objects list from database history
-        played_tracks = [Track(artist=tr[-1], album=tr[1], title=tr[2],
-                               file=tr[3]) for tr in tracks_from_db]
-        return played_tracks
-
-    def filter_track(self, tracks):
-        """
-        Extract one unplayed track from a Track object list.
-            * not in history
-            * not already in the queue
-            * not blacklisted
-        Then add to candidates in self.to_add
-        """
-        artist = tracks[0].artist
-        # In random play mode use complete playlist to filter
-        if self.player.playmode.get('random'):
-            black_list = self.player.playlist + self.to_add
-        else:
-            black_list = self.player.queue + self.to_add
-        not_in_hist = list(set(tracks) - set(self.get_history(artist=artist)))
-        if self.plugin_conf.get('queue_mode') != 'top' and not not_in_hist:
-            self.log.debug('All tracks already played for "%s"', artist)
-        random.shuffle(not_in_hist)
-        candidate = []
-        for trk in [_ for _ in not_in_hist if _ not in black_list]:
-            # Should use albumartist heuristic as well
-            if self.plugin_conf.getboolean('single_album'):  # pylint: disable=no-member
-                if (trk.album == self.player.current.album or
-                        trk.album in [tr.album for tr in black_list]):
-                    self.log.debug('Found unplayed track ' +
-                                   'but from an album already queued: %s', trk)
-                    continue
-            candidate.append(trk)
-        if not candidate:
-            return False
-        self.to_add.append(random.choice(candidate))
-        return True
-
-    def _get_artists_list_reorg(self, alist):
-        """
-        Move around items in artists_list in order to play first not recently
-        played artists
-        """
-        hist = list()
-        duration = self.daemon_conf.getint('sima', 'history_duration')
-        for art in self.sdb.get_artists_history(alist, duration=duration):
-            if art not in hist:
-                hist.insert(0, art)
-        reorg = [art for art in alist if art not in hist]
-        reorg.extend(hist)
-        return reorg
 
     @cache
     def get_artists_from_player(self, similarities):
@@ -273,7 +213,7 @@ class WebService(Plugin):
                 ret_extra = self.get_recursive_similar_artist()
         if ret_extra:
             # get them reorg to pick up best element
-            ret_extra = self._get_artists_list_reorg(ret_extra)
+            ret_extra = self.get_reorg_artists_list(ret_extra)
             # tries to pickup less artist from extra art
             if len(ret) < 4:
                 ret_extra = MetaContainer(ret_extra)
@@ -304,7 +244,7 @@ class WebService(Plugin):
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         self.log.info('Got %d artists in library', len(ret))
-        candidates = self._get_artists_list_reorg(list(ret))
+        candidates = self.get_reorg_artists_list(list(ret))
         if candidates:
             self.log.info(' / '.join(map(str, candidates)))
         return candidates
@@ -325,35 +265,7 @@ class WebService(Plugin):
         nb_album_add = 0
         target_album_to_add = self.plugin_conf.getint('album_to_add')  # pylint: disable=no-member
         for artist in artists:
-            self.log.info('Looking for an album to add for "%s"...' % artist)
-            albums = self.player.search_albums(artist)
-            if not albums:
-                continue
-            self.log.debug('Albums candidate: %s', albums)
-            albums_hist = self._get_album_history(artist)
-            albums_not_in_hist = [a for a in albums if a.name not in albums_hist]
-            # Get to next artist if there are no unplayed albums
-            if not albums_not_in_hist:
-                self.log.info('No unplayed album found for "%s"' % artist)
-                continue
-            album_to_queue = []
-            random.shuffle(albums_not_in_hist)
-            for album in albums_not_in_hist:
-                # Controls the album found is not already queued
-                if album in {t.album for t in self.player.queue}:
-                    self.log.debug('"%s" already queued, skipping!', album)
-                    continue
-                # In random play mode use complete playlist to filter
-                if self.player.playmode.get('random'):
-                    if album in {t.album for t in self.player.playlist}:
-                        self.log.debug('"%s" already in playlist, skipping!', album)
-                        continue
-                album_to_queue = album
-            if not album_to_queue:
-                self.log.info('No album found for "%s"', artist)
-                continue
-            self.log.info('%s album candidate: %s - %s', self.ws.name,
-                          artist, album_to_queue)
+            album = self.album_candidate(artist)
             nb_album_add += 1
             candidates = self.player.find_tracks(album)
             if self.plugin_conf.getboolean('shuffle_album'):
@@ -387,7 +299,9 @@ class WebService(Plugin):
                 found = self.player.search_track(artist, trk.title)
                 if found:
                     random.shuffle(found)
-                    if self.filter_track(found):
+                    top_trk = self.filter_track(found)
+                    if top_trk:
+                        self.to_add.append(top_trk)
                         break
 
     def _track(self):
@@ -403,7 +317,9 @@ class WebService(Plugin):
                 self.log.debug('Found nothing to queue for %s', artist)
                 continue
             # find tracks not in history for artist
-            self.filter_track(found)
+            track_candidate = self.filter_track(found)
+            if track_candidate:
+                self.to_add.append(track_candidate)
             if len(self.to_add) == nbtracks_target:
                 break
         if not self.to_add:

@@ -28,8 +28,8 @@ import random
 from musicpd import CommandError
 
 # local import
-from ...lib.plugin import Plugin, AdvancedLookUp
-from ...lib.meta import Artist, Album
+from ...lib.plugin import AdvancedPlugin
+from ...lib.meta import Artist
 from ...utils.utils import PluginException
 
 
@@ -53,7 +53,7 @@ def forge_filter(cfg):
     return mpd_filter
 
 
-class Tags(Plugin, AdvancedLookUp):
+class Tags(AdvancedPlugin):
     """Add track based on tags content
     """
     supported_tags = {'comment', 'date', 'genre', 'label', 'originaldate'}
@@ -61,7 +61,6 @@ class Tags(Plugin, AdvancedLookUp):
 
     def __init__(self, daemon):
         super().__init__(daemon)
-        self.daemon = daemon
         self._control_conf()
         self.mpd_filter = forge_filter(self.plugin_conf)
         self._setup_tagsneeded()
