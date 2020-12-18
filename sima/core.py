@@ -101,7 +101,7 @@ class Sima(Daemon):
     def queue(self):
         to_add = list()
         for plugin in self.plugins:
-            self.log.info('callback_need_track: %s', plugin)
+            self.log.debug('callback_need_track: %s', plugin)
             pl_candidates = getattr(plugin, 'callback_need_track')()
             if pl_candidates:
                 to_add.extend(pl_candidates)
