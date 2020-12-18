@@ -477,7 +477,7 @@ class MPD(MPDClient):
           looking for albums for Artist_B returns wrongly this album.
         """
         # First, look for all potential albums
-        self.log.debug('Searching album for "%s"', artist)
+        self.log.debug('Searching album for "%r"', artist)
         if artist.aliases:
             self.log.debug('Searching album for %s aliases: "%s"',
                            artist, artist.aliases)
