@@ -34,7 +34,6 @@ class History(Plugin):
     """
     def __init__(self, daemon):
         Plugin.__init__(self, daemon)
-        self.sdb = daemon.sdb
         self._last_clean = time()
 
     def shutdown(self):
@@ -52,7 +51,7 @@ class History(Plugin):
             return
         self.log.debug('add history: "%s"', current)
         self.sdb.add_history(current)
-        if self._last_clean - time() > 86400:
+        if time() - self._last_clean > 86400:
             self.shutdown()
             self._last_clean = time()
 
