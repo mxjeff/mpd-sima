@@ -37,7 +37,6 @@ class Random(Plugin):
 
     def __init__(self, daemon):
         super().__init__(daemon)
-        self.daemon = daemon
         self.mode = self.plugin_conf.get('flavour', None)
         if self.mode not in ['pure', 'sensible']:
             self.log.warning('Bad value for flavour, '
@@ -49,8 +48,8 @@ class Random(Plugin):
     def get_played_artist(self,):
         """Constructs list of already played artists.
         """
-        duration = self.daemon.config.getint('sima', 'history_duration')
-        tracks_from_db = self.daemon.sdb.get_history(duration=duration)
+        duration = self.main_conf.getint('sima', 'history_duration')
+        tracks_from_db = self.sdb.get_history(duration=duration)
         artists = [tr[0] for tr in tracks_from_db]
         return set(artists)
 
@@ -63,7 +62,7 @@ class Random(Plugin):
          * not blacklisted
         """
         if self.mode == 'sensible':
-            if self.daemon.sdb.get_bl_artist(artist, add_not=True):
+            if self.sdb.get_bl_artist(artist, add_not=True):
                 self.log.debug('Random: Blacklisted "%s"', artist)
                 return True
             if artist in self.get_played_artist():
@@ -88,7 +87,7 @@ class Random(Plugin):
             if trks:
                 trk = random.choice(trks)
                 self.candidates.append(trk)
-                self.log.info('Random candidate (%s): %s', self.mode, trk)
+                self.log.info('Random plugin chose (%s): %s', self.mode, trk)
             if len(self.candidates) >= target:
                 break
         return self.candidates
