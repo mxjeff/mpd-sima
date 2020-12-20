@@ -110,36 +110,6 @@ class Tags(AdvancedPlugin):
             raise PluginException('Badly formated filter in tags plugin configuration: "%s"'
                                   % self.plugin_conf['filter'])
 
-    def callback_need_track_(self):
-        candidates = []
-        queue_mode = self.plugin_conf.get('queue_mode', 'track')
-        target = self.plugin_conf.getint(f'{queue_mode}_to_add')
-        tracks = self.player.find(self.mpd_filter)
-        random.shuffle(tracks)
-        history = self.get_history()
-        while tracks:
-            trk = tracks.pop()
-            if trk in self.player.queue or \
-               trk in candidates:
-                self.log.debug('%s already queued', trk)
-                continue
-            if trk in history:
-                self.log.debug('%s in history', trk)
-                continue
-            candidates.append(trk)
-            self.log.info('Tags candidate: {}'.format(trk))
-            if len(candidates) >= target:
-                break
-        if queue_mode == 'track':
-            return candidates
-        if queue_mode == 'album':
-            for trk in candidates:
-                self.log.info(trk.Artist)
-                _ = self.album_candidate(trk.Artist)
-        if not candidates:
-            self.log.info('Tags plugin failed to find some tracks')
-        return candidates
-
     def callback_need_track(self):
         candidates = []
         queue_mode = self.plugin_conf.get('queue_mode', 'track')
