@@ -118,16 +118,15 @@ class Tags(AdvancedPlugin):
         artists = self.player.list('artist', self.mpd_filter)
         random.shuffle(artists)
         artists = self.get_reorg_artists_list(artists)
-        self.log.debug('Tags candidates: %s', ' / '.join(artists))
+        self.log.debug('Tags artists found: %s', ' / '.join(artists))
         for artist in artists:
-            if artist in {t.Artist for t in self.player.queue}:
-                continue
             self.log.debug('looking for %s', artist)
-            trk = self.filter_track(self.player.find_tracks(Artist(name=artist)))
+            tracks = self.player.find_tracks(Artist(name=artist))
+            trk = self.filter_track(tracks)
             if not trk:
                 continue
             if queue_mode == 'track':
-                self.log.info('Tags candidate: {}'.format(trk))
+                self.log.info('Tags plugin chose: {}'.format(trk))
                 candidates.append(trk)
                 if len(candidates) == target:
                     break

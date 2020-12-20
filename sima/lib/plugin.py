@@ -46,7 +46,7 @@ class Plugin:
         if cls.__doc__:
             doc = cls.__doc__.strip(' \n').splitlines()[0]
         return {'name': cls.__name__,
-                'doc': doc,}
+                'doc': doc}
 
     def __init__(self, daemon):
         self.log = daemon.log
@@ -160,17 +160,24 @@ class AdvancedPlugin(Plugin):
 
     def get_reorg_artists_list(self, alist):
         """
-        Move around items in artists_list in order to play first not recently
-        played artists
+        Move around items in alist in order to have first not recently
+        played (or about to be played) artists.
 
-        :param list(str) alist:
+        :param list(str) alist: artist name list (Not an Artist object)
         """
-        hist = list()
+        queued_artist = {_.artist for _ in self.player.queue}
+        not_queued_artist = set(alist) - queued_artist
         duration = self.main_conf.getint('sima', 'history_duration')
-        for art in self.sdb.get_artists_history(alist, duration=duration):
+        hist = []
+        for art in self.sdb.get_artists_history(alist,
+                                                duration=duration):
             if art not in hist:
-                hist.insert(0, art)
-        reorg = [art for art in alist if art not in hist]
+                if art not in queued_artist:
+                    hist.insert(0, art)
+                else:
+                    hist.append(art)
+        # Find not recently played (not in history)
+        reorg = [art for art in not_queued_artist if art not in hist]
         reorg.extend(hist)
         return reorg
     # /Query History
@@ -185,34 +192,35 @@ class AdvancedPlugin(Plugin):
         self.log.info('Searching an album for "%s"...' % artist)
         albums = self.player.search_albums(artist)
         if not albums:
-            return []
-        self.log.debug('Albums candidate: %s', albums)
+            return None
+        self.log.debug('Albums candidates: %s', albums)
         albums_hist = self.get_album_history(artist)
-        self.log.debug('Albums history: %s', [a.name for a in albums_hist])
+        self.log.trace('Albums history: %s', [a.name for a in albums_hist])
         albums_not_in_hist = [a for a in albums if a.name not in albums_hist]
         # Get to next artist if there are no unplayed albums
         if not albums_not_in_hist:
             self.log.info('No unplayed album found for "%s"' % artist)
             if unplayed:
-                return []
+                return None
         random.shuffle(albums_not_in_hist)
         albums_not_in_hist.extend(albums_hist)
+        self.log.debug('Albums candidate: %s', albums_not_in_hist)
         album_to_queue = []
         for album in albums_not_in_hist:
             # Controls the album found is not already queued
             if album in {t.album for t in self.player.queue}:
                 self.log.debug('"%s" already queued, skipping!', album)
-                return []
+                continue
             # In random play mode use complete playlist to filter
             if self.player.playmode.get('random'):
                 if album in {t.album for t in self.player.playlist}:
                     self.log.debug('"%s" already in playlist, skipping!',
                                    album)
-                    return []
+                    continue
             album_to_queue = album
         if not album_to_queue:
             self.log.info('No album found for "%s"', artist)
-            return []
+            return None
         self.log.info('%s album candidate: %s - %s', self.__class__.__name__,
                       artist, album_to_queue)
         return album_to_queue
