@@ -214,9 +214,7 @@ class WebService(AdvancedPlugin):
             # get them reorg to pick up best element
             ret_extra = self.get_reorg_artists_list(ret_extra)
             # tries to pickup less artist from extra art
-            if len(ret) < 4:
-                ret_extra = MetaContainer(ret_extra)
-            else:
+            if len(ret) > 4:
                 ret_extra = MetaContainer(ret_extra[:max(4, len(ret))//2])
             if ret_extra:
                 self.log.debug('extra found in library: %s',
@@ -245,7 +243,7 @@ class WebService(AdvancedPlugin):
         # Move around similars items to get in unplayed|not recently played
         # artist first.
         self.log.info('Got %d artists in library', len(ret))
-        candidates = self.get_reorg_artists_list(list(ret))
+        candidates = self.get_reorg_artists_list(ret)
         if candidates:
             self.log.info(' / '.join(map(str, candidates)))
         return candidates
@@ -266,7 +264,9 @@ class WebService(AdvancedPlugin):
         nb_album_add = 0
         target_album_to_add = self.plugin_conf.getint('album_to_add')
         for artist in artists:
-            album = self.album_candidate(artist)
+            album = self.album_candidate(artist, unplayed=True)
+            if not album:
+                continue
             nb_album_add += 1
             candidates = self.player.find_tracks(album)
             if self.plugin_conf.getboolean('shuffle_album'):
@@ -313,10 +313,10 @@ class WebService(AdvancedPlugin):
         for artist in artists:
             self.log.debug('Trying to find titles to add for "%r"', artist)
             found = self.player.find_tracks(artist)
-            random.shuffle(found)
             if not found:
                 self.log.debug('Found nothing to queue for %s', artist)
                 continue
+            random.shuffle(found)
             # find tracks not in history for artist
             track_candidate = self.filter_track(found)
             if track_candidate:

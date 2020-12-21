@@ -29,7 +29,7 @@ from musicpd import CommandError
 
 # local import
 from ...lib.plugin import AdvancedPlugin
-from ...lib.meta import Artist
+from ...lib.meta import Artist, MetaContainer
 from ...utils.utils import PluginException
 
 
@@ -115,13 +115,15 @@ class Tags(AdvancedPlugin):
         queue_mode = self.plugin_conf.get('queue_mode', 'track')
         target = self.plugin_conf.getint(f'{queue_mode}_to_add')
         # look for artists acording to filter
-        artists = self.player.list('artist', self.mpd_filter)
-        random.shuffle(artists)
+        artists = MetaContainer([Artist(name=a) for a in self.player.list('artist', self.mpd_filter)])
+        if not artists:
+            self.log.info('Tags plugin found nothing to queue')
+            return candidates
         artists = self.get_reorg_artists_list(artists)
-        self.log.debug('Tags artists found: %s', ' / '.join(artists))
+        self.log.debug('Tags plugin found: %s', ' / '.join(map(str, artists)))
         for artist in artists:
             self.log.debug('looking for %s', artist)
-            tracks = self.player.find_tracks(Artist(name=artist))
+            tracks = self.player.find_tracks(artist)
             trk = self.filter_track(tracks)
             if not trk:
                 continue

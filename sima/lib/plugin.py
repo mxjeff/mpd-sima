@@ -24,7 +24,7 @@ Plugin object to derive from
 import random
 
 from .track import Track
-from .meta import Album, Artist
+from .meta import Album, Artist, MetaContainer
 
 
 class Plugin:
@@ -163,10 +163,10 @@ class AdvancedPlugin(Plugin):
         Move around items in alist in order to have first not recently
         played (or about to be played) artists.
 
-        :param list(str) alist: artist name list (Not an Artist object)
+        :param {Artist} alist: Artist objects list/container
         """
-        queued_artist = {_.artist for _ in self.player.queue}
-        not_queued_artist = set(alist) - queued_artist
+        queued_artist = MetaContainer([Artist(_.artist) for _ in self.player.queue])
+        not_queued_artist = alist - queued_artist
         duration = self.main_conf.getint('sima', 'history_duration')
         hist = []
         for art in self.sdb.get_artists_history(alist,
@@ -176,7 +176,7 @@ class AdvancedPlugin(Plugin):
                     hist.insert(0, art)
                 else:
                     hist.append(art)
-        # Find not recently played (not in history)
+        # Find not recently played (not in history) & not in queue
         reorg = [art for art in not_queued_artist if art not in hist]
         reorg.extend(hist)
         return reorg

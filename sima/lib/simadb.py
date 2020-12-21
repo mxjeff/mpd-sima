@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2009-2013, 2019 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2013, 2019-2020 kaliko <kaliko@azylum.org>
 # Copyright (c) 2009, Eric Casteleijn <thisfred@gmail.com>
 # Copyright (c) 2008 Rick van Hattem
 #
@@ -324,6 +324,8 @@ class SimaDB(object):
 
     def get_artists_history(self, artists, duration=__HIST_DURATION__):
         """
+        :param list artists: list of object that can evaluate equality with
+                             artist name, iterable of str or Artist object
         """
         date = datetime.utcnow() - timedelta(hours=duration)
         connection = self.get_database_connection()
