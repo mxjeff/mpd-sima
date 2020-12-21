@@ -482,8 +482,9 @@ class MPD(MPDClient):
             self.log.debug('Searching album for %s aliases: "%s"',
                            artist, artist.aliases)
         for name_sz in artist.names_sz:
-            raw_albums = self.list('album', f"( albumartist == '{name_sz}')")
-            albums = [Album(a, albumartist=artist.name, artist=artist) for a in raw_albums if a]
+            mpd_filter = f"((albumartist == '{name_sz}') AND ( album != ''))"
+            raw_albums = self.list('album', mpd_filter)
+            albums = [Album(a, albumartist=artist.name, artist=artist) for a in raw_albums]
         candidates = []
         for album in albums:
             album_trks = self.find_tracks(album)

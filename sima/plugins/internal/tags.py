@@ -48,8 +48,8 @@ def forge_filter(cfg):
         else:
             mpd_filter.append(f"({tag} == '{cfg[tag].strip()}')")
     mpd_filter = ' AND '.join(mpd_filter)
-    if 'AND' in mpd_filter:
-        mpd_filter = f'({mpd_filter})'
+    # Ensure there is at least an artist name
+    mpd_filter = f"({mpd_filter} AND (artist != ''))"
     return mpd_filter
 
 

@@ -77,7 +77,7 @@ class Random(Plugin):
         self.candidates = []
         trks = []
         target = self.plugin_conf.getint('track_to_add')
-        artists = self.player.list('artist')
+        artists = self.player.list('artist', '( artist != "")')
         random.shuffle(artists)
         for art in artists:
             if self.filtered_artist(art):
