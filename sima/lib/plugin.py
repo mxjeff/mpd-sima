@@ -82,50 +82,42 @@ class Plugin:
         Called when the daemon().run() is called and
         right after the player has connected successfully.
         """
-        pass
 
     def callback_player(self):
         """
         Called on player changes, stopped, paused, skipped
         """
-        pass
 
     def callback_player_database(self):
         """
         Called on player music library changes
         """
-        pass
 
     def callback_playlist(self):
         """
         Called on playlist changes
         Not returning data
         """
-        pass
 
     def callback_next_song(self):
         """
         Could be use to scrobble, maintain an history…
         Not returning data,
         """
-        pass
 
     def callback_need_track(self):
         """
         Returns a list of Track objects to add
         """
-        pass
 
     def callback_need_track_fb(self):
         """
         Called when callback_need_track failled to find tracks to queue
         Returns a list of Track objects to add
         """
-        pass
 
     def shutdown(self):
         """Called on application shutdown"""
-        pass
 
 
 class AdvancedPlugin(Plugin):
@@ -169,8 +161,7 @@ class AdvancedPlugin(Plugin):
         not_queued_artist = alist - queued_artist
         duration = self.main_conf.getint('sima', 'history_duration')
         hist = []
-        for art in self.sdb.get_artists_history(alist,
-                                                duration=duration):
+        for art in self.sdb.get_artists_history(alist, duration=duration):
             if art not in hist:
                 if art not in queued_artist:
                     hist.insert(0, art)

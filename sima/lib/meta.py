@@ -46,7 +46,7 @@ def is_uuid4(uuid):
 
 class MetaException(Exception):
     """Generic Meta Exception"""
-    pass
+
 
 def mbidfilter(func):
     def wrapper(*args, **kwargs):
@@ -91,7 +91,7 @@ class Meta:
         self.log = logging.getLogger(__name__)
         if 'name' not in kwargs or not kwargs.get('name'):
             raise MetaException('Need a "name" argument (str type)')
-        elif not isinstance(kwargs.get('name'), str):
+        if not isinstance(kwargs.get('name'), str):
             raise MetaException('"name" argument not a string')
         else:
             self.__name = kwargs.pop('name')
@@ -118,9 +118,9 @@ class Meta:
         #if hasattr(other, 'mbid'):  # better isinstance?
         if isinstance(other, Meta) and self.mbid and other.mbid:
             return self.mbid == other.mbid
-        elif isinstance(other, Meta):
+        if isinstance(other, Meta):
             return bool(self.names & other.names)
-        elif getattr(other, '__str__', None):
+        if getattr(other, '__str__', None):
             # is other.__str__() in self.__name or self.__aliases
             return other.__str__() in self.names
         return False

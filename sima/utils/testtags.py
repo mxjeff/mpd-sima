@@ -34,8 +34,7 @@ from ..plugins.internal.tags import forge_filter
 def is_valid_file(parser, arg):
     if not os.path.exists(arg) or not os.path.isfile(arg):
         parser.error('The file "%s" does not exist!' % arg)
-    else:
-        return arg
+    return arg
 
 
 def main():

@@ -110,7 +110,6 @@ class FileAction(Action):
     def checks(self):
         """control method
         """
-        pass
 
 
 class Wfile(FileAction):

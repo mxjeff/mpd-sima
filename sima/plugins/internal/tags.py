@@ -22,7 +22,6 @@ Add titles based on tags
 """
 
 # standard library import
-import random
 
 # third parties components
 from musicpd import CommandError

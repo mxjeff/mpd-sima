@@ -50,8 +50,8 @@ class Random(Plugin):
         """
         duration = self.main_conf.getint('sima', 'history_duration')
         tracks_from_db = self.sdb.get_history(duration=duration)
-        artists = [tr[0] for tr in tracks_from_db]
-        return set(artists)
+        artists = {tr[0] for tr in tracks_from_db}
+        return artists
 
     def filtered_artist(self, artist):
         """Filters artists:

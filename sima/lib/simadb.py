@@ -42,20 +42,17 @@ class SimaDBError(Exception):
     """
     Exceptions.
     """
-    pass
 
 
 class SimaDBAccessError(SimaDBError):
     """Error on accessing DB file"""
-    pass
 
 
 class SimaDBNoFile(SimaDBError):
     """No DB file present"""
-    pass
 
 
-class SimaDB(object):
+class SimaDB:
     "SQLite management"
 
     def __init__(self, db_path=None):

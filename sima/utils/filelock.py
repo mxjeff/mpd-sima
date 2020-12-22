@@ -31,9 +31,10 @@ import errno
 import os
 import time
 
+
 class FileLockException(Exception):
     """FileLock Exception"""
-    pass
+
 
 class FileLock:
     """ A plain file lock whit context-manager"""

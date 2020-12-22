@@ -95,8 +95,7 @@ class Track:
     def __hash__(self):
         if self.file:
             return hash(self.file)
-        else:
-            return id(self)
+        return id(self)
 
     def __eq__(self, other):
         return hash(self) == hash(other)
