@@ -4,7 +4,7 @@ MPD_sima v0.16.1
  * tags plugin: Ensure metadata used in filter are enabled
  so that MPD exposes them (closes #38)
 
- -- kaliko <kaliko@azylum.org>  UNRELEASED
+ -- kaliko <kaliko@azylum.org>  Sat, 09 Jan 2021 12:28:17 +0100
 
 MPD_sima v0.16.0
 
