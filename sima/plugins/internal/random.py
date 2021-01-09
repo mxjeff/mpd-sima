@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013-2015, 2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013-2015, 2020-2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -63,7 +63,7 @@ class Random(Plugin):
         """
         if self.mode == 'sensible':
             if self.sdb.get_bl_artist(artist, add_not=True):
-                self.log.debug('Random: Blacklisted "%s"', artist)
+                self.log.debug('Random plugin: Blacklisted "%s"', artist)
                 return True
             if artist in self.get_played_artist():
                 return True
