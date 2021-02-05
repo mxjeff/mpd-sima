@@ -1,3 +1,9 @@
+MPD_sima v0.16.2.dev0
+
+ * Fixed issue with un-tagged titles (closes #40)
+
+ -- kaliko <kaliko@azylum.org>  UNRELEASED
+
 MPD_sima v0.16.1
 
  * tags plugin: Add album queue mode

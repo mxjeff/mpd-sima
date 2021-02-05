@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013-2015, 2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013-2015, 2020-2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -157,7 +157,8 @@ class AdvancedPlugin(Plugin):
 
         :param {Artist} alist: Artist objects list/container
         """
-        queued_artist = MetaContainer([Artist(_.artist) for _ in self.player.queue])
+        queued_artist = MetaContainer([Artist(_.artist) for _ in
+                                       self.player.queue if _.artist])
         not_queued_artist = alist - queued_artist
         duration = self.main_conf.getint('sima', 'history_duration')
         hist = []
