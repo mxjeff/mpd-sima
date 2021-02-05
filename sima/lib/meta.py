@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014, 2015 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015, 2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -21,10 +21,8 @@
 Defines some object to handle audio file metadata
 """
 
-try:
-    from collections.abc import Set # python >= 3.3
-except ImportError:
-    from collections import Set # python 3.2
+
+from collections.abc import Set
 import logging
 import re
 
