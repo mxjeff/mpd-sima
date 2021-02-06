@@ -1,6 +1,7 @@
 MPD_sima v0.16.2.dev0
 
  * Fixed issue with un-tagged titles (closes #40)
+ * Fixed "artist with quotes not found" (closes #41)
 
  -- kaliko <kaliko@azylum.org>  UNRELEASED
 

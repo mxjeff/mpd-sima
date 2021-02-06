@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009-2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -343,7 +343,7 @@ class MPD(MPDClient):
         tracks = set()
         if artist.mbid:
             tracks |= set(self.find('musicbrainz_artistid', artist.mbid))
-        for name in artist.names_sz:
+        for name in artist.names:
             tracks |= set(self.find('artist', name))
         return list(tracks)
 
