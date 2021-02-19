@@ -210,6 +210,7 @@ class AdvancedPlugin(Plugin):
                                    album)
                     continue
             album_to_queue = album
+            break
         if not album_to_queue:
             self.log.info('No album found for "%s"', artist)
             return None
