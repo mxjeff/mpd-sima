@@ -22,6 +22,7 @@ Add titles based on tags
 """
 
 # standard library import
+import random
 
 # third parties components
 from musicpd import CommandError
@@ -115,6 +116,7 @@ class Tags(AdvancedPlugin):
         target = self.plugin_conf.getint(f'{queue_mode}_to_add')
         # look for artists acording to filter
         artists = MetaContainer([Artist(name=a) for a in self.player.list('artist', self.mpd_filter)])
+        random.shuffle(artists)
         if not artists:
             self.log.info('Tags plugin found nothing to queue')
             return candidates
