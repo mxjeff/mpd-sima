@@ -115,8 +115,9 @@ class Tags(AdvancedPlugin):
         queue_mode = self.plugin_conf.get('queue_mode', 'track')
         target = self.plugin_conf.getint(f'{queue_mode}_to_add')
         # look for artists acording to filter
-        artists = MetaContainer([Artist(name=a) for a in self.player.list('artist', self.mpd_filter)])
+        artists = [Artist(name=a) for a in self.player.list('artist', self.mpd_filter)]
         random.shuffle(artists)
+        artists = MetaContainer(artists)
         if not artists:
             self.log.info('Tags plugin found nothing to queue')
             return candidates
