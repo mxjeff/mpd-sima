@@ -214,8 +214,8 @@ class AdvancedPlugin(Plugin):
         if not album_to_queue:
             self.log.info('No album found for "%s"', artist)
             return None
-        self.log.info('%s album candidate: %s - %s', self.__class__.__name__,
-                      artist, album_to_queue)
+        self.log.info('%s plugin chose album: %s - %s',
+                      self.__class__.__name__, artist, album_to_queue)
         return album_to_queue
 
     def filter_track(self, tracks, unplayed=False):

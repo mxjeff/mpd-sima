@@ -327,7 +327,7 @@ class WebService(AdvancedPlugin):
             self.log.debug('Found no tracks to queue!')
             return
         for track in self.to_add:
-            self.log.info('%s candidates: %s', track, self.ws.name)
+            self.log.info('%s plugin chose: %s', self.ws.name, trk)
 
     def _album(self):
         """Get albums for album queue mode
@@ -356,6 +356,8 @@ class WebService(AdvancedPlugin):
         msg = ' '.join(['{0}: {1:>3d}'.format(k, v) for
                         k, v in sorted(self.ws.stats.items())])
         self.log.debug('http stats: ' + msg)
+        if not self.to_add:
+            self.log.info('%s plugin found nothing to queue', self.ws.name)
         candidates = self.to_add
         self.to_add = list()
         if self.plugin_conf.get('queue_mode') != 'album':
