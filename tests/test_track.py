@@ -42,4 +42,12 @@ class TestTrackObject(unittest.TestCase):
         trk = Track(artist='track_artist')
         self.assertEqual(trk.Artist.name, 'track_artist')
 
+    def test_genres(self):
+        trk = Track(**{'artist': 'Devolt', 'genre': ['Rock, Stoner ', ' Punk; Heavy', 'doom']})
+        self.assertEqual(trk.genres, ['Rock', 'Stoner', 'Punk', 'Heavy', 'doom'])
+        trk = Track(**{'artist': 'Devolt', 'genre': [' Rock ', ' Stoner ', 'Punk ']})
+        self.assertEqual(trk.genres, ['Rock', 'Stoner', 'Punk'])
+        trk = Track(**{'artist': 'Devolt', 'genre': 'Punk '})
+        self.assertEqual(trk.genres, ['Punk'])
+
 # vim: ai ts=4 sw=4 sts=4 expandtab

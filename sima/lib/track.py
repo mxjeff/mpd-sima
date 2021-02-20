@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009-2017 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2021 kaliko <kaliko@azylum.org>
 # Copyright (c) 2009 J. Alexander Treuman (Tag collapse method)
 # Copyright (c) 2008 Rick van Hattem
 #
@@ -66,7 +66,7 @@ class Track:
                 continue
             if isinstance(value, list):
                 self.collapsed_tags.append(tag)
-                self.__dict__.update({tag: SEPARATOR.join(set(value))})
+                self.__dict__.update({tag: SEPARATOR.join(value)})
 
     def __repr__(self):
         return '%s(artist="%s", album="%s", title="%s", file="%s")' % (
@@ -132,6 +132,21 @@ class Track:
         else:
             fmt = '%M:%S'
         return time.strftime(fmt, temps)
+
+    @property
+    def genres(self):
+        """Fetches Genres for the track
+        Multivalue genre are dealt with:
+          * when genre tag is multivalued
+          * when single tag uses coma or semi-colon separator
+        """
+        if 'genre' not in self.__dict__:
+            return []
+        genres = self.genre.split(SEPARATOR)
+        for sep in [',', ';']:
+            if sep in self.genre:
+                genres = [g for multi in genres for g in multi.split(sep) if g]
+        return list(map(str.strip, genres))
 
     @property
     def Artist(self):
