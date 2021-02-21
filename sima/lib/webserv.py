@@ -327,7 +327,7 @@ class WebService(AdvancedPlugin):
             self.log.debug('Found no tracks to queue!')
             return
         for track in self.to_add:
-            self.log.info('%s plugin chose: %s', self.ws.name, trk)
+            self.log.info('%s plugin chose: %s', self.ws.name, track)
 
     def _album(self):
         """Get albums for album queue mode
