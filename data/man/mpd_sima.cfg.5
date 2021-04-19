@@ -3,11 +3,11 @@
 .\"    Author: kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.2 <http://docbook.sf.net/>
 .\"      Date: 04/19/2021
-.\"    Manual: mpd-sima 0.16.1 User Manual
+.\"    Manual: mpd-sima 0.17.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "04/19/2021" "mpd-sima" "mpd-sima 0.16.1 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "04/19/2021" "mpd-sima" "mpd-sima 0.17.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -411,6 +411,52 @@ If set to "false", caching is still done but in memory\&.
 .RS 4
 Plugin priority
 .RE
+.SS "Genre section"
+.PP
+Genre plugin\*(Aqs configuration\&.
+.PP
+This plugin permits offline autoqueuing based on files genre tag only\&.
+.PP
+it will try to queue tracks base on genre tags of tracks in the queue\&.
+.PP
+\fB[tags]\fR
+.RS 4
+.RE
+.PP
+\fBqueue_mode=\fR\fItrack\fR
+.RS 4
+Queue mode to use among
+\fItrack\fR,
+\fIalbum\fR
+(see
+the section called \(lqQUEUE MODES\(rq
+for info about queue modes)\&.
+.RE
+.PP
+\fBsingle_album=\fR\fIfalse\fR
+.RS 4
+Prevent from queueing a track from the same album (it often happens with OST)\&.
+.br
+
+Only relevant in "track" queue mode\&.
+.RE
+.PP
+\fBpriority=\fR\fI80\fR
+.RS 4
+Plugin priority
+.RE
+.PP
+\fBtrack_to_add=\fR\fI1\fR
+.RS 4
+How many track(s) to add\&.
+.RE
+.PP
+\fBalbum_to_add=\fR\fI1\fR
+.RS 4
+How many album(s) to add\&. Only relevant in
+\fBalbum\fR
+queue mode\&.
+.RE
 .SS "Tags section"
 .PP
 Tags plugin\*(Aqs configuration\&. There is no default configuration for this plugin, it does not work out of the box\&.
@@ -449,6 +495,14 @@ Queue mode to use among
 (see
 the section called \(lqQUEUE MODES\(rq
 for info about queue modes)\&.
+.RE
+.PP
+\fBsingle_album=\fR\fIfalse\fR
+.RS 4
+Prevent from queueing a track from the same album (it often happens with OST)\&.
+.br
+
+Only relevant in "track" queue mode\&.
 .RE
 .PP
 \fBfilter=\fR

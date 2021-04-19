@@ -1,5 +1,6 @@
-MPD_sima v0.16.2.dev0
+MPD_sima v0.17.0.dev0
 
+ * New offline autoqueue plugin based on file genre tags only
  * Add randomness in Tags plugin artist selection
  * Fixed issue with un-tagged titles (closes #40)
  * Fixed "artist with quotes not found" (closes #41)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009-2015, 2019-2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2015, 2019-2021 kaliko <kaliko@azylum.org>
 # Copyright (c) 2019 sacha <sachahony@gmail.com>
 #
 #  This file is part of sima
@@ -95,10 +95,18 @@ DEFAULT_CONF = {
             'originaldate': "",
             'filter': "",
             'queue_mode': "track",
+            'single_album': "false",
             'track_to_add': 1,
             'album_to_add': 1,
             'priority': 80,
-            }
+            },
+        'genre': {
+            'queue_mode': "track",
+            'single_album': "false",
+            'track_to_add': 1,
+            'album_to_add': 1,
+            'priority': 80,
+            },
         }
 #
 

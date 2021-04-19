@@ -425,6 +425,52 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 </varlistentry>
             </variablelist>
         </refsect2>
+        <refsect2 id="genre">
+            <title>Genre section</title>
+            <para>Genre plugin's configuration.</para>
+            <para>This plugin permits offline autoqueuing based on files genre tag only.</para>
+            <para>it will try to queue tracks base on genre tags of tracks in the queue.</para>
+                <varlistentry> <!-- genre -->
+                   <term><option>[tags]</option></term>
+                </varlistentry>
+                <varlistentry> <!-- tags.queue_mode -->
+                    <term><option>queue_mode=</option><replaceable>track</replaceable></term>
+                    <listitem>
+                        <para>Queue mode to use among
+                            <replaceable>track</replaceable>,
+                            <replaceable>album</replaceable> (see <xref linkend="queue_mode"/> for info about queue modes).</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry> <!-- genre.single_album -->
+                    <term><option>single_album=</option><replaceable>false</replaceable></term>
+                    <listitem>
+                        <para>Prevent from queueing a track from the same album
+                            (it often happens with OST).<sbr />
+                            Only relevant in "track" queue mode.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry> <!-- genre.priority -->
+                    <term><option>priority=</option><replaceable>80</replaceable></term>
+                    <listitem>
+                        <para>
+                            Plugin priority
+                        </para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry> <!-- genre.track_to_add -->
+                    <term><option>track_to_add=</option><replaceable>1</replaceable></term>
+                    <listitem>
+                        <para>How many track(s) to add.</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry> <!-- genre.album_to_add -->
+                    <term><option>album_to_add=</option><replaceable>1</replaceable></term>
+                    <listitem>
+                        <para>How many album(s) to add. Only relevant in
+                            <option>album</option> queue mode.</para>
+                    </listitem>
+                </varlistentry>
+        </refsect2>
         <refsect2 id="tags">
             <title>Tags section</title>
             <para>Tags plugin's configuration. There is no default configuration for this plugin,
@@ -454,6 +500,14 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                         <para>Queue mode to use among
                             <replaceable>track</replaceable>,
                             <replaceable>album</replaceable> (see <xref linkend="queue_mode"/> for info about queue modes).</para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry> <!-- tags.single_album -->
+                    <term><option>single_album=</option><replaceable>false</replaceable></term>
+                    <listitem>
+                        <para>Prevent from queueing a track from the same album
+                            (it often happens with OST).<sbr />
+                            Only relevant in "track" queue mode.</para>
                     </listitem>
                 </varlistentry>
                 <varlistentry> <!-- tags.filter -->
