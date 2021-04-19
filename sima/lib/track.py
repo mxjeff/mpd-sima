@@ -31,19 +31,19 @@ class Track:
     Instantiate with Player replies.
 
     :param str file: media file, defaults to ``None``
-    :param int time: duration in second, defaults to 0
+    :param int duration: duration in second, defaults to 0
     :param int pos: position in queue, defaults to -1
     :param str title|artist|album: defaults to ""
     :param str musicbrainz_artistid|musicbrainz_albumartistid: MusicBrainz IDs, defaults to ``None``
     """
 
-    def __init__(self, file=None, time=0, pos=-1, **kwargs):
+    def __init__(self, file=None, duration=0, pos=-1, **kwargs):
         self.title = self.artist = self.album = self.albumartist = ''
         self.musicbrainz_artistid = self.musicbrainz_albumartistid = None
         self.pos = int(pos)
         self._file = file
         self._empty = False
-        self._time = time
+        self.duration = float(duration)
         if not kwargs:
             self._empty = True
         self.__dict__.update(**kwargs)
@@ -84,13 +84,13 @@ class Track:
                 )
 
     def __int__(self):
-        return self.time
+        return int(self.duration)
 
     def __add__(self, other):
-        return Track(time=self.time + other.time)
+        return Track(duration=self.duration + other.duration)
 
     def __sub__(self, other):
-        return Track(time=self.time - other.time)
+        return Track(duration=self.duration - other.duration)
 
     def __hash__(self):
         if self.file:
@@ -113,20 +113,10 @@ class Track:
         """file is an immutable attribute that's used for the hash method"""
         return self._file
 
-    def get_time(self):
-        """get time property"""
-        return self._time
-
-    def set_time(self, value):
-        """set time property"""
-        self._time = int(value)
-
-    time = property(get_time, set_time, doc='song duration in seconds (use :attr:`length` for human readable time)')
-
     @property
     def length(self):
-        """Get a fancy duration as ``%H:%M:%S`` (use :attr:`time` to get duration in second only)"""
-        temps = time.gmtime(int(self.time))  #TODO: returns a date not a duration
+        """Get a fancy duration as ``%H:%M:%S`` (use :attr:`duration` to get duration in second only)"""
+        temps = time.gmtime(self.duration)  #TODO: returns a date not a duration
         if temps.tm_hour:
             fmt = '%H:%M:%S'
         else:

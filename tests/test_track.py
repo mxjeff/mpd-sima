@@ -18,6 +18,7 @@ DEVOLT = {
   'musicbrainz_artistid': 'd8e7e3e2-49ab-4f7c-b148-fc946d521f99',
   'musicbrainz_trackid': 'fabf8fc9-2ae5-49c9-8214-a839c958d872',
   'time': '220',
+  'duration': '220.000',
   'title': 'Crazy',
   'track': '3/6'}
 
