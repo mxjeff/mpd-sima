@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: mpd_sima.cfg
 .\"    Author: kaliko <kaliko@azylum.org>
-.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
-.\"      Date: 01/09/2021
+.\" Generator: DocBook XSL Stylesheets v1.79.2 <http://docbook.sf.net/>
+.\"      Date: 04/19/2021
 .\"    Manual: mpd-sima 0.16.1 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "01/09/2021" "mpd-sima" "mpd-sima 0.16.1 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "04/19/2021" "mpd-sima" "mpd-sima 0.16.1 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -421,16 +421,16 @@ This plugin permits offline autoqueuing based on files tags only\&. Supported ta
 \fB\*(Aqgenre\*(Aq\fR,
 \fB\*(Aqlabel\*(Aq\fR
 and
-\fB\*(Aqoriginaldate\*(Aq\fR\&. It currently supports single track queuing only, no album mode for this plugin\&.
+\fB\*(Aqoriginaldate\*(Aq\fR\&.
 .PP
 In addition to supported tags above you can use an MPD filter\&. Please refer to MPD protocol documentation for more\&.
 .PP
-All entries in this section are ANDed as a single MPD filter to look for titles in the library\&. Moreover, with tags, comma separated values are also ORed\&.
+All tag entries in this section are ANDed as a single MPD filter to look for titles in the library\&. Moreover, for each tags, comma separated values are also ORed\&.
 .br
 
 For instance setting "\fBgenre=rock\fR" and "\fBdate=1982,1983,1984,1985,1986,1987,1988,1989\fR" will end up looking for track tagged with genre
 \fBrock\fR
-and date within 1985 through 1990\&.
+and date within 1982 through 1989\&.
 .br
 
 Using an MPD filter to replace
@@ -469,6 +469,10 @@ You can use here any valid MPD filter as defined in MPD protocol documentation\&
 .RE
 .PP
 \fBlabel=\fR
+.RS 4
+.RE
+.PP
+\fBoriginaldate=\fR
 .RS 4
 .RE
 .PP

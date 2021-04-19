@@ -429,18 +429,17 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
             <title>Tags section</title>
             <para>Tags plugin's configuration. There is no default configuration for this plugin,
               it does not work out of the box.</para>
-            <para>  This plugin permits offline autoqueuing based on files tags only. Supported tags are
+            <para>This plugin permits offline autoqueuing based on files tags only. Supported tags are
               <option>'comment'</option>, <option>'date'</option>, <option>'genre'</option>,
-              <option>'label'</option> and <option>'originaldate'</option>. It currently
-              supports single track queuing only, no album mode for this plugin.</para>
+              <option>'label'</option> and <option>'originaldate'</option>.</para>
             <para>In addition to supported tags above you can use an MPD filter. Please refer to
               MPD protocol documentation for more.</para>
-            <para>All entries in this section are ANDed as a single MPD filter to look for titles
-              in the library. Moreover, with tags, comma separated values are also ORed.<sbr />
+            <para>All tag entries in this section are ANDed as a single MPD filter to look for titles
+              in the library. Moreover, for each tags, comma separated values are also ORed.<sbr />
               For instance setting "<option>genre=rock</option>" and
               "<option>date=1982,1983,1984,1985,1986,1987,1988,1989</option>"
               will end up looking for track tagged with genre <option>rock</option>
-              and date within 1985 through 1990.<sbr />
+              and date within 1982 through 1989.<sbr />
               Using an MPD filter to replace <option>date</option> you can achieve
               the same with the following setting: "<option>genre=rock</option>" and
               "<option>filter=(date =~ '198[2-9]+')</option>" (provided your MPD server
@@ -474,6 +473,9 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 </varlistentry>
                 <varlistentry> <!-- tags.label -->
                     <term><option>label=</option></term>
+                </varlistentry>
+                <varlistentry> <!-- tags.originaldate -->
+                    <term><option>originaldate=</option></term>
                 </varlistentry>
                 <varlistentry> <!-- tags.priority -->
                     <term><option>priority=</option><replaceable>80</replaceable></term>
