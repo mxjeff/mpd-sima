@@ -22,6 +22,7 @@ Add titles based on tags
 """
 
 # standard library import
+import logging
 import random
 
 # third parties components
@@ -31,6 +32,26 @@ from musicpd import CommandError
 from ...lib.plugin import AdvancedPlugin
 from ...lib.meta import Artist, MetaContainer
 from ...utils.utils import PluginException
+
+
+def control_config(tags_config):
+    log = logging.getLogger('sima')
+    sup_tags = Tags.supported_tags
+    config_tags = {k for k, v in tags_config.items()
+                   if (v and k in Tags.supported_tags)}
+    if not tags_config.get('filter', None) and \
+            config_tags.isdisjoint(sup_tags):
+        log.warning('Found no config for Tags plugin! '
+                  'Need at least "filter" or a supported tag')
+        log.info('Supported Tags are : %s', ', '.join(sup_tags))
+        # raise PluginException('plugin misconfiguration')
+        return False
+    if config_tags.difference(sup_tags):
+        log.error('Found unsupported tag in config: %s',
+                   config_tags.difference(sup_tags))
+        # raise PluginException('plugin misconfiguration')
+        return False
+    return True
 
 
 def forge_filter(cfg):
@@ -57,7 +78,8 @@ class Tags(AdvancedPlugin):
     """Add track based on tags content
     """
     supported_tags = {'comment', 'date', 'genre', 'label', 'originaldate'}
-    options = {'queue_mode', 'priority', 'filter', 'track_to_add', 'album_to_add'}
+    # options = {'queue_mode', 'priority', 'filter', 'track_to_add',
+    #            'album_to_add'}
 
     def __init__(self, daemon):
         super().__init__(daemon)
@@ -67,18 +89,7 @@ class Tags(AdvancedPlugin):
         self.log.debug('mpd filter: %s', self.mpd_filter)
 
     def _control_conf(self):
-        sup_tags = Tags.supported_tags
-        config_tags = {k for k, v in self.plugin_conf.items()
-                       if (v and k not in Tags.options)}
-        if not self.plugin_conf.get('filter', None) and \
-                config_tags.isdisjoint(sup_tags):
-            self.log.error('Found no config for %s plugin! '
-                           'Need at least "filter" or a supported tag', self)
-            self.log.info('Supported Tags are : %s', ', '.join(sup_tags))
-            raise PluginException('plugin misconfiguration')
-        if config_tags.difference(sup_tags):
-            self.log.error('Found unsupported tag in config: %s',
-                           config_tags.difference(sup_tags))
+        if not control_config(self.plugin_conf):
             raise PluginException('plugin misconfiguration')
 
     def _setup_tagsneeded(self):
