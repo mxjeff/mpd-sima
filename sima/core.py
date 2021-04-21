@@ -46,7 +46,7 @@ class Sima(Daemon):
         self.log = getLogger('sima')
         self._plugins = list()
         self._core_plugins = list()
-        self.player = PlayerClient(self)  # Player client
+        self.player = PlayerClient(conf)  # MPD client
         self.short_history = deque(maxlen=60)
 
     def add_history(self):

@@ -20,6 +20,7 @@
 from difflib import get_close_matches
 from functools import wraps
 from itertools import dropwhile
+from logging import getLogger
 
 # external module
 from musicpd import MPDClient, MPDError
@@ -133,12 +134,11 @@ class MPD(MPDClient):
                           'MUSICBRAINZ_RELEASETRACKID', 'MUSICBRAINZ_WORKID'}
     database = None
 
-    def __init__(self, daemon):
+    def __init__(self, config):
         super().__init__()
         self.use_mbid = True
-        self.daemon = daemon
-        self.log = daemon.log
-        self.config = self.daemon.config['MPD']
+        self.log = getLogger('sima')
+        self.config = config
         self._cache = None
 
     # ######### Overriding MPDClient ###########
@@ -156,10 +156,11 @@ class MPD(MPDClient):
 
     def connect(self):
         """Overriding explicitly MPDClient.connect()"""
+        mpd_config = self.config['MPD']
         # host, port, password
-        host = self.config.get('host')
-        port = self.config.get('port')
-        password = self.config.get('password', fallback=None)
+        host = mpd_config.get('host')
+        port = mpd_config.get('port')
+        password = mpd_config.get('password', fallback=None)
         self.disconnect()
         try:
             super().connect(host, port)
@@ -199,7 +200,7 @@ class MPD(MPDClient):
         for tag in MPD.needed_mbid_tags:
             self.tagtypes('enable', tag)
         # Controls use of MusicBrainzIdentifier
-        if self.daemon.config.get('sima', 'musicbrainzid'):
+        if self.config.getboolean('sima', 'musicbrainzid'):
             tt = set(self.tagtypes())
             if len(MPD.needed_mbid_tags & tt) != len(MPD.needed_mbid_tags):
                 self.log.warning('Use of MusicBrainzIdentifier is set but MPD '
