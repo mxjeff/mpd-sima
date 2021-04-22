@@ -431,7 +431,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
             <para>This plugin permits offline autoqueuing based on files genre tag only.</para>
             <para>it will try to queue tracks base on genre tags of tracks in the queue.</para>
                 <varlistentry> <!-- genre -->
-                   <term><option>[tags]</option></term>
+                   <term><option>[genre]</option></term>
                 </varlistentry>
                 <varlistentry> <!-- tags.queue_mode -->
                     <term><option>queue_mode=</option><replaceable>track</replaceable></term>
