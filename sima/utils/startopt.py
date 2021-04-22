@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009-2015 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2015, 2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -19,14 +19,19 @@
 #
 #
 
-from argparse import (ArgumentParser, SUPPRESS)
+from argparse import ArgumentParser, RawDescriptionHelpFormatter, SUPPRESS
 
 
 from .utils import Wfile, Rfile, Wdir
 
 DESCRIPTION = """
 MPD_sima automagicaly queue new tracks in MPD playlist.
-Command line options override their equivalent in configuration file."""
+
+Command line options override their equivalent in configuration file.
+If a positional arguments is provided MPD_sima execute the command and returns.
+Commands available:
+{}
+"""
 
 
 def clean_dict(to_clean):
@@ -35,7 +40,11 @@ def clean_dict(to_clean):
         if not to_clean.get(k):
             to_clean.pop(k)
 
-
+# COMMANDS LIST
+CMDS = {'config-test': 'Test configuration (MPD connection and Tags plugin only)',
+        'create-db': 'Create the database',
+        'generate-config': 'Generate a configuration file to stdout',
+        }
 # OPTIONS LIST
 # pop out 'sw' value before creating Parser object.
 # PAY ATTENTION:
@@ -46,13 +55,13 @@ def clean_dict(to_clean):
 #   name it is meant to override.
 OPTS = [
     {
-        'sw':['-l', '--log'],
+        'sw': ['-l', '--log'],
         'type': str,
         'dest': 'logfile',
         'action': Wfile,
         'help': 'file to log message to, default is stdout/stderr'},
     {
-        'sw':['-v', '--log-level'],
+        'sw': ['-v', '--log-level'],
         'type': str,
         'dest': 'verbosity',
         'choices': ['debug', 'info', 'warning', 'error'],
@@ -77,39 +86,30 @@ OPTS = [
         'dest': 'port',
         'help': 'Port MPD in listening on'},
     {
-        'sw':['-c', '--config'],
+        'sw': ['-c', '--config'],
         'dest': 'conf_file',
         'action': Rfile,
         'help': 'Configuration file to load'},
-    {
-        'sw':['--generate-config'],
+    {  # TODO: To remove eventually in next major realese v0.18
+        'sw': ['--generate-config'],
         'dest': 'generate_config',
         'action': 'store_true',
-        'help': 'Generate a sample configuration file to stdout according to the current\
-         configuration. You can put other options with this one to get them in\
-         the generated configuration.'},
+        'help': SUPPRESS},
     {
-        'sw':['--var-dir', '--var_dir'],
+        'sw': ['--var-dir', '--var_dir'],
         'dest': 'var_dir',
         'action': Wdir,
         'help': 'Directory to store var content (ie. database, cache)'},
-    {
+    {  # TODO: To remove eventually in next major realese v0.18
         'sw': ['--create-db'],
         'action': 'store_true',
         'dest': 'create_db',
-        'help': '''Create database and exit, use destination
-                   specified in --var-dir or standard location.'''},
-    {
-        'sw':['--queue-mode', '-q'],
-        'dest': 'queue_mode',
-        'choices': ['track', 'top', 'album'],
-        #'help': 'Queue mode in [track, top, album]',
-        'help': SUPPRESS, },
-    {
-        'sw':['--purge-history'],
-        'action': 'store_true',
-        'dest': 'do_purge_history',
         'help': SUPPRESS},
+    {
+        'sw': ['command'],
+        'nargs': '?',
+        'choices': CMDS.keys(),
+        'help': 'Command to run (cf. description or unix manual for more)'},
 ]
 
 
@@ -127,10 +127,12 @@ class StartOpt:
         """
         Declare options in ArgumentParser object.
         """
-        self.parser = ArgumentParser(description=DESCRIPTION,
+        cmds = '\n'.join([f'    * {k}: {v}' for k, v in CMDS.items()])
+        self.parser = ArgumentParser(description=DESCRIPTION.format(cmds),
                                      prog=self.info.get('prog'),
                                      epilog='Happy Listening',
-                                    )
+                                     formatter_class=RawDescriptionHelpFormatter,
+                                     )
         self.parser.add_argument('--version', action='version',
                         version='%(prog)s {version}'.format(**self.info))
         # Add all options declare in OPTS

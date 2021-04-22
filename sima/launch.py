@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014, 2015, 2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015, 2020,2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -79,13 +79,39 @@ def start(sopt, restart=False):
     """starts application
     """
     # loads configuration
-    config = ConfMan(sopt.options).config
+    cfg_mgmt = ConfMan(sopt.options)
+    config = cfg_mgmt.config
     # set logger
     logger = logging.getLogger('sima')
     logfile = config.get('log', 'logfile', fallback=None)
     verbosity = config.get('log', 'verbosity')
     set_logger(verbosity, logfile)
     logger.debug('Command line say: %s', sopt.options)
+
+    if sopt.options.get('command'):
+        cmd = sopt.options.get('command')
+        if cmd == "generate-config":
+            config.write(sys.stdout, space_around_delimiters=True)
+            sys.exit(0)
+        logger.info('Running "%s" and exit' % cmd)
+        if cmd == "config-test":
+            logger.info('Config location: "%s"', cfg_mgmt.conf_file)
+            from .utils.configtest import config_test
+            config_test(config)
+            sys.exit(0)
+        if cmd == "create-db":
+            db_file = config.get('sima', 'db_file')
+            if not isfile(db_file):
+                logger.info('Creating database in "%s"', db_file)
+                open(db_file, 'a').close()
+                SimaDB(db_path=db_file).create_db()
+                if sopt.options.get('create_db', None):
+                    logger.info('Done, bye...')
+            else:
+                logger.info('Database already there, not overwriting %s', db_file)
+            sys.exit(0)
+
+    # TODO: To remove eventually in next major realese v0.18
     # Create Database
     db_file = config.get('sima', 'db_file')
     if (sopt.options.get('create_db', None)
@@ -95,8 +121,9 @@ def start(sopt, restart=False):
         SimaDB(db_path=db_file).create_db()
         if sopt.options.get('create_db', None):
             logger.info('Done, bye...')
-            sys.exit(0)
+        sys.exit(0)
 
+    # TODO: To remove eventually in next major realese v0.18
     if sopt.options.get('generate_config'):
         config.write(sys.stdout, space_around_delimiters=True)
         sys.exit(0)

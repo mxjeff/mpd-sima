@@ -16,9 +16,6 @@ OPTIONS=--nonet\
 
 all: man
 
-test-tags-config: test-tags-config.1.xml
-	xmllint --xinclude --nowarning --noent $< | $(XP) $(OPTIONS) $(XSL) -
-
 simadb_cli: simadb_cli.1.xml
 	xmllint --xinclude --nowarning --noent $< | $(XP) $(OPTIONS) $(XSL) -
 
@@ -37,7 +34,7 @@ simadb_cli_html:
 mpd_sima.cfg_html:
 	xmllint --xinclude --nowarning --noent mpd_sima.cfg.5.xml | $(XP) $(HXSL) - > ./mpd_sima.cfg.5.html
 
-man: test-tags-config simadb_cli mpd_sima mpd_sima.cfg
+man: simadb_cli mpd_sima mpd_sima.cfg
 
 html: simadb_cli_html mpd_sima_html mpd_sima.cfg_html
 

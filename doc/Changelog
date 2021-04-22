@@ -6,6 +6,10 @@ MPD_sima v0.17.0.dev0
  * Fixed "artist with quotes not found" (closes #41)
  * Fixed bad pid in Uniq core plugin (closes #32)
  * Use duration instead of time in Track objects (closes #37)
+ * Move "test-tags-config" as positional argument "config-test"
+ * Move "--create-db" as positional argument "create-db"
+ * Add commands as positional arguments:
+ config-test, create-db, generate-config
 
  -- kaliko <kaliko@azylum.org>  UNRELEASED
 

@@ -73,16 +73,6 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
     </cmdsynopsis>
     <cmdsynopsis>
       <command>&dhpackage;</command>
-      <arg choice="plain">--create-db</arg>
-      <arg choice="opt"><option>--var-dir=</option><replaceable class="option">var_directory</replaceable></arg>
-    </cmdsynopsis>
-    <cmdsynopsis>
-      <command>&dhpackage;</command>
-      <arg choice="plain">--generate-config</arg>
-      <arg choice="opt"><option>…</option></arg>
-    </cmdsynopsis>
-    <cmdsynopsis>
-      <command>&dhpackage;</command>
       <!-- Normally the help and version options make the programs stop
            right after outputting the requested information. -->
       <group choice="plain">
@@ -94,6 +84,21 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
           <arg choice="plain"><option>--version</option></arg>
         </arg>
       </group>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <arg choice="plain">config-test</arg>
+      <arg choice="opt"><option>--config=</option><replaceable class="option">conf_file</replaceable></arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <arg choice="plain">create-db</arg>
+      <arg choice="opt"><option>--var-dir=</option><replaceable class="option">var_directory</replaceable></arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <arg choice="plain">generate-config</arg>
+      <arg choice="opt"><option>…</option></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1 id="description">
@@ -192,19 +197,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         <varlistentry> <!-- var-dir -->
             <term><option>--var-dir=<replaceable class="parameter">var_directory</replaceable></option></term>
             <listitem>
-                <para>Use the specific path <replaceable>var_directory</replaceable> to look for (or create) var files (ie. database) instead of looking at the default user data location.<sbr />Default is to look in <envar>$XDG_DATA_HOME/mpd_sima/</envar>.  Concerning <envar>$XDG_DATA_HOME</envar> see also <xref linkend="files"/></para>
-            </listitem>
-        </varlistentry>
-        <varlistentry> <!-- generate-config -->
-            <term><option>--generate-config</option></term>
-            <listitem>
-                <para>Generate a sample configuration file according to the current configuration. You can put other options with this one to get them in the generated configuration.</para>
-            </listitem>
-        </varlistentry>
-        <varlistentry> <!-- create-db -->
-            <term><option>--create-db</option></term>
-            <listitem>
-                <para>Create the database and exit. Uses folder specified with <option>--var-dir</option> or default directory.<sbr />Default is to use <envar>$XDG_DATA_HOME/mpd_sima/</envar>.  Concerning <envar>$XDG_DATA_HOME</envar> see also <xref linkend="files"/></para>
+                <para>Use the specific path <replaceable>var_directory</replaceable> to look for (or create) var files (ie. database) instead of looking at the default user data location.<sbr />Default is to look in <envar>$XDG_DATA_HOME/mpd_sima/</envar>.  Concerning <envar>$XDG_DATA_HOME</envar> see also <xref linkend="files"/>.</para>
             </listitem>
         </varlistentry>
         <varlistentry><!-- host -->
@@ -221,6 +214,25 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
             <listitem>
                 <para>Use the specific port number <replaceable>mpd_port</replaceable> on MPD server. This overrides <envar>MPD_PORT</envar> environment variable.<sbr />Default is <emphasis>6600</emphasis>.</para>
                 <para>See also <xref linkend="environment"/></para>
+            </listitem>
+        </varlistentry>
+        <varlistentry> <!-- config-test -->
+            <term><option>config-test</option></term>
+            <listitem>
+              <para>Test configuration file and exit. Uses the configuration file specified with <option>--config</option> or default location.<sbr />Default is to use <envar>$XDG_CONFIG_HOME/mpd_sima/mpd_sima.cfg</envar> (see <xref linkend="files"/> for more).</para>
+                <para>config-test tests MPD connection and Tags plugin configuration.</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry> <!-- create-db -->
+            <term><option>create-db</option></term>
+            <listitem>
+                <para>Create the database and exit. Uses folder specified with <option>--var-dir</option> or default directory.<sbr />Default is to use <envar>$XDG_DATA_HOME/mpd_sima/</envar> (see <xref linkend="files"/> for more).</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry> <!-- generate-config -->
+            <term><option>generate-config</option></term>
+            <listitem>
+                <para>Generate a sample configuration file according to the current CLI options and env. var.. The configuration is written on stdout.</para>
             </listitem>
         </varlistentry>
     </variablelist>
@@ -266,9 +278,9 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
           <varlistentry>
               <term>DEFAULTS</term>
               <listitem>
-                  <para>Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env. var. if set).</para>
+                  <para>Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env. var. if set). The default plugins will use Last.fm to find similar tracks to queue and fallback to random if nothing if found.</para>
                   <para>The get the defaults as detected by &dhpackage; on your system you can run &dhpackage; to print the config:</para>
-                  <para><command>&dhpackage; --generate-config</command></para>
+                  <para><command>&dhpackage; generate-config</command></para>
               </listitem>
           </varlistentry>
       </variablelist>
