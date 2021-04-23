@@ -59,37 +59,40 @@ OPTS = [
         'type': str,
         'dest': 'logfile',
         'action': Wfile,
+        'metavar': 'LOG',
         'help': 'file to log message to, default is stdout/stderr'},
     {
         'sw': ['-v', '--log-level'],
         'type': str,
         'dest': 'verbosity',
         'choices': ['debug', 'info', 'warning', 'error'],
-        'help': 'Log messages verbosity, default is info'},
+        'help': 'log messages verbosity, default is info'},
     {
         'sw': ['-p', '--pid'],
         'dest': 'pidfile',
         'action': Wfile,
+        'metavar': 'FILE',
         'help': 'file to save PID to, default is not to store pid'},
     {
         'sw': ['-d', '--daemon'],
         'dest': 'daemon',
         'action': 'store_true',
-        'help': 'Daemonize process.'},
+        'help': 'daemonize process'},
     {
         'sw': ['-S', '--host'],
         'dest': 'host',
-        'help': 'Host MPD in running on (IP or FQDN)'},
+        'help': 'host MPD in running on (IP or FQDN)'},
     {
         'sw': ['-P', '--port'],
         'type': int,
         'dest': 'port',
-        'help': 'Port MPD in listening on'},
+        'help': 'port MPD in listening on'},
     {
         'sw': ['-c', '--config'],
         'dest': 'conf_file',
         'action': Rfile,
-        'help': 'Configuration file to load'},
+        'metavar': 'CONFIG',
+        'help': 'configuration file to load'},
     {  # TODO: To remove eventually in next major realese v0.18
         'sw': ['--generate-config'],
         'dest': 'generate_config',
@@ -99,7 +102,7 @@ OPTS = [
         'sw': ['--var-dir', '--var_dir'],
         'dest': 'var_dir',
         'action': Wdir,
-        'help': 'Directory to store var content (ie. database, cache)'},
+        'help': 'directory to store var content (ie. database, cache)'},
     {  # TODO: To remove eventually in next major realese v0.18
         'sw': ['--create-db'],
         'action': 'store_true',
@@ -109,7 +112,7 @@ OPTS = [
         'sw': ['command'],
         'nargs': '?',
         'choices': CMDS.keys(),
-        'help': 'Command to run (cf. description or unix manual for more)'},
+        'help': 'command to run (cf. description or unix manual for more)'},
 ]
 
 
