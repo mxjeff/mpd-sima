@@ -2,12 +2,12 @@
 .\"     Title: mpd-sima
 .\"    Author: kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.2 <http://docbook.sf.net/>
-.\"      Date: 04/22/2021
+.\"      Date: 04/23/2021
 .\"    Manual: mpd-sima 0.17.0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD\-SIMA" "1" "04/22/2021" "mpd-sima" "mpd-sima 0.17.0 User Manual"
+.TH "MPD\-SIMA" "1" "04/23/2021" "mpd-sima" "mpd-sima 0.17.0 User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -40,6 +40,8 @@ mpd-sima \- mpd\-sima will try to maintain some titles ahead in the queue follow
 \fBmpd\-sima\fR create\-db [\fB\-\-var\-dir=\fR\fIvar_directory\fR]
 .HP \w'\fBmpd\-sima\fR\ 'u
 \fBmpd\-sima\fR generate\-config [\fB\&...\fR]
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR purge\-history [\fB\-\-var\-dir=\fR\fIvar_directory\fR]
 .SH "DESCRIPTION"
 .PP
 This manual page documents briefly the
@@ -219,6 +221,19 @@ for more)\&.
 \fBgenerate\-config\fR
 .RS 4
 Generate a sample configuration file according to the current CLI options and env\&. var\&.\&. The configuration is written on stdout\&.
+.RE
+.PP
+\fBpurge\-history\fR
+.RS 4
+Purge play history in the database and exit\&. Uses folder specified with
+\fB\-\-var\-dir\fR
+or default directory\&.
+.br
+Default is to use
+\fB$XDG_DATA_HOME/mpd_sima/\fR
+(see
+the section called \(lqFILES\(rq
+for more)\&.
 .RE
 .SH "FILES"
 .PP

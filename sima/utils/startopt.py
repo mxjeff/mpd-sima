@@ -44,6 +44,7 @@ def clean_dict(to_clean):
 CMDS = {'config-test': 'Test configuration (MPD connection and Tags plugin only)',
         'create-db': 'Create the database',
         'generate-config': 'Generate a configuration file to stdout',
+        'purge-history': 'Remove play history'
         }
 # OPTIONS LIST
 # pop out 'sw' value before creating Parser object.

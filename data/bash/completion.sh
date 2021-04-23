@@ -36,7 +36,8 @@ _sima() {
           --var-dir \
           -d --daemon \
           config-test \
-          generate-config"
+          generate-config \
+          purge-history"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )

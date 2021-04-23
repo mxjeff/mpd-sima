@@ -100,6 +100,11 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
       <arg choice="plain">generate-config</arg>
       <arg choice="opt"><option>…</option></arg>
     </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <arg choice="plain">purge-history</arg>
+      <arg choice="opt"><option>--var-dir=</option><replaceable class="option">var_directory</replaceable></arg>
+    </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1 id="description">
     <title>DESCRIPTION</title>
@@ -233,6 +238,12 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
             <term><option>generate-config</option></term>
             <listitem>
                 <para>Generate a sample configuration file according to the current CLI options and env. var.. The configuration is written on stdout.</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry> <!-- purge-history -->
+            <term><option>purge-history</option></term>
+            <listitem>
+                <para>Purge play history in the database and exit. Uses folder specified with <option>--var-dir</option> or default directory.<sbr />Default is to use <envar>$XDG_DATA_HOME/mpd_sima/</envar> (see <xref linkend="files"/> for more).</para>
             </listitem>
         </varlistentry>
     </variablelist>

@@ -110,6 +110,14 @@ def start(sopt, restart=False):
             else:
                 logger.info('Database already there, not overwriting %s', db_file)
             sys.exit(0)
+        if cmd == "purge-history":
+            db_file = config.get('sima', 'db_file')
+            if not isfile(db_file):
+                logger.warning('No db found: %s', db_file)
+                sys.exit(1)
+            SimaDB(db_path=db_file).purge_history(duration=0)
+            sys.exit(0)
+
 
     # TODO: To remove eventually in next major realese v0.18
     # Create Database

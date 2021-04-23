@@ -8,8 +8,8 @@ MPD_sima v0.17.0.dev0
  * Use duration instead of time in Track objects (closes #37)
  * Move "test-tags-config" as positional argument "config-test"
  * Move "--create-db" as positional argument "create-db"
- * Add commands as positional arguments:
- config-test, create-db, generate-config
+ * Add mpd-sima commands as positional arguments:
+ config-test, create-db, generate-config, purge-history
 
  -- kaliko <kaliko@azylum.org>  UNRELEASED
 
