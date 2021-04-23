@@ -1,4 +1,4 @@
-# Copyright (c) 2010, 2011, 2013, 2014, 2015 Jack Kaliko <kaliko@azylum.org>
+# Copyright (c) 2010, 2011, 2013, 2014, 2015, 2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of MPD_sima
 #
@@ -34,8 +34,9 @@ _sima() {
           -P --port \
           -h --help --version \
           --var-dir \
-          --generate-config \
-          -d --daemon"
+          -d --daemon \
+          config-test \
+          generate-config"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -54,13 +55,6 @@ _sima() {
             ;;
         -c|--config)
             _filedir
-            if [ -z $XDG_DATA_HOME ]; then
-                local confnames=$(for x in $(ls -1 $HOME/.config/mpd_sima/*.cfg $PWD/*.cfg 2>/dev/null) ; do echo "${x##*//}"; done)
-            else
-                local confnames=$(for x in $(ls -1 $HOME/.config/mpd_sima/*.cfg $XDG_DATA_HOME/mpd_sima/*.cfg $PWD/*.cfg 2>/dev/null) ; do echo "${x##*//}"; done)
-            fi
-            COMPREPLY+=( $(compgen -W "${confnames}" -- ${cur} ) )
-            return 0
             ;;
         --host|-S)
             COMPREPLY=( $(compgen -A hostname ${cur}) )
@@ -77,8 +71,8 @@ _simadb_cli() {
     local IFS=$'\n'
     COMPREPLY=()
     _get_comp_words_by_ref cur prev
-    opts="--purge_hist \
-        --bl_curr_trk --bl_curr_art --bl_curr_al --bl_art --remove_bl --view_bl \
+    opts="--bl_curr_trk --bl_curr_art --bl_curr_al \
+      --bl_art --remove_bl --view_bl --purge_hist \
         --dbfile -d \
         --host -S --port -P \
         --check_names -c \
