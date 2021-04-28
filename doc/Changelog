@@ -5,11 +5,12 @@ MPD_sima v0.17.0.dev0
  * Fixed issue with un-tagged titles (closes #40)
  * Fixed "artist with quotes not found" (closes #41)
  * Fixed bad pid in Uniq core plugin (closes #32)
- * Use duration instead of time in Track objects (closes #37)
  * Move "test-tags-config" as positional argument "config-test"
  * Move "--create-db" as positional argument "create-db"
  * Add mpd-sima commands as positional arguments:
  config-test, create-db, generate-config, purge-history
+ * Use duration instead of time in Track object (closes #37)
+ * Use musicbrainz_albumid|trackid tags in Tracks object
 
  -- kaliko <kaliko@azylum.org>  UNRELEASED
 

@@ -33,13 +33,14 @@ class Track:
     :param str file: media file, defaults to ``None``
     :param int duration: duration in second, defaults to 0
     :param int pos: position in queue, defaults to -1
-    :param str title|artist|album: defaults to ""
-    :param str musicbrainz_artistid|musicbrainz_albumartistid: MusicBrainz IDs, defaults to ``None``
+    :param str title|artist|album|albumartist: defaults to ""
+    :param str musicbrainz_{artistid|albumartistid|albumid|trackid}: MusicBrainz IDs, defaults to ``None``
     """
 
     def __init__(self, file=None, duration=0, pos=-1, **kwargs):
         self.title = self.artist = self.album = self.albumartist = ''
         self.musicbrainz_artistid = self.musicbrainz_albumartistid = None
+        self.musicbrainz_albumid = self.musicbrainz_trackid = None
         self.pos = int(pos)
         self._file = file
         self._empty = False
