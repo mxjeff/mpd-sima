@@ -1,4 +1,4 @@
-MPD_sima v0.17.0.dev0
+MPD_sima v0.17.0
 
  * New offline autoqueue plugin based on file genre tags only
  * Add randomness in Tags plugin artist selection
@@ -12,7 +12,7 @@ MPD_sima v0.17.0.dev0
  * Use duration instead of time in Track object (closes #37)
  * Use musicbrainz_albumid|trackid tags in Tracks object
 
- -- kaliko <kaliko@azylum.org>  UNRELEASED
+ -- kaliko <kaliko@azylum.org>  Wed, 28 Apr 2021 17:21:39 +0200
 
 MPD_sima v0.16.1
 
