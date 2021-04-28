@@ -118,24 +118,6 @@ def start(sopt, restart=False):
             SimaDB(db_path=db_file).purge_history(duration=0)
             sys.exit(0)
 
-
-    # TODO: To remove eventually in next major realese v0.18
-    # Create Database
-    db_file = config.get('sima', 'db_file')
-    if (sopt.options.get('create_db', None)
-            or not isfile(db_file)):
-        logger.info('Creating database in "%s"', db_file)
-        open(db_file, 'a').close()
-        SimaDB(db_path=db_file).create_db()
-        if sopt.options.get('create_db', None):
-            logger.info('Done, bye...')
-        sys.exit(0)
-
-    # TODO: To remove eventually in next major realese v0.18
-    if sopt.options.get('generate_config'):
-        config.write(sys.stdout, space_around_delimiters=True)
-        sys.exit(0)
-
     logger.info('Starting (%s)...', info.__version__)
     sima = core.Sima(config)
 

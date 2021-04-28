@@ -1,6 +1,6 @@
 MPD_sima v0.18.0.dev0
 
- * …
+ * Removed obsolete --create-db and --generate-config options
 
  -- kaliko <kaliko@azylum.org>  Wed, 28 Apr 2021 17:21:39 +0200
 

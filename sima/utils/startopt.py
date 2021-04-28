@@ -94,21 +94,11 @@ OPTS = [
         'action': Rfile,
         'metavar': 'CONFIG',
         'help': 'configuration file to load'},
-    {  # TODO: To remove eventually in next major realese v0.18
-        'sw': ['--generate-config'],
-        'dest': 'generate_config',
-        'action': 'store_true',
-        'help': SUPPRESS},
     {
         'sw': ['--var-dir', '--var_dir'],
         'dest': 'var_dir',
         'action': Wdir,
         'help': 'directory to store var content (ie. database, cache)'},
-    {  # TODO: To remove eventually in next major realese v0.18
-        'sw': ['--create-db'],
-        'action': 'store_true',
-        'dest': 'create_db',
-        'help': SUPPRESS},
     {
         'sw': ['command'],
         'nargs': '?',
