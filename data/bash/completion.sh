@@ -36,6 +36,7 @@ _sima() {
           --var-dir \
           -d --daemon \
           config-test \
+          create-db \
           generate-config \
           purge-history"
 
