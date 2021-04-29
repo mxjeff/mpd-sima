@@ -32,6 +32,12 @@ from sima.lib.meta import Artist, Album
 from sima.lib.track import Track
 
 
+class SimaDBError(Exception):
+    """
+    Exceptions.
+    """
+
+
 class SimaDB:
     "SQLite management"
 
@@ -80,43 +86,78 @@ class SimaDB:
             'CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, '
             'last_play TIMESTAMP, track integer, '
             'FOREIGN KEY(track) REFERENCES tracks(id))')
+        connection.execute(  # BLOCKLIST
+            'CREATE TABLE IF NOT EXISTS blocklist (id INTEGER PRIMARY KEY, '
+            'artist INTEGER, album INTEGER, track INTEGER, '
+            'FOREIGN KEY(artist) REFERENCES artists(id), '
+            'FOREIGN KEY(album)  REFERENCES albums(id), '
+            'FOREIGN KEY(track)  REFERENCES tracks(id))')
         # Create cleanup triggers:
-        # Tracks table
+        # DELETE history → Tracks table
         connection.execute('''
-                CREATE TRIGGER IF NOT EXISTS cleanup_tracks
-                AFTER DELETE ON history
-                WHEN ((SELECT count(*) FROM history WHERE track=old.id) = 0)
-                BEGIN
-                 DELETE FROM tracks WHERE id = old.id;
-                END;
-                ''')
-        # Artists table
+           CREATE TRIGGER IF NOT EXISTS del_history_cleanup_tracks
+           AFTER DELETE ON history
+           WHEN ((SELECT count(*) FROM history WHERE track=old.track) = 0 AND
+                 (SELECT count(*) FROM blocklist WHERE track=old.track) = 0)
+           BEGIN
+            DELETE FROM tracks WHERE id = old.track;
+           END;
+           ''')
+        # DELETE Tracks → Artists table
         connection.execute('''
-                CREATE TRIGGER IF NOT EXISTS cleanup_artists
-                AFTER DELETE ON tracks
-                WHEN ((SELECT count(*) FROM tracks WHERE artist=old.artist) = 0)
-                BEGIN
-                 DELETE FROM artists WHERE id = old.artist;
-                END;
-                ''')
-        # Albums table
+           CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_artists
+           AFTER DELETE ON tracks
+           WHEN ((SELECT count(*) FROM tracks WHERE artist=old.artist) = 0 AND
+                 (SELECT count(*) FROM blocklist WHERE artist=old.artist) = 0)
+           BEGIN
+            DELETE FROM artists WHERE id = old.artist;
+           END;
+           ''')
+        # DELETE Tracks → Albums table
         connection.execute('''
-                CREATE TRIGGER IF NOT EXISTS cleanup_albums
-                AFTER DELETE ON tracks
-                WHEN ((SELECT count(*) FROM tracks WHERE album=old.album) = 0)
-                BEGIN
-                 DELETE FROM albums WHERE id = old.album;
-                END;
-                ''')
-        # AlbumArtists table
+           CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_albums
+           AFTER DELETE ON tracks
+           WHEN ((SELECT count(*) FROM tracks WHERE album=old.album) = 0 AND
+                 (SELECT count(*) FROM blocklist WHERE album=old.album) = 0)
+           BEGIN
+            DELETE FROM albums WHERE id = old.album;
+           END;
+           ''')
+        # DELETE Tracks → cleanup AlbumArtists table
         connection.execute('''
-                CREATE TRIGGER IF NOT EXISTS cleanup_albumartists
-                AFTER DELETE ON tracks
-                WHEN ((SELECT count(*) FROM tracks WHERE albumartist=old.albumartist) = 0)
-                BEGIN
-                 DELETE FROM albumartists WHERE id = old.albumartist;
-                END;
-                ''')
+           CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_albumartists
+           AFTER DELETE ON tracks
+           WHEN ((SELECT count(*) FROM tracks WHERE albumartist=old.albumartist) = 0)
+           BEGIN
+            DELETE FROM albumartists WHERE id = old.albumartist;
+           END;
+           ''')
+        # DELETE blocklist → Tracks table
+        connection.execute('''
+           CREATE TRIGGER IF NOT EXISTS del_blocklist_cleanup_tracks
+           AFTER DELETE ON blocklist
+           WHEN ((SELECT count(*) FROM history WHERE track=old.track) = 0 AND
+                 (SELECT count(*) FROM blocklist WHERE track=old.track) = 0)
+           BEGIN
+            DELETE FROM tracks WHERE id = old.track;
+           END;
+           ''')
+        self.close_database_connection(connection)
+
+    def drop_all(self):
+        connection = self.get_database_connection()
+        rows = connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'")
+        for r in rows.fetchall():
+            connection.execute(f'DROP TABLE IF EXISTS {r[0]}')
+        connection.close()
+
+    def _remove_blocklist_id(self, blid):
+        """Remove id"""
+        connection = self.get_database_connection()
+        connection.execute('DELETE FROM blocklist'
+                           ' WHERE blocklist.id = ?', (blid,))
+        connection.commit()
         self.close_database_connection(connection)
 
     def _get_album(self, album, connection):
@@ -250,6 +291,8 @@ class SimaDB:
         """Get a track from Tracks table, add if not existing,
         Attention: use Track() object!!
         if not in database insert new entry."""
+        if not track.file:
+            raise SimaDBError('Got a track with no file attribute: %r' % track)
         if with_connection:
             connection = with_connection
         else:
@@ -325,7 +368,30 @@ class SimaDB:
         connection.commit()
         self.close_database_connection(connection)
 
-    def get_history(self, duration=__HIST_DURATION__):
+    def fetch_artists_history(self, duration=__HIST_DURATION__):
+        date = datetime.utcnow() - timedelta(hours=duration)
+        connection = self.get_database_connection()
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute("""
+                SELECT artists.name AS name,
+                       artists.mbid as mbid
+                FROM history
+                JOIN tracks ON history.track = tracks.id
+                LEFT OUTER JOIN artists ON tracks.artist = artists.id
+                WHERE history.last_play > ?
+                ORDER BY history.last_play DESC""", (date.isoformat(' '),))
+        hist = list()
+        for row in rows:
+            if hist and hist[-1] == Album(**row):  # remove consecutive dupes
+                continue
+            hist.append(Album(**row))
+        connection.close()
+        return hist
+
+    def fetch_history(self, duration=__HIST_DURATION__):
+        """Fetches tracks history, more recent first
+        :param int duration: How long ago to fetch history from
+        """
         date = datetime.utcnow() - timedelta(hours=duration)
         connection = self.get_database_connection()
         connection.row_factory = sqlite3.Row
@@ -349,10 +415,92 @@ class SimaDB:
         connection.close()
         return hist
 
+    def get_bl_track(self, track, with_connection=None, add=True):
+        """Add a track to blocklist
+        :param sima.lib.track.Track track: Track object to add to blocklist
+        :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, else create a new one
+        :param bool add: Default is to add a new record, set to False to fetch associated record"""
+        if with_connection:
+            connection = with_connection
+        else:
+            connection = self.get_database_connection()
+        track_id = self.get_track(track, with_connection=connection, add=True)
+        rows = connection.execute(
+            "SELECT * FROM blocklist WHERE track = ?", (track_id,))
+        if not rows.fetchone():
+            if not add:
+                return None
+            connection.execute('INSERT INTO blocklist (track) VALUES (?)',
+                               (track_id,))
+            connection.commit()
+        rows = connection.execute(
+            "SELECT * FROM blocklist WHERE track = ?", (track_id,))
+        return rows.fetchone()[0]
+
+    def get_bl_album(self, album, with_connection=None, add=True):
+        """Add an album to blocklist
+        :param sima.lib.meta.Album: Album object to add to blocklist
+        :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, ele create a new one
+        :param bool add: Default is to add a new record, set to False to fetch associated record"""
+        if with_connection:
+            connection = with_connection
+        else:
+            connection = self.get_database_connection()
+        album_id = self.get_album(album, with_connection=connection, add=True)
+        rows = connection.execute(
+            "SELECT * FROM blocklist WHERE album = ?", (album_id,))
+        if not rows.fetchone():
+            if not add:
+                return None
+            connection.execute('INSERT INTO blocklist (album) VALUES (?)',
+                               (album_id,))
+            connection.commit()
+        rows = connection.execute(
+            "SELECT * FROM blocklist WHERE album = ?", (album_id,))
+        return rows.fetchone()
+
+    def get_bl_artist(self, artist, with_connection=None, add=True):
+        """Add an artist to blocklist
+        :param sima.lib.meta.Artist: Artist object to add to blocklist
+        :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, ele create a new one
+        :param bool add: Default is to add a new record, set to False to fetch associated record"""
+        if with_connection:
+            connection = with_connection
+        else:
+            connection = self.get_database_connection()
+        artist_id = self.get_artist(artist, with_connection=connection, add=True)
+        rows = connection.execute(
+            "SELECT * FROM blocklist WHERE artist = ?", (artist_id,))
+        if not rows.fetchone():
+            if not add:
+                return None
+            connection.execute('INSERT INTO blocklist (artist) VALUES (?)',
+                               (artist_id,))
+            connection.commit()
+        rows = connection.execute(
+            "SELECT * FROM blocklist WHERE artist = ?", (artist_id,))
+        return rows.fetchone()
+
 
 def main():
+    DEVOLT = {
+        'album': 'Grey',
+        'albumartist': 'Devolt',
+        'artist': 'Devolt',
+        'date': '2011-12-01',
+        'file': 'music/Devolt/2011-Grey/03-Devolt - Crazy.mp3',
+        'musicbrainz_albumartistid': 'd8e7e3e2-49ab-4f7c-b148-fc946d521f99',
+        'musicbrainz_albumid': 'ea2ef2cf-59e1-443a-817e-9066e3e0be4b',
+        'musicbrainz_artistid': 'd8e7e3e2-49ab-4f7c-b148-fc946d521f99',
+        'musicbrainz_trackid': 'fabf8fc9-2ae5-49c9-8214-a839c958d872',
+        'duration': '220.000',
+        'title': 'Crazy'}
     db = SimaDB('/dev/shm/test.sqlite')
     db.create_db()
+    db.add_history(Track(**DEVOLT))
+    DEVOLT['file'] = 'foo'
+    print(db.get_bl_track(Track(**DEVOLT)))
+    db.add_history(Track(**DEVOLT))
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab fileencoding=utf8
