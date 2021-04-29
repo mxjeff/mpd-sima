@@ -88,6 +88,13 @@ def start(sopt, restart=False):
     set_logger(verbosity, logfile)
     logger.debug('Command line say: %s', sopt.options)
 
+    # Create database if not present
+    db_file = config.get('sima', 'db_file')
+    if not isfile(db_file):
+        logger.debug('Creating database in "%s"', db_file)
+        open(db_file, 'a').close()  # TODO: to remove with new simadb in v0.18
+        SimaDB(db_path=db_file).create_db()
+
     if sopt.options.get('command'):
         cmd = sopt.options.get('command')
         if cmd == "generate-config":
@@ -100,10 +107,9 @@ def start(sopt, restart=False):
             config_test(config)
             sys.exit(0)
         if cmd == "create-db":
-            db_file = config.get('sima', 'db_file')
             if not isfile(db_file):
                 logger.info('Creating database in "%s"', db_file)
-                open(db_file, 'a').close()
+                open(db_file, 'a').close()  # TODO: to remove with new simadb in v0.18
                 SimaDB(db_path=db_file).create_db()
                 if sopt.options.get('create_db', None):
                     logger.info('Done, bye...')
