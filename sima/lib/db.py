@@ -95,53 +95,53 @@ class SimaDB:
         # Create cleanup triggers:
         # DELETE history → Tracks table
         connection.execute('''
-           CREATE TRIGGER IF NOT EXISTS del_history_cleanup_tracks
-           AFTER DELETE ON history
-           WHEN ((SELECT count(*) FROM history WHERE track=old.track) = 0 AND
-                 (SELECT count(*) FROM blocklist WHERE track=old.track) = 0)
-           BEGIN
-            DELETE FROM tracks WHERE id = old.track;
-           END;
-           ''')
+            CREATE TRIGGER IF NOT EXISTS del_history_cleanup_tracks
+            AFTER DELETE ON history
+            WHEN ((SELECT count(*) FROM history WHERE track=old.track) = 0 AND
+                  (SELECT count(*) FROM blocklist WHERE track=old.track) = 0)
+            BEGIN
+             DELETE FROM tracks WHERE id = old.track;
+            END;
+            ''')
         # DELETE Tracks → Artists table
         connection.execute('''
-           CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_artists
-           AFTER DELETE ON tracks
-           WHEN ((SELECT count(*) FROM tracks WHERE artist=old.artist) = 0 AND
-                 (SELECT count(*) FROM blocklist WHERE artist=old.artist) = 0)
-           BEGIN
-            DELETE FROM artists WHERE id = old.artist;
-           END;
-           ''')
+            CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_artists
+            AFTER DELETE ON tracks
+            WHEN ((SELECT count(*) FROM tracks WHERE artist=old.artist) = 0 AND
+                  (SELECT count(*) FROM blocklist WHERE artist=old.artist) = 0)
+            BEGIN
+             DELETE FROM artists WHERE id = old.artist;
+            END;
+            ''')
         # DELETE Tracks → Albums table
         connection.execute('''
-           CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_albums
-           AFTER DELETE ON tracks
-           WHEN ((SELECT count(*) FROM tracks WHERE album=old.album) = 0 AND
-                 (SELECT count(*) FROM blocklist WHERE album=old.album) = 0)
-           BEGIN
-            DELETE FROM albums WHERE id = old.album;
-           END;
-           ''')
+            CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_albums
+            AFTER DELETE ON tracks
+            WHEN ((SELECT count(*) FROM tracks WHERE album=old.album) = 0 AND
+                  (SELECT count(*) FROM blocklist WHERE album=old.album) = 0)
+            BEGIN
+             DELETE FROM albums WHERE id = old.album;
+            END;
+            ''')
         # DELETE Tracks → cleanup AlbumArtists table
         connection.execute('''
-           CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_albumartists
-           AFTER DELETE ON tracks
-           WHEN ((SELECT count(*) FROM tracks WHERE albumartist=old.albumartist) = 0)
-           BEGIN
-            DELETE FROM albumartists WHERE id = old.albumartist;
-           END;
-           ''')
+            CREATE TRIGGER IF NOT EXISTS del_tracks_cleanup_albumartists
+            AFTER DELETE ON tracks
+            WHEN ((SELECT count(*) FROM tracks WHERE albumartist=old.albumartist) = 0)
+            BEGIN
+             DELETE FROM albumartists WHERE id = old.albumartist;
+            END;
+            ''')
         # DELETE blocklist → Tracks table
         connection.execute('''
-           CREATE TRIGGER IF NOT EXISTS del_blocklist_cleanup_tracks
-           AFTER DELETE ON blocklist
-           WHEN ((SELECT count(*) FROM history WHERE track=old.track) = 0 AND
-                 (SELECT count(*) FROM blocklist WHERE track=old.track) = 0)
-           BEGIN
-            DELETE FROM tracks WHERE id = old.track;
-           END;
-           ''')
+            CREATE TRIGGER IF NOT EXISTS del_blocklist_cleanup_tracks
+            AFTER DELETE ON blocklist
+            WHEN ((SELECT count(*) FROM history WHERE track=old.track) = 0 AND
+                  (SELECT count(*) FROM blocklist WHERE track=old.track) = 0)
+            BEGIN
+             DELETE FROM tracks WHERE id = old.track;
+            END;
+            ''')
         self.close_database_connection(connection)
 
     def drop_all(self):
