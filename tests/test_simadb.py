@@ -28,7 +28,7 @@ DEVOLT = {
     'track': '3/6'}
 
 DB_FILE = 'file::memory:?cache=shared'
-KEEP_FILE = False  # File db in file to ease debug
+KEEP_FILE = True  # File db in file to ease debug
 if KEEP_FILE:
     DB_FILE = '/dev/shm/unittest.sqlite'
 CURRENT = datetime.datetime.utcnow()
@@ -226,7 +226,20 @@ class Test_01BlockList(Main):
             if i == 3:
                 self.db.get_bl_artist(trk.Artist)
 
-    def test_blocklist_triggers(self):
+    def test_blocklist_triggers_00(self):
+        trk01 = Track(file='01', name='01', artist='artist A', album='album A')
+        blart01_id = self.db.get_bl_artist(trk01.Artist)
+        blalb01_id = self.db.get_bl_album(Album(name=trk01.album, mbid=trk01.musicbrainz_albumid))
+        conn = self.db.get_database_connection()
+        self.db._remove_blocklist_id(blart01_id, with_connection=conn)
+        self.db._remove_blocklist_id(blalb01_id, with_connection=conn)
+        albums = conn.execute('SELECT albums.name FROM albums;').fetchall()
+        artists = conn.execute('SELECT artists.name FROM artists;').fetchall()
+        conn.close()
+        self.assertNotIn((trk01.album,), albums)
+        self.assertNotIn((trk01.artist,), artists)
+
+    def test_blocklist_triggers_01(self):
         trk01 = Track(file='01', name='01', artist='artist A', album='album A')
         trk02 = Track(file='02', name='01', artist='artist A', album='album B')
         trk01_id = self.db.get_bl_track(trk01)

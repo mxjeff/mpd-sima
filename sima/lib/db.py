@@ -142,6 +142,30 @@ class SimaDB:
              DELETE FROM tracks WHERE id = old.track;
             END;
             ''')
+        # DELETE blocklist → Artists table
+        # The "SELECT count(*) FROM blocklist" is useless,
+        # there can be only one blocklist.artist
+        connection.execute('''
+            CREATE TRIGGER IF NOT EXISTS del_blocklist_cleanup_artists
+            AFTER DELETE ON blocklist
+            WHEN ((SELECT count(*) FROM tracks WHERE artist=old.artist) = 0 AND
+                  (SELECT count(*) FROM blocklist WHERE artist=old.artist) = 0)
+            BEGIN
+             DELETE FROM artists WHERE id = old.artist;
+            END;
+            ''')
+        # DELETE Tracks → Albums table
+        # The "SELECT count(*) FROM blocklist" is useless,
+        # there can be only one blocklist.album
+        connection.execute('''
+            CREATE TRIGGER IF NOT EXISTS del_blocklist_cleanup_albums
+            AFTER DELETE ON blocklist
+            WHEN ((SELECT count(*) FROM tracks WHERE album=old.album) = 0 AND
+                  (SELECT count(*) FROM blocklist WHERE album=old.album) = 0)
+            BEGIN
+             DELETE FROM albums WHERE id = old.album;
+            END;
+            ''')
         self.close_database_connection(connection)
 
     def drop_all(self):
@@ -152,13 +176,18 @@ class SimaDB:
             connection.execute(f'DROP TABLE IF EXISTS {r[0]}')
         connection.close()
 
-    def _remove_blocklist_id(self, blid):
+    def _remove_blocklist_id(self, blid, with_connection=None):
         """Remove id"""
+        if with_connection:
+            connection = with_connection
+        else:
+            connection = self.get_database_connection()
         connection = self.get_database_connection()
         connection.execute('DELETE FROM blocklist'
                            ' WHERE blocklist.id = ?', (blid,))
         connection.commit()
-        self.close_database_connection(connection)
+        if not with_connection:
+            self.close_database_connection(connection)
 
     def _get_album(self, album, connection):
         if album.mbid:
@@ -426,7 +455,7 @@ class SimaDB:
             connection = self.get_database_connection()
         track_id = self.get_track(track, with_connection=connection, add=True)
         rows = connection.execute(
-            "SELECT * FROM blocklist WHERE track = ?", (track_id,))
+            "SELECT id FROM blocklist WHERE track = ?", (track_id,))
         if not rows.fetchone():
             if not add:
                 return None
@@ -434,13 +463,13 @@ class SimaDB:
                                (track_id,))
             connection.commit()
         rows = connection.execute(
-            "SELECT * FROM blocklist WHERE track = ?", (track_id,))
+            "SELECT id FROM blocklist WHERE track = ?", (track_id,))
         return rows.fetchone()[0]
 
     def get_bl_album(self, album, with_connection=None, add=True):
         """Add an album to blocklist
         :param sima.lib.meta.Album: Album object to add to blocklist
-        :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, ele create a new one
+        :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, else create a new one
         :param bool add: Default is to add a new record, set to False to fetch associated record"""
         if with_connection:
             connection = with_connection
@@ -448,7 +477,7 @@ class SimaDB:
             connection = self.get_database_connection()
         album_id = self.get_album(album, with_connection=connection, add=True)
         rows = connection.execute(
-            "SELECT * FROM blocklist WHERE album = ?", (album_id,))
+            "SELECT id FROM blocklist WHERE album = ?", (album_id,))
         if not rows.fetchone():
             if not add:
                 return None
@@ -456,13 +485,13 @@ class SimaDB:
                                (album_id,))
             connection.commit()
         rows = connection.execute(
-            "SELECT * FROM blocklist WHERE album = ?", (album_id,))
-        return rows.fetchone()
+            "SELECT id FROM blocklist WHERE album = ?", (album_id,))
+        return rows.fetchone()[0]
 
     def get_bl_artist(self, artist, with_connection=None, add=True):
         """Add an artist to blocklist
         :param sima.lib.meta.Artist: Artist object to add to blocklist
-        :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, ele create a new one
+        :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, else create a new one
         :param bool add: Default is to add a new record, set to False to fetch associated record"""
         if with_connection:
             connection = with_connection
@@ -470,7 +499,7 @@ class SimaDB:
             connection = self.get_database_connection()
         artist_id = self.get_artist(artist, with_connection=connection, add=True)
         rows = connection.execute(
-            "SELECT * FROM blocklist WHERE artist = ?", (artist_id,))
+            "SELECT id FROM blocklist WHERE artist = ?", (artist_id,))
         if not rows.fetchone():
             if not add:
                 return None
@@ -478,9 +507,23 @@ class SimaDB:
                                (artist_id,))
             connection.commit()
         rows = connection.execute(
-            "SELECT * FROM blocklist WHERE artist = ?", (artist_id,))
-        return rows.fetchone()
+            "SELECT id FROM blocklist WHERE artist = ?", (artist_id,))
+        return rows.fetchone()[0]
 
+    def delete_bl(self, track=None, album=None, artist=None):
+        if not (track or album or artist):
+            return
+        connection = self.get_database_connection()
+        blid = None
+        if track:
+            blid = self.get_bl_track(track, with_connection=connection)
+        if album:
+            blid = self.get_bl_album(album, with_connection=connection)
+        if artist:
+            blid = self.get_bl_artist(artist, with_connection=connection)
+        if not blid:
+            return
+        self._remove_blocklist_id(blid, with_connection=connection)
 
 def main():
     DEVOLT = {
