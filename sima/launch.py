@@ -111,10 +111,9 @@ def start(sopt, restart=False):
                 logger.info('Creating database in "%s"', db_file)
                 open(db_file, 'a').close()  # TODO: to remove with new simadb in v0.18
                 SimaDB(db_path=db_file).create_db()
-                if sopt.options.get('create_db', None):
-                    logger.info('Done, bye...')
             else:
                 logger.info('Database already there, not overwriting %s', db_file)
+            logger.info('Done, bye...')
             sys.exit(0)
         if cmd == "purge-history":
             db_file = config.get('sima', 'db_file')
