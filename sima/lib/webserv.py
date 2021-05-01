@@ -248,15 +248,6 @@ class WebService(AdvancedPlugin):
             self.log.info(' / '.join(map(str, candidates)))
         return candidates
 
-    def _get_album_history(self, artist):
-        """Retrieve album history"""
-        albums_list = set()
-        for trk in self.get_history(artist=artist.name):
-            if not trk.album:
-                continue
-            albums_list.add(trk.album)
-        return albums_list
-
     def find_album(self, artists):
         """Find albums to queue.
         """
