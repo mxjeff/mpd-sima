@@ -26,6 +26,7 @@ __HIST_DURATION__ = int(30 * 24)  # in hours
 
 import sqlite3
 
+from collections import deque
 from datetime import (datetime, timedelta)
 
 from sima.lib.meta import Artist, Album
@@ -394,10 +395,49 @@ class SimaDB:
         connection = self.get_database_connection()
         connection.execute("DELETE FROM history WHERE last_play"
                            " < datetime('now', '-%i hours')" % duration)
+        connection.execute('VACUUM')
         connection.commit()
         self.close_database_connection(connection)
 
-    def fetch_artists_history(self, duration=__HIST_DURATION__):
+    def fetch_albums_history(self, needle=None, duration=__HIST_DURATION__):
+        """
+        :param sima.lib.meta.Artist needle: When specified, returns albums history for this artist.
+        """
+        date = datetime.utcnow() - timedelta(hours=duration)
+        connection = self.get_database_connection()
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute("""
+                SELECT albums.name AS name,
+                       albums.mbid as mbid,
+                       artists.name as artist,
+                       artists.mbid as artist_mbib
+                FROM history
+                JOIN tracks ON history.track = tracks.id
+                LEFT OUTER JOIN albums ON tracks.album = albums.id
+                LEFT OUTER JOIN artists ON tracks.artist = artists.id
+                WHERE history.last_play > ? AND albums.name NOT NULL AND artists.name NOT NULL
+                ORDER BY history.last_play DESC""", (date.isoformat(' '),))
+        hist = list()
+        for row in rows:
+            vals = dict(row)
+            artist = Artist(name=vals.pop('artist'),
+                            mbid=vals.pop('artist_mbib'))
+            if needle:
+                if needle != artist:
+                    continue
+            album = Album(**vals, artist=artist)
+            if hist and hist[-1] == album:
+                # remove consecutive dupes
+                continue
+            hist.append(album)
+        connection.close()
+        return hist
+
+    def fetch_artists_history(self, needle=None, duration=__HIST_DURATION__):
+        """Returns a list of Artist objects
+        :param sima.lib.meta.Artist|sima.lib.meta.MetaContainer needle: When specified, returns history for this artist, it's actually testing the artist presence in history.
+        :param sima.lib.meta.MetaContainer needle: When specified, returns history for these artists only
+        """
         date = datetime.utcnow() - timedelta(hours=duration)
         connection = self.get_database_connection()
         connection.row_factory = sqlite3.Row
@@ -407,37 +447,63 @@ class SimaDB:
                 FROM history
                 JOIN tracks ON history.track = tracks.id
                 LEFT OUTER JOIN artists ON tracks.artist = artists.id
-                WHERE history.last_play > ?
+                WHERE history.last_play > ? AND artists.name NOT NULL
                 ORDER BY history.last_play DESC""", (date.isoformat(' '),))
+        last = deque(maxlen=1)
         hist = list()
         for row in rows:
-            if hist and hist[-1] == Album(**row):  # remove consecutive dupes
+            artist = Artist(**row)
+            if last and last[0] == artist:  # remove consecutive dupes
                 continue
-            hist.append(Album(**row))
-        connection.close()
+            last.append(artist)
+            if needle and isinstance(needle, (Artist, str)):
+                if needle == artist:
+                    hist.append(artist)  # No need to go further
+                    break
+                continue
+            elif needle and getattr(needle, '__contains__'):
+                if artist in needle:
+                    hist.append(artist)  # No need to go further
+                continue
+            hist.append(artist)
         return hist
 
-    def fetch_history(self, duration=__HIST_DURATION__):
+    def fetch_history(self, artist=None, duration=__HIST_DURATION__):
         """Fetches tracks history, more recent first
+        :param sima.lib.meta.Artist artist: limit history to this artist
         :param int duration: How long ago to fetch history from
         """
         date = datetime.utcnow() - timedelta(hours=duration)
         connection = self.get_database_connection()
         connection.row_factory = sqlite3.Row
-        rows = connection.execute("""
-                SELECT tracks.title, tracks.file, artists.name AS artist,
-                       albumartists.name AS albumartist,
-                       artists.mbid as musicbrainz_artistid,
-                       albums.name AS album,
-                       albums.mbid AS musicbrainz_albumid,
-                       tracks.mbid as musicbrainz_trackid
-                FROM history
-                JOIN tracks ON history.track = tracks.id
-                LEFT OUTER JOIN artists ON tracks.artist = artists.id
-                LEFT OUTER JOIN albumartists ON tracks.albumartist = albumartists.id
-                LEFT OUTER JOIN albums ON tracks.album = albums.id
-                WHERE history.last_play > ?
-                ORDER BY history.last_play DESC""", (date.isoformat(' '),))
+        sql = """
+              SELECT tracks.title, tracks.file, artists.name AS artist,
+                     albumartists.name AS albumartist,
+                     artists.mbid as musicbrainz_artistid,
+                     albums.name AS album,
+                     albums.mbid AS musicbrainz_albumid,
+                     tracks.mbid as musicbrainz_trackid
+              FROM history
+              JOIN tracks ON history.track = tracks.id
+              LEFT OUTER JOIN artists ON tracks.artist = artists.id
+              LEFT OUTER JOIN albumartists ON tracks.albumartist = albumartists.id
+              LEFT OUTER JOIN albums ON tracks.album = albums.id
+              WHERE history.last_play > ?
+              """
+        if artist:
+            if artist.mbid:
+                rows = connection.execute(sql+"""
+                        AND artists.mbid = ?
+                        ORDER BY history.last_play DESC""",
+                                          (date.isoformat(' '), artist.mbid))
+            else:
+                rows = connection.execute(sql+"""
+                        AND artists.name = ?
+                        ORDER BY history.last_play DESC""",
+                                          (date.isoformat(' '), artist.name))
+        else:
+            rows = connection.execute(sql+'ORDER BY history.last_play DESC',
+                                      (date.isoformat(' '),))
         hist = list()
         for row in rows:
             hist.append(Track(**row))
@@ -525,25 +591,6 @@ class SimaDB:
             return
         self._remove_blocklist_id(blid, with_connection=connection)
 
-def main():
-    DEVOLT = {
-        'album': 'Grey',
-        'albumartist': 'Devolt',
-        'artist': 'Devolt',
-        'date': '2011-12-01',
-        'file': 'music/Devolt/2011-Grey/03-Devolt - Crazy.mp3',
-        'musicbrainz_albumartistid': 'd8e7e3e2-49ab-4f7c-b148-fc946d521f99',
-        'musicbrainz_albumid': 'ea2ef2cf-59e1-443a-817e-9066e3e0be4b',
-        'musicbrainz_artistid': 'd8e7e3e2-49ab-4f7c-b148-fc946d521f99',
-        'musicbrainz_trackid': 'fabf8fc9-2ae5-49c9-8214-a839c958d872',
-        'duration': '220.000',
-        'title': 'Crazy'}
-    db = SimaDB('/dev/shm/test.sqlite')
-    db.create_db()
-    db.add_history(Track(**DEVOLT))
-    DEVOLT['file'] = 'foo'
-    print(db.get_bl_track(Track(**DEVOLT)))
-    db.add_history(Track(**DEVOLT))
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab fileencoding=utf8

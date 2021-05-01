@@ -6,7 +6,7 @@ import os
 
 from sima.lib.db import SimaDB
 from sima.lib.track import Track
-from sima.lib.meta import Album
+from sima.lib.meta import Album, Artist, MetaContainer
 
 
 DEVOLT = {
@@ -145,9 +145,11 @@ class Test_00DB(Main):
         #
         trk03 = Track(file='03', **tr)
         self.db.add_history(trk03, CURRENT-datetime.timedelta(hours=1))
-        # got multiple tracks, same artist, got artist history len == 1
+        # got multiple tracks, same artist/album, got artist/album history len = 1
         art_history = self.db.fetch_artists_history()
+        alb_history = self.db.fetch_albums_history()
         self.assertEqual(len(art_history), 1)
+        self.assertEqual(len(alb_history), 1)
         self.assertEqual(art_history, [trk01.Artist])
 
         # Now add new artist to history
@@ -164,7 +166,43 @@ class Test_00DB(Main):
                          trk04.artist, trk03.artist],
                          art_history)
 
-    def test_04_triggers(self):
+    def test_04_filtering_history(self):
+        # Controls artist history filtering
+        for i in range(0, 5):
+            trk = Track(file=f'/foo/bar.{i}', name=f'{i}-baz',
+                        artist=f'{i}-art', album=f'{i}-lbum')
+            last = CURRENT - datetime.timedelta(minutes=i)
+            self.db.add_history(trk, date=last)
+            if i == 5:  # bounce latest record
+                self.db.add_history(trk, date=last)
+        art_history = self.db.fetch_artists_history()
+        # Already checked but to be sure, we should have 5 artists in history
+        self.assertEqual(len(art_history), 5)
+        for needle in ['4-art', Artist(name='4-art')]:
+            art_history = self.db.fetch_artists_history(needle=needle)
+            self.assertEqual(art_history, [needle])
+        needle = Artist(name='not-art')
+        art_history = self.db.fetch_artists_history(needle=needle)
+        self.assertEqual(art_history, [])
+        # Controls artists history filtering
+        #   for a list of Artist objects
+        needle_list = [Artist(name='3-art'), Artist(name='4-art')]
+        art_history = self.db.fetch_artists_history(needle=needle_list)
+        self.assertEqual(art_history, needle_list)
+        #   for a MetaContainer
+        needle_meta = MetaContainer(needle_list)
+        art_history = self.db.fetch_artists_history(needle=needle_meta)
+        self.assertEqual(art_history, needle_list)
+        #   for a list of string (Meta object handles Artist/str comparison)
+        art_history = self.db.fetch_artists_history(['3-art', '4-art'])
+        self.assertEqual(art_history, needle_list)
+
+        # Controls album history filtering
+        needle = Artist(name='4-art')
+        alb_history = self.db.fetch_albums_history(needle=needle)
+        self.assertEqual(alb_history, [Album(name='4-lbum')])
+
+    def test_05_triggers(self):
         self.db.purge_history(duration=0)
         tracks_ids = list()
         #  Add a first track
