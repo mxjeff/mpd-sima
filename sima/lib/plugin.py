@@ -126,29 +126,15 @@ class AdvancedPlugin(Plugin):
     """
 
     # Query History
-    def get_history(self, artist=False):
-        """Constructs Track list of already played artists.
-
-        :param Artist artist: Artist object to look history for
-        """
+    def get_history(self):
+        """Returns a Track list of already played artists."""
         duration = self.main_conf.getint('sima', 'history_duration')
-        name = None
-        if artist:
-            name = artist.name
-        from_db = self.sdb.get_history(duration=duration, artist=name)
-        hist = [Track(artist=tr[0], album=tr[1], title=tr[2],
-                      file=tr[3]) for tr in from_db]
-        return hist
+        return self.sdb.fetch_history(duration=duration)
 
     def get_album_history(self, artist):
         """Retrieve album history"""
-        hist = []
-        tracks_from_db = self.get_history(artist=artist)
-        for trk in tracks_from_db:
-            if trk.album and trk.album in hist:
-                continue
-            hist.append(Album(name=trk.album, artist=Artist(trk.artist)))
-        return hist
+        duration = self.main_conf.getint('sima', 'history_duration')
+        return self.sdb.fetch_albums_history(needle=artist, duration=duration)
 
     def get_reorg_artists_list(self, alist):
         """
@@ -162,7 +148,7 @@ class AdvancedPlugin(Plugin):
         not_queued_artist = alist - queued_artist
         duration = self.main_conf.getint('sima', 'history_duration')
         hist = []
-        for art in self.sdb.get_artists_history(alist, duration=duration):
+        for art in self.sdb.fetch_artists_history(alist, duration=duration):
             if art not in hist:
                 if art not in queued_artist:
                     hist.insert(0, art)
@@ -230,7 +216,7 @@ class AdvancedPlugin(Plugin):
             deny_list = self.player.playlist
         else:
             deny_list = self.player.queue
-        not_in_hist = list(set(tracks) - set(self.get_history(artist=artist)))
+        not_in_hist = list(set(tracks) - set(self.sdb.fetch_history(artist=artist)))
         if not not_in_hist:
             self.log.debug('All tracks already played for "%s"', artist)
             if unplayed:

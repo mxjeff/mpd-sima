@@ -39,15 +39,21 @@ class History(Plugin):
     def shutdown(self):
         self.log.info('Cleaning database')
         self.sdb.purge_history()
-        self.sdb.clean_database()
+
+    def _h_tip(self):
+        hist = self.sdb.fetch_history()
+        if hist:
+            return hist[0]
+        return None
 
     def callback_player(self):
         current = self.player.current
-        last_hist = next(self.sdb.get_history(), None)
-        if last_hist and last_hist[3] == current.file:
-            return
         if not current:
-            self.log.debug('Cannot add "%s" to history (empty or missing file)', current)
+            if self.player.state == 'play':
+                self.log.debug('Cannot add "%s" to history (empty or missing file)', current)
+            return
+        last_hist = self._h_tip()
+        if last_hist and last_hist == current:
             return
         self.log.debug('add history: "%s"', current)
         self.sdb.add_history(current)
