@@ -4,7 +4,7 @@ import datetime
 import unittest
 import os
 
-from sima.lib.db import SimaDB
+from sima.lib.simadb import SimaDB
 from sima.lib.track import Track
 from sima.lib.meta import Album, Artist, MetaContainer
 
