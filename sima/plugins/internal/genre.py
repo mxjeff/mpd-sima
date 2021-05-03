@@ -63,15 +63,14 @@ class Genre(AdvancedPlugin):
             raise PluginException('MPD >= 0.21 required')
 
     def fetch_genres(self):
-        pldepth = 4
-        nbgenres = 2
-        current_titles = self.player.playlist[-pldepth:]
-        genres = []
-        for track in current_titles:
-            if not track.genres:
-                self.log.debug('No genre found in %s', track)
-                continue
-            genres.extend(track.genres)
+        """Fetches ,at most, nb-depth genre from history,
+        and returns the nbgenres most present"""
+        depth = 10 # nb of genre to fetch from history for analysis
+        nbgenres = 2 # nb of genre to return
+        genres = [g[0] for g in self.sdb.fetch_genres_history(limit=depth)]
+        if not genres:
+            self.log.debug('No genre found in current track history')
+            return []
         genres_analysis = Counter(genres)
         if genres_analysis.most_common():
             self.log.debug('Most common genres: %s', genres_analysis.most_common())

@@ -14,6 +14,7 @@ DEVOLT = {
     'albumartist': 'Devolt',
     'albumartistsort': 'Devolt',
     'artist': 'Devolt',
+    'genre': ['Rock'],
     'date': '2011-12-01',
     'disc': '1/1',
     'file': 'music/Devolt/2011-Grey/03-Devolt - Crazy.mp3',
@@ -97,7 +98,8 @@ class Test_00DB(Main):
         # recent first, oldest last
         hist = list()
         for i in range(1, 5):  # starts at 1 to ensure records are in the past
-            trk = Track(file=f'/foo/bar.{i}', name='{i}-baz', album='foolbum')
+            trk = Track(file=f'/foo/bar.{i}', name=f'{i}-baz',
+                        album='foolbum', genre=f'{i}')
             hist.append(trk)
             last = CURRENT - datetime.timedelta(minutes=i)
             self.db.add_history(trk, date=last)
@@ -304,6 +306,21 @@ class Test_01BlockList(Main):
         self.assertNotIn(('artist A'), artists)
         conn.close()
 
+
+class Test_02Genre(Main):
+
+    def test_genre(self):
+        conn = self.db.get_database_connection()
+        self.db.get_genre('Post-Rock', with_connection=conn)
+        genres = list()
+        for i in range(1, 15):  # starts at 1 to ensure records are in the past
+            trk = Track(file=f'/foo/bar.{i}', name=f'{i}-baz',
+                        album='foolbum', artist=f'{i}-art', genre=f'{i}')
+            genres.append(f'{i}')
+            last = CURRENT - datetime.timedelta(minutes=i)
+            self.db.add_history(trk, date=last)
+        genre_hist = self.db.fetch_genres_history(limit=10)
+        self.assertEqual([g[0] for g in genre_hist], genres[:10])
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab fileencoding=utf8
