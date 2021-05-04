@@ -49,6 +49,13 @@ class SimaDB:
             self._db_path, isolation_level=None)
         return connection
 
+    def get_info(self):
+        connection = self.get_database_connection()
+        info = connection.execute("""SELECT * FROM db_info
+                    WHERE name = "DB Version" LIMIT 1;""").fetchone()
+        connection.close()
+        return info
+
     def create_db(self):
         """ Set up a database
         """

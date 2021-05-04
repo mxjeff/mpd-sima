@@ -26,6 +26,7 @@ import sys
 
 from importlib import __import__ as sima_import
 from os.path import isfile
+from os import rename
 ##
 
 # third parties components
@@ -92,7 +93,13 @@ def start(sopt, restart=False):
     db_file = config.get('sima', 'db_file')
     if not isfile(db_file):
         logger.debug('Creating database in "%s"', db_file)
-        open(db_file, 'a').close()  # TODO: to remove with new simadb in v0.18
+        SimaDB(db_path=db_file).create_db()
+    # Migration from v0.17.0
+    dbinfo = SimaDB(db_path=db_file).get_info()
+    if not dbinfo:  # v0.17.0 → v0.18+ migration
+        logger.warning('Backing up database!')
+        rename(db_file, db_file + '-old-version-backup')
+        logger.info('Creating an new database in "%s"', db_file)
         SimaDB(db_path=db_file).create_db()
 
     if sopt.options.get('command'):
