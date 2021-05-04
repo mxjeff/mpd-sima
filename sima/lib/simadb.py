@@ -542,7 +542,7 @@ class SimaDB:
                 LEFT OUTER JOIN tracks_genres ON tracks_genres.track = tracks.id
                 LEFT OUTER JOIN artists ON tracks.artist = artists.id
                 LEFT OUTER JOIN genres ON genres.id = tracks_genres.genre
-                WHERE history.last_play > ?
+                WHERE history.last_play > ? AND genres.name NOT NULL
                 ORDER BY history.last_play DESC
                 """, (date.isoformat(' '),))
         genres = list()

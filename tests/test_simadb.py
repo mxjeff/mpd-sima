@@ -322,5 +322,16 @@ class Test_02Genre(Main):
         genre_hist = self.db.fetch_genres_history(limit=10)
         self.assertEqual([g[0] for g in genre_hist], genres[:10])
 
+    def test_null_genres(self):
+        conn = self.db.get_database_connection()
+        genres = list()
+        for i in range(1, 2):  # starts at 1 to ensure records are in the past
+            trk = Track(file=f'/foo/bar.{i}', name=f'{i}-baz',
+                        album='foolbum', artist=f'{i}-art')
+            last = CURRENT - datetime.timedelta(minutes=i)
+            self.db.add_history(trk, date=last)
+        genre_hist = self.db.fetch_genres_history(limit=10)
+        self.assertEqual(genre_hist, [])
+
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab fileencoding=utf8
