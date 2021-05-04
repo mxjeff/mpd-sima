@@ -46,11 +46,9 @@ class Random(Plugin):
         self.candidates = []
 
     def get_played_artist(self,):
-        """Constructs list of already played artists.
-        """
+        """Constructs list of already played artists."""
         duration = self.main_conf.getint('sima', 'history_duration')
-        tracks_from_db = self.sdb.get_history(duration=duration)
-        artists = {tr[0] for tr in tracks_from_db}
+        artists = self.sdb.fetch_artists_history(duration=duration)
         return artists
 
     def filtered_artist(self, artist):
@@ -59,10 +57,10 @@ class Random(Plugin):
 
         If sensible random is set:
          * not in recent history
-         * not blacklisted
+         * not in blocklist
         """
         if self.mode == 'sensible':
-            if self.sdb.get_bl_artist(artist, add_not=True):
+            if self.sdb.get_bl_artist(Artist(artist), add=False):
                 self.log.debug('Random plugin: Blacklisted "%s"', artist)
                 return True
             if artist in self.get_played_artist():
@@ -79,7 +77,7 @@ class Random(Plugin):
         target = self.plugin_conf.getint('track_to_add')
         artists = self.player.list('artist', '( artist != "")')
         random.shuffle(artists)
-        for art in artists:
+        for art in artists:  # artists is a list of strings here
             if self.filtered_artist(art):
                 continue
             self.log.debug('Random art: %s', art)

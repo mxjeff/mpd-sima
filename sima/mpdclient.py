@@ -48,8 +48,9 @@ def bl_artist(func):
             return None
         names = list()
         for art in result.names:
-            if cls.database.get_bl_artist(art, add_not=True):
-                cls.log.debug('Blacklisted "%s"', art)
+            artist = Artist(name=art, mbid=result.mbid)
+            if cls.database.get_bl_artist(artist, add=False):
+                cls.log.debug('Artist "%s" in blocklist!', artist)
                 continue
             names.append(art)
         if not names:
@@ -75,7 +76,7 @@ def tracks_wrapper(func):
 # / decorators
 
 
-def blacklist(artist=False, album=False, track=False):
+def blocklist(album=False, track=False):
     # pylint: disable=C0111,W0212
     field = (album, track)
 
@@ -98,7 +99,7 @@ def blacklist(artist=False, album=False, track=False):
                 if track and cls.database.get_bl_album(elem, add=False):
                     # filter album as well in track mode
                     # (artist have already been)
-                    cls.log.debug('Blacklisted alb. "%s"', elem)
+                    cls.log.debug('Album "%s" in blocklist', elem)
                     continue
                 results.append(elem)
             return results
@@ -437,7 +438,7 @@ class MPD(MPDClient):
             return artist
         return None
 
-    @blacklist(track=True)
+    @blocklist(track=True)
     def search_track(self, artist, title):
         """Fuzzy search of title by an artist
         """
@@ -467,7 +468,7 @@ class MPD(MPDClient):
                                mtitle, title, leven)
         return tracks
 
-    @blacklist(album=True)
+    @blocklist(album=True)
     def search_albums(self, artist):
         """Find potential albums for "artist"
 
