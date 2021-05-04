@@ -142,10 +142,10 @@ class ConfMan:  # CONFIG MANAGER CLASS
         ## INIT CALLS
         self.init_config()
         self.supersedes_config_with_cmd_line_options()
-        # Controls files access
-        self.control_facc()
         # set dbfile
         self.config['sima']['db_file'] = join(self.config['sima']['var_dir'], 'sima.db')
+        # Controls files access
+        self.control_facc()
 
         # Create directories
         data_dir = self.config['sima']['var_dir']
@@ -158,11 +158,12 @@ class ConfMan:  # CONFIG MANAGER CLASS
         """Controls file access.
         This is relevant only for file provided through the configuration file
         since files provided on the command line are already checked with
-        argparse.
+        argparse. Also add config['sima']['db_file'] contructed here in init
         """
         ok = True
         for op, ftochk in [('logfile', self.config.get('log', 'logfile')),
-                           ('pidfile', self.config.get('daemon', 'pidfile')),]:
+                           ('pidfile', self.config.get('daemon', 'pidfile')),
+                           ('db file', self.config.get('sima', 'db_file'))]:
             if not ftochk:
                 continue
             if isdir(ftochk):
@@ -179,8 +180,6 @@ class ConfMan:  # CONFIG MANAGER CLASS
                     self.log.critical('no write access to "%s" (%s)', ftochk, op)
                     ok = False
         if not ok:
-            if exists(self.conf_file):
-                self.log.warning('Try to check the configuration file: %s', self.conf_file)
             sys.exit(2)
 
     def control_mod(self):

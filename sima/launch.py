@@ -109,7 +109,6 @@ def start(sopt, restart=False):
         if cmd == "create-db":
             if not isfile(db_file):
                 logger.info('Creating database in "%s"', db_file)
-                open(db_file, 'a').close()  # TODO: to remove with new simadb in v0.18
                 SimaDB(db_path=db_file).create_db()
             else:
                 logger.info('Database already there, not overwriting %s', db_file)
