@@ -245,6 +245,7 @@ class ConfMan:  # CONFIG MANAGER CLASS
             pass
         elif environ.get('XDG_CONFIG_HOME'):
             conf_dir = join(environ.get('XDG_CONFIG_HOME'), DIRNAME)
+            self.conf_file = join(conf_dir, CONF_FILE)
         elif homedir and isdir(homedir) and homedir not in ['/']:
             conf_dir = join(homedir, '.config', DIRNAME)
             self.conf_file = join(conf_dir, CONF_FILE)
@@ -253,7 +254,7 @@ class ConfMan:  # CONFIG MANAGER CLASS
             self.log.critical('Please use "--config" to locate the conf file')
             sys.exit(1)
 
-        ## Sima sqlite DB
+        # Sima sqlite DB
         self.config['sima']['var_dir'] = join(data_dir)
 
         # If no conf file present, uses defaults
