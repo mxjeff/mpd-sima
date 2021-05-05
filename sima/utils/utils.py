@@ -30,7 +30,7 @@ from argparse import ArgumentError, Action
 from base64 import b64decode as push
 from codecs import getencoder
 from datetime import datetime
-from os import environ, access, getcwd, W_OK, R_OK
+from os import getenv, access, getcwd, W_OK, R_OK
 from os.path import dirname, isabs, join, normpath, exists, isdir, isfile
 from time import sleep
 
@@ -45,22 +45,33 @@ def getws(dic):
     aka = getencoder('rot-13')(str((aka), 'utf-8'))[0]
     dic.update({'apikey': aka})
 
+def parse_mpd_host(value):
+    passwd = host = None
+    # If password is set: MPD_HOST=pass@host
+    if '@' in value:
+        mpd_host_env = value.split('@', 1)
+        if mpd_host_env[0]:
+            # A password is actually set
+            passwd = mpd_host_env[0]
+            if mpd_host_env[1]:
+                host = mpd_host_env[1]
+        elif mpd_host_env[1]:
+            # No password set but leading @ is an abstract socket
+            host = '@'+mpd_host_env[1]
+    else:
+        # MPD_HOST is a plain host
+        host = value
+    return host, passwd
+
 
 def get_mpd_environ():
     """
     Retrieve MPD env. var.
     """
     passwd = host = None
-    mpd_host_env = environ.get('MPD_HOST')
-    if mpd_host_env:
-        # If password is set:
-        # mpd_host_env = ['pass', 'host'] because MPD_HOST=pass@host
-        mpd_host_env = mpd_host_env.split('@')
-        mpd_host_env.reverse()
-        host = mpd_host_env[0]
-        if len(mpd_host_env) > 1 and mpd_host_env[1]:
-            passwd = mpd_host_env[1]
-    return (host, environ.get('MPD_PORT', None), passwd)
+    if getenv('MPD_HOST'):
+        host, passwd = parse_mpd_host(getenv('MPD_HOST'))
+    return (host, getenv('MPD_PORT', None), passwd)
 
 
 def normalize_path(path):

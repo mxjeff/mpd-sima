@@ -139,7 +139,7 @@ class ConfMan:  # CONFIG MANAGER CLASS
         self.use_envar()
         self.startopt = options
 
-        ## INIT CALLS
+        # INIT CALLS
         self.init_config()
         self.supersedes_config_with_cmd_line_options()
         # set dbfile
@@ -204,9 +204,11 @@ class ConfMan:  # CONFIG MANAGER CLASS
         # honor MPD_HOST format as in mpc(1)  for command line option --host
         if self.startopt.get('host'):
             if '@' in self.startopt.get('host'):
-                passwd, host = self.startopt.get('host').split('@')
-                self.config.set('MPD', 'password', passwd)
-                self.config.set('MPD', 'host', host)
+                host, passwd = utils.parse_mpd_host(self.startopt.get('host'))
+                if passwd:
+                    self.config.set('MPD', 'password', passwd)
+                if host:
+                    self.config.set('MPD', 'host', host)
 
     def use_envar(self):
         """Use MPD en.var. to set defaults"""
