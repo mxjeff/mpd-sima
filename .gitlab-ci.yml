@@ -21,8 +21,7 @@ stages:
 smoketest:
   stage: test
   script:
-  - pip install pytest-cov requests
-  - py.test -q --cov=sima tests
+  - pip install requests
   - python setup.py test
   # build wheel and source
   - python setup.py bdist_wheel sdist
@@ -36,6 +35,16 @@ smoketest:
     - dist/*.whl
     - dist/*.tar.gz
     - dist/*.zip
+
+unittests:
+  stage: test
+  script:
+  - pip install pytest-cov requests
+  - py.test -q --cov=sima --junitxml=report.xml tests
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 vinstall:
   stage: test
