@@ -15,7 +15,8 @@ class TestConfMan(unittest.TestCase):
 
     @patch('sima.utils.config.makedirs')
     @patch('sima.utils.config.chmod')
-    def test_XDG_var(self, mock_makedirs, mock_chmod):
+    @patch('sima.utils.config.ConfMan.control_facc')
+    def test_XDG_var(self, *args):
         config_home = '/foo/bar'
         os.environ['XDG_CONFIG_HOME'] = config_home
         conf_file = os.path.join(config_home, DIRNAME, CONF_FILE)
@@ -28,7 +29,8 @@ class TestConfMan(unittest.TestCase):
         self.assertEqual(conf.config['sima']['var_dir'], var_dir)
 
     @patch('sima.utils.config.isdir')
-    def test_default_locations(self, mock_isdir):
+    @patch('sima.utils.config.ConfMan.control_facc')
+    def test_default_locations(self, mock_isdir, *args):
         home = '/foo'
         mock_isdir.return_value = True
         os.environ.pop('XDG_CONFIG_HOME', None)
