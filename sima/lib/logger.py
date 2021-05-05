@@ -26,7 +26,7 @@ Logging facility for sima.
 import logging
 import sys
 
-from os import environ
+from os import getenv
 
 DEBUG = logging.DEBUG
 INFO = logging.INFO
@@ -56,7 +56,7 @@ def set_logger(level='info', logfile=None):
         logfile: file to log to
     """
     name = 'sima'
-    if environ.get('TRACE', False):
+    if getenv('TRACE', False):
         user_log_level = TRACE_LEVEL_NUM
     else:
         user_log_level = getattr(logging, level.upper())

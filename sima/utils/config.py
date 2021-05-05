@@ -30,7 +30,7 @@ import logging
 import sys
 
 from configparser import Error
-from os import (access, makedirs, environ, stat, chmod, W_OK)
+from os import (access, makedirs, getenv, stat, chmod, W_OK)
 from os.path import (join, isdir, isfile, dirname, exists)
 from stat import (S_IMODE, ST_MODE, S_IRWXO, S_IRWXG)
 
@@ -230,10 +230,10 @@ class ConfMan:  # CONFIG MANAGER CLASS
         http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
         """
 
-        homedir = environ.get('HOME')
+        homedir = getenv('HOME')
 
-        if environ.get('XDG_DATA_HOME'):
-            data_dir = join(environ.get('XDG_DATA_HOME'), DIRNAME)
+        if getenv('XDG_DATA_HOME'):
+            data_dir = join(getenv('XDG_DATA_HOME'), DIRNAME)
         elif homedir and isdir(homedir) and homedir not in ['/']:
             data_dir = join(homedir, '.local', 'share', DIRNAME)
         else:
@@ -244,8 +244,8 @@ class ConfMan:  # CONFIG MANAGER CLASS
         if self.startopt.get('conf_file'):
             # No need to handle conf file location
             pass
-        elif environ.get('XDG_CONFIG_HOME'):
-            conf_dir = join(environ.get('XDG_CONFIG_HOME'), DIRNAME)
+        elif getenv('XDG_CONFIG_HOME'):
+            conf_dir = join(getenv('XDG_CONFIG_HOME'), DIRNAME)
             self.conf_file = join(conf_dir, CONF_FILE)
         elif homedir and isdir(homedir) and homedir not in ['/']:
             conf_dir = join(homedir, '.config', DIRNAME)
