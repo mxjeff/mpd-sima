@@ -353,11 +353,11 @@ class MPD(MPDClient):
         if not hasattr(album, 'artist'):
             raise PlayerError('Album object have no artist attribute')
         albums = []
-        if self.use_mbid and album.mbid:
+        if album.mbid:
             filt = f"(MUSICBRAINZ_ALBUMID == '{album.mbid}')"
             albums = self.find(filt)
         # Now look for album with no MusicBrainzIdentifier
-        if not albums and album.artist.mbid and self.use_mbid:  # Use album artist MBID if possible
+        if not albums and album.artist.mbid:  # Use album artist MBID if possible
             filt = f"((MUSICBRAINZ_ALBUMARTISTID == '{album.artist.mbid}') AND (album == '{album.name_sz}'))"
             albums = self.find(filt)
         if not albums:  # Falls back to (album)?artist/album name
@@ -382,7 +382,7 @@ class MPD(MPDClient):
         Returns an Artist object
         """
         found = False
-        if self.use_mbid and artist.mbid:
+        if artist.mbid:
             # look for exact search w/ musicbrainz_artistid
             library = self.list('artist', f"(MUSICBRAINZ_ARTISTID == '{artist.mbid}')")
             if library:
