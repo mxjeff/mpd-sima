@@ -604,7 +604,7 @@ class SimaDB:
             connection = with_connection
         else:
             connection = self.get_database_connection()
-        track_id = self.get_track(track, with_connection=connection, add=True)
+        track_id = self.get_track(track, with_connection=connection, add=add)
         rows = connection.execute(
             "SELECT id FROM blocklist WHERE track = ?", (track_id,))
         if not rows.fetchone():
@@ -629,7 +629,7 @@ class SimaDB:
             connection = with_connection
         else:
             connection = self.get_database_connection()
-        album_id = self.get_album(album, with_connection=connection, add=True)
+        album_id = self.get_album(album, with_connection=connection, add=add)
         rows = connection.execute(
             "SELECT id FROM blocklist WHERE album = ?", (album_id,))
         if not rows.fetchone():
@@ -654,7 +654,7 @@ class SimaDB:
             connection = with_connection
         else:
             connection = self.get_database_connection()
-        artist_id = self.get_artist(artist, with_connection=connection, add=True)
+        artist_id = self.get_artist(artist, with_connection=connection, add=add)
         rows = connection.execute(
             "SELECT id FROM blocklist WHERE artist = ?", (artist_id,))
         if not rows.fetchone():
