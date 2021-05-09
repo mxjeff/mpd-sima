@@ -39,6 +39,7 @@ from .lib.simadb import SimaDB
 from .utils.config import ConfMan
 from .utils.startopt import StartOpt
 from .utils.utils import exception_log, SigHup, MPDSimaException
+from .utils.blcli import BLCli
 # core plugins
 from .plugins.core.history import History
 from .plugins.core.mpdoptions import MpdOptions
@@ -86,7 +87,10 @@ def start(sopt, restart=False):
     logger = logging.getLogger('sima')
     logfile = config.get('log', 'logfile', fallback=None)
     verbosity = config.get('log', 'verbosity')
-    set_logger(verbosity, logfile)
+    if sopt.options.get('command'):  # disable file logging
+        set_logger(verbosity)
+    else:
+        set_logger(verbosity, logfile)
     logger.debug('Command line say: %s', sopt.options)
 
     # Create database if not present
@@ -104,6 +108,9 @@ def start(sopt, restart=False):
 
     if sopt.options.get('command'):
         cmd = sopt.options.get('command')
+        if cmd.startswith('bl-'):
+            BLCli(config, sopt.options)
+            sys.exit(0)
         if cmd == "generate-config":
             config.write(sys.stdout, space_around_delimiters=True)
             sys.exit(0)
@@ -185,7 +192,7 @@ def run(sopt, restart=False):
 def main():
     """Entry point"""
     nfo = dict({'version': info.__version__,
-                'prog': 'sima'})
+                'prog': 'mpd-sima'})
     # StartOpt gathers options from command line call (in StartOpt().options)
     sopt = StartOpt(nfo)
     run(sopt)

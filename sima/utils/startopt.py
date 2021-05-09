@@ -21,7 +21,6 @@
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, SUPPRESS
 
-
 from .utils import Wfile, Rfile, Wdir
 
 DESCRIPTION = """
@@ -29,8 +28,6 @@ MPD_sima automagicaly queue new tracks in MPD playlist.
 
 Command line options override their equivalent in configuration file.
 If a positional arguments is provided MPD_sima execute the command and returns.
-Commands available:
-{}
 """
 
 
@@ -40,12 +37,6 @@ def clean_dict(to_clean):
         if not to_clean.get(k):
             to_clean.pop(k)
 
-# COMMANDS LIST
-CMDS = {'config-test': 'Test configuration (MPD connection and Tags plugin only)',
-        'create-db': 'Create the database',
-        'generate-config': 'Generate a configuration file to stdout',
-        'purge-history': 'Remove play history'
-        }
 # OPTIONS LIST
 # pop out 'sw' value before creating Parser object.
 # PAY ATTENTION:
@@ -99,11 +90,30 @@ OPTS = [
         'dest': 'var_dir',
         'action': Wdir,
         'help': 'directory to store var content (ie. database, cache)'},
-    {
-        'sw': ['command'],
-        'nargs': '?',
-        'choices': CMDS.keys(),
-        'help': 'command to run (cf. description or unix manual for more)'},
+]
+# Commands
+CMDS = [
+        {'config-test': [{}], 'help': 'Test configuration (MPD connection and Tags plugin only)'},
+        {'create-db': [{}], 'help': 'Create the database'},
+        {'generate-config': [{}], 'help': 'Generate a configuration file to stdout'},
+        {'purge-history': [{}], 'help': 'Remove play history'},
+        {'bl-view': [{}], 'help': 'List blocklist IDs'},
+        {'bl-add-artist': [
+            {'name': 'artist', 'type': str, 'nargs': '?',
+             'help': 'If artist is provided use it else use currently playing value'}
+            ], 'help': 'Add artist to the blocklist'},
+        {'bl-add-album': [
+            {'name': 'album', 'type': str, 'nargs': '?',
+             'help': 'If album is provided use it else use currently playing value'}
+         ], 'help': 'Add album to the blocklist'},
+        {'bl-add-track': [
+            {'name': 'track', 'type': str, 'nargs': '?',
+             'help': 'If track is provided use it else use currently playing value'}
+         ], 'help': 'Add track to the blocklist'},
+        {'bl-delete': [
+            {'name': 'id', 'type': int, 'nargs': '?',
+             'help': 'blocklist ID to suppress (use bl-view list IDs)'}
+         ], 'help': 'Remove entries from the blocklist'},
 ]
 
 
@@ -121,8 +131,7 @@ class StartOpt:
         """
         Declare options in ArgumentParser object.
         """
-        cmds = '\n'.join([f'    * {k}: {v}' for k, v in CMDS.items()])
-        self.parser = ArgumentParser(description=DESCRIPTION.format(cmds),
+        self.parser = ArgumentParser(description=DESCRIPTION,
                                      prog=self.info.get('prog'),
                                      epilog='Happy Listening',
                                      formatter_class=RawDescriptionHelpFormatter,
@@ -133,6 +142,19 @@ class StartOpt:
         for opt in OPTS:
             opt_names = opt.pop('sw')
             self.parser.add_argument(*opt_names, **opt)
+        # Add sub commands
+        sp = self.parser.add_subparsers(
+                title=f'{self.info["prog"]} commands as positional arguments',
+                description=f"""Use them after optionnal arguments.\n"{self.info["prog"]} command -h" for more info.""",
+                metavar='', dest='command')
+        for cmd in CMDS:
+            helpmsg = cmd.pop('help')
+            cmd, args = cmd.popitem()
+            _ = sp.add_parser(cmd, description=helpmsg, help=helpmsg)
+            for arg in args:
+                name = arg.pop('name', None)
+                if name:
+                    _.add_argument(name, **arg)
 
     def main(self):
         """

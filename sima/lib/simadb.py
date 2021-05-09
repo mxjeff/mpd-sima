@@ -670,6 +670,24 @@ class SimaDB:
             connection.close()
         return bl
 
+    def view_bl(self):
+        connection = self.get_database_connection()
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute("""SELECT artists.name AS artist,
+               artists.mbid AS musicbrainz_artist,
+               albums.name AS album,
+               albums.mbid AS musicbrainz_album,
+               tracks.title AS title,
+               tracks.mbid AS musicbrainz_title,
+               blocklist.id
+               FROM blocklist
+               LEFT OUTER JOIN artists ON blocklist.artist = artists.id
+               LEFT OUTER JOIN albums ON blocklist.album = albums.id
+               LEFT OUTER JOIN tracks ON blocklist.track = tracks.id""")
+        res = [dict(row) for row in rows.fetchall()]
+        connection.close()
+        return res
+
     def delete_bl(self, track=None, album=None, artist=None):
         if not (track or album or artist):
             return
