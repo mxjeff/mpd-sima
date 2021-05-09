@@ -2,12 +2,12 @@
 .\"     Title: mpd-sima
 .\"    Author: kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.2 <http://docbook.sf.net/>
-.\"      Date: 04/23/2021
-.\"    Manual: mpd-sima 0.17.0 User Manual
+.\"      Date: 05/09/2021
+.\"    Manual: mpd-sima 0.18.0.dev0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD\-SIMA" "1" "04/23/2021" "mpd-sima" "mpd-sima 0.17.0 User Manual"
+.TH "MPD\-SIMA" "1" "05/09/2021" "mpd-sima" "mpd-sima 0.18.0.dev0 User Manu"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -42,6 +42,16 @@ mpd-sima \- mpd\-sima will try to maintain some titles ahead in the queue follow
 \fBmpd\-sima\fR generate\-config [\fB\&...\fR]
 .HP \w'\fBmpd\-sima\fR\ 'u
 \fBmpd\-sima\fR purge\-history [\fB\-\-var\-dir=\fR\fIvar_directory\fR]
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR bl\-view
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR bl\-add\-artist [\fBartist\fR]
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR bl\-add\-album [\fBalbum\fR]
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR bl\-add\-track [\fBtrack\fR]
+.HP \w'\fBmpd\-sima\fR\ 'u
+\fBmpd\-sima\fR bl\-delete \fBid\fR
 .SH "DESCRIPTION"
 .PP
 This manual page documents briefly the
@@ -49,7 +59,7 @@ This manual page documents briefly the
 commands\&.
 .PP
 At start up default configuration is first overridden by user configuration in mpd_sima\&.cfg (see
-the section called \(lqFILES\(rq) and finally command lines options are honored\&. For instance you can override default MPD_HOST set in defaults (localhost) or in your configuration file with
+the section called \(lqFILES\(rq) and finally command lines options are honored\&. For instance you can override default MPD host (localhost) in your configuration file or with
 \fB\-S\ \&my_mpd_server\fR
 option\&. For default configuration see
 the section called \(lqCONFIGURATION\(rq\&. See also environment variables special case for MPD host and port in
@@ -235,6 +245,38 @@ Default is to use
 the section called \(lqFILES\(rq
 for more)\&.
 .RE
+.PP
+\fBbl\-view\fR
+.RS 4
+View blocklist, useful to get entry IDs to remove with delete command\&.
+.RE
+.PP
+\fBbl\-add\-artist \fR\fB\fIartist\fR\fR
+.RS 4
+Add artist to the blocklist\&. If
+\fIartist\fR
+is not provided, try to get the currently playing artist\&.
+.RE
+.PP
+\fBbl\-add\-album \fR\fB\fIalbum\fR\fR
+.RS 4
+Add album to the blocklist\&. If
+\fIalbum\fR
+is not provided, try to get the currently playing album\&.
+.RE
+.PP
+\fBbl\-add\-track \fR\fB\fItrack\fR\fR
+.RS 4
+Add track to the blocklist\&. If
+\fItrack\fR
+is not provided, try to get the currently playing track\&.
+.RE
+.PP
+\fBbl\-delete \fR\fB\fIid\fR\fR
+.RS 4
+Remove blocklist entry referenced by its
+\fIid\fR\&. Use bloclist view command to get the id\&.
+.RE
 .SH "FILES"
 .PP
 ${XDG_CONFIG_HOME}/mpd_sima/mpd_sima\&.cfg
@@ -299,7 +341,7 @@ mpd_sima\&.cfg
 mpd_sima\&.cfg
 is read if present\&. Otherwise built\-in defaults are used\&. An example should be provided in the tarball within
 doc/examples/\&. On Debian system please look in
-/usr/share/doc/mpd\-sima\&.
+/usr/share/doc/mpd_sima\&.
 .RE
 .PP
 DEFAULTS
@@ -308,7 +350,7 @@ Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env\&.
 .sp
 The get the defaults as detected by mpd\-sima on your system you can run mpd\-sima to print the config:
 .sp
-\fBmpd\-sima generate\-config\fR
+\fBmpd_sima generate\-config\fR
 .RE
 .PP
 For details about mpd_sima\&.cfg refer to the manual

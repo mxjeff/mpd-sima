@@ -43,7 +43,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
 <!DOCTYPE refentry [
 
   <!ENTITY dhsection   "1">
-  <!ENTITY dhpackage "mpd-sima">
+  <!ENTITY dhpackage "mpd_sima">
   <!ENTITY dhutils "mpd-sima">
 
 ]>
@@ -56,12 +56,12 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
       <manvolnum>&dhsection;</manvolnum>
   </refmeta>
   <refnamediv>
-    <refname>&dhpackage;</refname>
-    <refpurpose>&dhpackage; will try to maintain some titles ahead in the queue following different policies.</refpurpose>
+    <refname>&dhutils;</refname>
+    <refpurpose>&dhutils; will try to maintain some titles ahead in the queue following different policies.</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <cmdsynopsis>
-      <command>&dhpackage;</command>
+      <command>&dhutils;</command>
       <arg choice="opt"><option>--daemon</option></arg>
       <arg choice="opt"><option>--config=</option><replaceable class="option">conf_file</replaceable></arg>
       <arg choice="opt"><option>--var-dir=</option><replaceable class="option">var_directory</replaceable></arg>
@@ -72,7 +72,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
       <arg choice="opt"><option>--mpd_port=</option><replaceable class="option">mpd_port</replaceable></arg>
     </cmdsynopsis>
     <cmdsynopsis>
-      <command>&dhpackage;</command>
+      <command>&dhutils;</command>
       <!-- Normally the help and version options make the programs stop
            right after outputting the requested information. -->
       <group choice="plain">
@@ -86,35 +86,59 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
       </group>
     </cmdsynopsis>
     <cmdsynopsis>
-      <command>&dhpackage;</command>
+      <command>&dhutils;</command>
       <arg choice="plain">config-test</arg>
       <arg choice="opt"><option>--config=</option><replaceable class="option">conf_file</replaceable></arg>
     </cmdsynopsis>
     <cmdsynopsis>
-      <command>&dhpackage;</command>
+      <command>&dhutils;</command>
       <arg choice="plain">create-db</arg>
       <arg choice="opt"><option>--var-dir=</option><replaceable class="option">var_directory</replaceable></arg>
     </cmdsynopsis>
     <cmdsynopsis>
-      <command>&dhpackage;</command>
+      <command>&dhutils;</command>
       <arg choice="plain">generate-config</arg>
       <arg choice="opt"><option>…</option></arg>
     </cmdsynopsis>
     <cmdsynopsis>
-      <command>&dhpackage;</command>
+      <command>&dhutils;</command>
       <arg choice="plain">purge-history</arg>
       <arg choice="opt"><option>--var-dir=</option><replaceable class="option">var_directory</replaceable></arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhutils;</command>
+      <arg choice="plain">bl-view</arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhutils;</command>
+      <arg choice="plain">bl-add-artist</arg>
+      <arg choice="opt"><option>artist</option></arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhutils;</command>
+      <arg choice="plain">bl-add-album</arg>
+      <arg choice="opt"><option>album</option></arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhutils;</command>
+      <arg choice="plain">bl-add-track</arg>
+      <arg choice="opt"><option>track</option></arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhutils;</command>
+      <arg choice="plain">bl-delete</arg>
+      <arg choice="plain"><option>id</option></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1 id="description">
     <title>DESCRIPTION</title>
     <para>This manual page documents briefly the
-      <command>&dhpackage;</command> commands.</para>
+      <command>&dhutils;</command> commands.</para>
     <para>At start up default configuration is first overridden by user
         configuration in mpd_sima.cfg (see <xref linkend="files"/>) and finally
         command lines options are honored. For instance you can override
-        default MPD_HOST set in defaults (localhost) or in your configuration
-        file with <command>-S my_mpd_server</command> option. For default
+        default MPD host (localhost) in your configuration
+        file or with <command>-S my_mpd_server</command> option. For default
         configuration see <xref linkend="configuration"/>. See also environment
         variables special case for MPD host and port in <xref linkend="environment"/>.
     </para>
@@ -123,16 +147,16 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         <title>EXAMPLE</title>
         <refsect2 id="daemon">
             <title>Launch as a system service (dæmon).</title>
-            <para>Here follows an example on how to launch &dhpackage; as a service on your system, not attach to regular user configuration/database.</para>
-            <para><command>&dhpackage; --daemon --conf=/etc/mpd_sima.cfg --var-dir=/var/cache/mpd-sima/ --pid=/run/mpd-sima.pid --log=/var/log/mpd-sima.log</command></para>
+            <para>Here follows an example on how to launch &dhutils; as a service on your system, not attach to regular user configuration/database.</para>
+            <para><command>&dhutils; --daemon --conf=/etc/mpd_sima.cfg --var-dir=/var/cache/mpd-sima/ --pid=/run/mpd-sima.pid --log=/var/log/mpd-sima.log</command></para>
         </refsect2>
         <refsect2 id="user_land">
             <title>Launch in user land</title>
-            <para>Launching &dhpackage; from/whithin your user account is easy, you can simply call <command>&dhpackage;</command> from your shell or one of the following command:</para>
+            <para>Launching &dhutils; from/whithin your user account is easy, you can simply call <command>&dhutils;</command> from your shell or one of the following command:</para>
             <para>Background execution (dæmonise), log in the specified file, save pid:</para>
-            <para><command>&dhpackage; --daemon --pid=$HOME/var/run/mpd-sima.pid --log=$HOME/var/log/mpd-sima.log</command></para>
+            <para><command>&dhutils; --daemon --pid=$HOME/var/run/mpd-sima.pid --log=$HOME/var/log/mpd-sima.log</command></para>
             <para>Foreground execution, connect <emphasis>my.mpd.server.org</emphasis>, log to std(out|err):</para>
-            <para><command>&dhpackage; --host=my.mpd.server.org</command></para>
+            <para><command>&dhutils; --host=my.mpd.server.org</command></para>
         </refsect2>
     </refsect1>
   <refsect1 id="options">
@@ -246,6 +270,47 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <para>Purge play history in the database and exit. Uses folder specified with <option>--var-dir</option> or default directory.<sbr />Default is to use <envar>$XDG_DATA_HOME/mpd_sima/</envar> (see <xref linkend="files"/> for more).</para>
             </listitem>
         </varlistentry>
+        <varlistentry> <!-- bl-view -->
+            <term><option>bl-view</option></term>
+            <listitem>
+                <para>View blocklist, useful to get entry IDs to remove with delete command.</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry> <!-- bl-add-artist -->
+          <term><option>bl-add-artist <replaceable class="parameter">artist</replaceable></option></term>
+            <listitem>
+              <para>Add artist to the blocklist. If
+              <replaceable class="parameter">artist</replaceable>
+                is not provided, try to get the currently playing artist.
+              </para>
+            </listitem>
+        </varlistentry>
+        <varlistentry> <!-- bl-add-album -->
+          <term><option>bl-add-album <replaceable class="parameter">album</replaceable></option></term>
+            <listitem>
+              <para>Add album to the blocklist. If
+              <replaceable class="parameter">album</replaceable>
+                is not provided, try to get the currently playing album.
+              </para>
+            </listitem>
+        </varlistentry>
+        <varlistentry> <!-- bl-add-track -->
+          <term><option>bl-add-track <replaceable class="parameter">track</replaceable></option></term>
+            <listitem>
+              <para>Add track to the blocklist. If
+              <replaceable class="parameter">track</replaceable>
+                is not provided, try to get the currently playing track.
+              </para>
+            </listitem>
+        </varlistentry>
+        <varlistentry> <!-- bl-delete -->
+          <term><option>bl-delete <replaceable class="parameter">id</replaceable></option></term>
+            <listitem>
+              <para>Remove blocklist entry referenced by its
+              <replaceable class="parameter">id</replaceable>. Use bloclist view command to get the id.
+              </para>
+            </listitem>
+        </varlistentry>
     </variablelist>
   </refsect1>
   <xi:include href="files.xml" />
@@ -290,7 +355,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
               <term>DEFAULTS</term>
               <listitem>
                   <para>Default is to look for MPD server at localhost:6600 (or MPD_HOST/MPD_PORT env. var. if set). The default plugins will use Last.fm to find similar tracks to queue and fallback to random if nothing if found.</para>
-                  <para>The get the defaults as detected by &dhpackage; on your system you can run &dhpackage; to print the config:</para>
+                  <para>The get the defaults as detected by &dhutils; on your system you can run &dhutils; to print the config:</para>
                   <para><command>&dhpackage; generate-config</command></para>
               </listitem>
           </varlistentry>
