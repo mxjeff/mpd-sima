@@ -70,7 +70,7 @@ class Test_00DB(Main):
     def test_01_add_track(self):
         trk = Track(**DEVOLT)
         trk_id = self.db.get_track(trk)
-        self.assertEqual(trk_id, self.db.get_track(trk),
+        self.assertEqual(trk_id, self.db.get_track(trk, add=False),
                          'Same track, same record')
 
     def test_02_history(self):
@@ -248,6 +248,8 @@ class Test_00DB(Main):
 class Test_01BlockList(Main):
 
     def test_blocklist_addition(self):
+        trk = Track(file='/foo/bar/baz', name='title')
+        self.assertIs(self.db.get_bl_track(trk, add=False), None)
         tracks_ids = list()
         # Set 6 records, same album
         for i in range(1, 6):  # starts at 1 to ensure records are in the past
@@ -255,16 +257,16 @@ class Test_01BlockList(Main):
                         albumartist='fooalbart', album='foolbum',)
             # Add track, save its DB id
             tracks_ids.append(self.db.get_track(trk))
-            # set records in the past to ease purging then
-            last = CURRENT - datetime.timedelta(minutes=i)
-            self.db.add_history(trk, date=last)  # Add to history
             if i == 1:
                 self.db.get_bl_track(trk)
+                self.assertIsNot(self.db.get_bl_track(trk, add=False), None)
             if i == 2:
-                self.db.get_bl_track(trk)
                 self.db.get_bl_album(Album(name=trk.album))
             if i == 3:
                 self.db.get_bl_artist(trk.Artist)
+            if i == 4:
+                self.assertIs(self.db.get_bl_track(trk, add=False), None)
+
 
     def test_blocklist_triggers_00(self):
         trk01 = Track(file='01', name='01', artist='artist A', album='album A')

@@ -45,8 +45,7 @@ class SimaDB:
 
     def get_database_connection(self):
         """get database reference"""
-        connection = sqlite3.connect(
-            self._db_path, isolation_level=None)
+        connection = sqlite3.connect(self._db_path, isolation_level=None)
         return connection
 
     def get_info(self):
@@ -383,7 +382,8 @@ class SimaDB:
                 connection.close()
             return row[0]
         if not add:  # Not adding non existing track
-            connection.close()
+            if not with_connection:
+                connection.close()
             return None
         # Get an artist record or None
         if track.artist:
@@ -609,6 +609,8 @@ class SimaDB:
             "SELECT id FROM blocklist WHERE track = ?", (track_id,))
         if not rows.fetchone():
             if not add:
+                if not with_connection:
+                    connection.close()
                 return None
             connection.execute('INSERT INTO blocklist (track) VALUES (?)',
                                (track_id,))
@@ -634,6 +636,8 @@ class SimaDB:
             "SELECT id FROM blocklist WHERE album = ?", (album_id,))
         if not rows.fetchone():
             if not add:
+                if not with_connection:
+                    connection.close()
                 return None
             connection.execute('INSERT INTO blocklist (album) VALUES (?)',
                                (album_id,))
