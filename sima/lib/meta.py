@@ -26,7 +26,7 @@ from collections.abc import Set
 import logging
 import re
 
-UUID_RE = r'^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$'
+UUID_RE = r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89AB][a-f0-9]{3}-[a-f0-9]{12}$'
 # The Track Object is collapsing multiple tags into a single string using this
 # separator. It is used then to split back the string to tags list.
 SEPARATOR = chr(0x1F)  # ASCII Unit Separator

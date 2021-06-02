@@ -13,7 +13,6 @@ class TestMetaObject(unittest.TestCase):
         wrong = VALID +'a'
         self.assertFalse(is_uuid4(wrong))
         #  test UUID4 format validation
-        self.assertFalse(is_uuid4(VALID.replace('4', '3')))
         self.assertFalse(is_uuid4(VALID.replace('a', 'z')))
 
     def test_init(self):
