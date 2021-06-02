@@ -124,17 +124,15 @@ class TestArtistObject(unittest.TestCase):
         artist = {'artist': SEPARATOR.join(['Original Name', 'Featuring Nane', 'Feature…']),
                   'albumartist': 'Name',
                   'musicbrainz_artistid': VALID,
-                  'musicbrainz_albumartistid': VALID.replace('11', '22'),
                   }
         art = Artist(**artist)
-        self.assertTrue(art.name == 'Name')
-        self.assertTrue(art.mbid == VALID.replace('11', '22'))
-        artist.pop('musicbrainz_albumartistid')
-        art = Artist(**artist)
+        self.assertEqual(art.name, 'Original Name')
         self.assertTrue(art.mbid == VALID)
+        self.assertEqual(art.albumartist, artist['albumartist'])
         artist.pop('albumartist')
         art = Artist(**artist)
-        self.assertTrue(art.name == 'Original Name', art.name)
+        self.assertTrue(art.name, 'Original Name')
+        self.assertTrue(art.albumartist, 'Original Name')
 
     def test_empty_name(self):
         for args in [

@@ -198,16 +198,14 @@ class Artist(Meta):
     :param str name: Artist name
     :param str mbid: Musicbrainz artist ID
     :param str artist: Overrides "name" argument
-    :param str albumartist: Overrides "name" and "artist" argument
+    :param str albumartist: use "name" if not set
     :param str musicbrainz_artistid: Overrides "mbid" argument
-    :param str musicbrainz_albumartistid: Overrides "musicbrainz_artistid" argument
 
     :Example:
 
     >>> trk = {'artist':'Art Name',
     >>>        'albumartist': 'Alb Art Name',           # optional
     >>>        'musicbrainz_artistid': '<UUID4>',       # optional
-    >>>        'musicbrainz_albumartistid': '<UUID4>',  # optional
     >>>       }
     >>> artobj0 = Artist(**trk)
     >>> artobj1 = Artist(name='Tool')
@@ -219,13 +217,11 @@ class Artist(Meta):
             name = kwargs.get('artist').split(SEPARATOR)[0]
         if kwargs.get('musicbrainz_artistid', False):
             mbid = kwargs.get('musicbrainz_artistid').split(SEPARATOR)[0]
-        if (kwargs.get('albumartist', False) and
-                kwargs.get('albumartist') != 'Various Artists'):
-            name = kwargs.get('albumartist').split(SEPARATOR)[0]
-        if (kwargs.get('musicbrainz_albumartistid', False) and
-                kwargs.get('musicbrainz_albumartistid') != '89ad4ac3-39f7-470e-963a-56509c546377'):
-            mbid = kwargs.get('musicbrainz_albumartistid').split(SEPARATOR)[0]
-        super().__init__(name=name, mbid=mbid)
+        if not kwargs.get('albumartist', False):
+            kwargs['albumartist'] = name
+        super().__init__(name=name, mbid=mbid,
+                         albumartist=kwargs.get('albumartist'))
+
 
 class MetaContainer(Set):
 

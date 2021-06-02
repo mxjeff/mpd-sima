@@ -39,9 +39,10 @@ class TestTrackObject(unittest.TestCase):
 
     def test_albumartist(self):
         trk = Track(albumartist='album_artist', artist='track_artist')
-        self.assertEqual(trk.Artist.name, 'album_artist')
+        self.assertEqual(trk.Artist.name, 'track_artist')
         trk = Track(artist='track_artist')
         self.assertEqual(trk.Artist.name, 'track_artist')
+        self.assertEqual(trk.Artist.albumartist, 'track_artist')
 
     def test_genres(self):
         trk = Track(**{'artist': 'Devolt', 'genre': ['Rock, Stoner ', ' Punk; Heavy', 'doom']})

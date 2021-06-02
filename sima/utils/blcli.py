@@ -112,9 +112,8 @@ class BLCli(MPD):
                 return
             track = tracks[0]
             album = Album(name=track.album, mbid=track.musicbrainz_albumid)
-            artist = Artist(name=track.artist, mbid=track.musicbrainz_artistid)
             self.log.info('Found album in library: %s (by "%s")',
-                          album, artist)
+                          album, track.Artist.albumartist)
         if self.sdb.get_bl_album(album, add=False):
             self.log.info('Already in blocklist')
             return
