@@ -56,6 +56,7 @@ def mbidfilter(func):
         func(*args, **kwargs)
     return wrapper
 
+
 def serialize(func):
     def wrapper(*args, **kwargs):
         ans = func(*args, **kwargs)
@@ -182,6 +183,8 @@ class Album(Meta):
 
     @mbidfilter
     def __init__(self, name=None, mbid=None, **kwargs):
+        if kwargs.get('musicbrainz_albumid', False):
+            mbid = kwargs.get('musicbrainz_albumid').split(SEPARATOR)[0]
         super().__init__(name=name, mbid=mbid, **kwargs)
 
     @property

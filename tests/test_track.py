@@ -51,4 +51,14 @@ class TestTrackObject(unittest.TestCase):
         trk = Track(**{'artist': 'Devolt', 'genre': 'Punk '})
         self.assertEqual(trk.genres, ['Punk'])
 
+    def test_artist_object(self):
+        trk = Track(**DEVOLT)
+        self.assertEqual(trk.Artist.name, DEVOLT['artist'])
+        self.assertEqual(trk.Artist.mbid, DEVOLT['musicbrainz_artistid'])
+
+    def test_album_object(self):
+        trk = Track(**DEVOLT)
+        self.assertEqual(trk.Album.name, DEVOLT['album'])
+        self.assertEqual(trk.Album.mbid, DEVOLT['musicbrainz_albumid'])
+
 # vim: ai ts=4 sw=4 sts=4 expandtab

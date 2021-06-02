@@ -23,7 +23,7 @@
 
 import time
 
-from .meta import Artist, SEPARATOR
+from .meta import Artist, Album, SEPARATOR
 
 class Track:
     """
@@ -148,6 +148,13 @@ class Track:
                               mbid='125ec42a-7229-4250-afc5-e057484327fe')
             return Artist(name='[unknown]', **self.__dict__)
         return Artist(**self.__dict__)
+
+    @property
+    def Album(self):
+        """Get the :class:`sima.lib.meta.Album` associated to this track"""
+        if not self.album:
+            return Album(name='[unknown]', **self.__dict__)
+        return Album(name=self.album, **self.__dict__)
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
