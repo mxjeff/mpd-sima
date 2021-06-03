@@ -683,6 +683,7 @@ class SimaDB:
                albums.mbid AS musicbrainz_album,
                tracks.title AS title,
                tracks.mbid AS musicbrainz_title,
+               tracks.file AS file,
                blocklist.id
                FROM blocklist
                LEFT OUTER JOIN artists ON blocklist.artist = artists.id
