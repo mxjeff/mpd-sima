@@ -23,8 +23,7 @@ Plugin object to derive from
 
 import random
 
-from .track import Track
-from .meta import Album, Artist, MetaContainer
+from .meta import Artist, MetaContainer
 
 
 class Plugin:
@@ -226,8 +225,10 @@ class AdvancedPlugin(Plugin):
         for trk in [_ for _ in not_in_hist if _ not in deny_list]:
             # Should use albumartist heuristic as well
             if self.plugin_conf.getboolean('single_album', False):  # pylint: disable=no-member
+                albums = [tr.album for tr in deny_list]
+                albums += [tr.album for tr in self.to_add]
                 if (trk.album == self.player.current.album or
-                        trk.album in [tr.album for tr in deny_list]):
+                        trk.album in albums):
                     self.log.debug('Found unplayed track ' +
                                    'but from an album already queued: %s', trk)
                     continue
