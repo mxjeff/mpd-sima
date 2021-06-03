@@ -19,7 +19,6 @@
 # standard library import
 from difflib import get_close_matches
 from functools import wraps
-from itertools import dropwhile
 from logging import getLogger
 
 # external module
@@ -43,22 +42,18 @@ def bl_artist(func):
         cls = args[0]
         if not cls.database:
             return func(*args, **kwargs)
-        result = func(*args, **kwargs)
-        if not result:
+        results = func(*args, **kwargs)
+        if not results:
             return None
-        names = list()
-        for art in result.names:
-            artist = Artist(name=art, mbid=result.mbid)
+        for art in results.names:
+            mbid = results.mbid
+            if not mbid:
+                mbid = cls._find_musicbrainz_artistid(results)
+            artist = Artist(name=art, mbid=mbid)
             if cls.database.get_bl_artist(artist, add=False):
-                cls.log.debug('Artist "%s" in blocklist!', artist)
-                continue
-            names.append(art)
-        if not names:
-            return None
-        resp = Artist(name=names.pop(), mbid=result.mbid)
-        for name in names:
-            resp.add_alias(name)
-        return resp
+                cls.log.debug('Artist in blocklist: %s', artist)
+                return None
+        return results
     return wrapper
 
 
@@ -74,37 +69,6 @@ def tracks_wrapper(func):
         return [Track(**t) for t in ret]
     return wrapper
 # / decorators
-
-
-def blocklist(album=False, track=False):
-    # pylint: disable=C0111,W0212
-    field = (album, track)
-
-    def decorated(func):
-        def wrapper(*args, **kwargs):
-            if not args[0].database:
-                return func(*args, **kwargs)
-            cls = args[0]
-            boolgen = (bl for bl in field)
-            bl_fun = (cls.database.get_bl_album,
-                      cls.database.get_bl_track,)
-            #bl_getter = next(fn for fn, bl in zip(bl_fun, boolgen) if bl is True)
-            bl_getter = next(dropwhile(lambda _: not next(boolgen), bl_fun))
-            #cls.log.debug('using {0} as bl filter'.format(bl_getter.__name__))
-            results = list()
-            for elem in func(*args, **kwargs):
-                if bl_getter(elem, add=False):
-                    #cls.log.debug('Blacklisted "{0}"'.format(elem))
-                    continue
-                if track and cls.database.get_bl_album(elem, add=False):
-                    # filter album as well in track mode
-                    # (artist have already been)
-                    cls.log.debug('Album "%s" in blocklist', elem)
-                    continue
-                results.append(elem)
-            return results
-        return wrapper
-    return decorated
 
 
 class MPD(MPDClient):
@@ -343,15 +307,37 @@ class MPD(MPDClient):
 
     def _find_art(self, artist):
         tracks = set()
+        # artist blocklist
+        if self.database.get_bl_artist(artist, add=False):
+            self.log.info('Artist in blocklist: %s', artist)
+            return []
         if artist.mbid:
             tracks |= set(self.find('musicbrainz_artistid', artist.mbid))
         for name in artist.names:
             tracks |= set(self.find('artist', name))
+        # album blocklist
+        albums = {Album(trk.album, mbid=trk.musicbrainz_albumid)
+                  for trk in tracks}
+        bl_albums = {Album(a.get('album'), mbid=a.get('musicbrainz_album'))
+                     for a in self.database.view_bl() if a.get('album')}
+        if albums & bl_albums:
+            self.log.info('Albums in blocklist for %s: %s', artist, albums & bl_albums)
+            tracks = {trk for trk in tracks if trk.Album not in bl_albums}
+        # track blocklist
+        bl_tracks = {Track(title=t.get('title'), file=t.get('file'))
+                     for t in self.database.view_bl() if t.get('title')}
+        if tracks & bl_tracks:
+            self.log.info('Tracks in blocklist for %s: %s',
+                          artist, tracks & bl_tracks)
+            tracks = {trk for trk in tracks if trk not in bl_tracks}
         return list(tracks)
 
     def _find_alb(self, album):
         if not hasattr(album, 'artist'):
             raise PlayerError('Album object have no artist attribute')
+        if self.database.get_bl_album(album, add=False):
+            self.log.info('Album in blocklist: %s', album)
+            return []
         albums = []
         if album.mbid:
             filt = f"(MUSICBRAINZ_ALBUMID == '{album.mbid}')"
@@ -368,6 +354,23 @@ class MPD(MPDClient):
 # #### / find_tracks ##
 
 # #### Search Methods #####
+    def _find_musicbrainz_artistid(self, artist):
+        if not self.use_mbid:
+            return None
+        mbids = self.list('MUSICBRAINZ_ARTISTID',
+                          f'(artist == "{artist.name_sz}")')
+        if not mbids:
+            return None
+        if len(mbids) > 1:
+            self.log.debug("Got multiple MBID for artist: %r", artist)
+            return None
+        if artist.mbid:
+            if artist.mbid != mbids[0]:
+                self.log('MBID discrepancy, %s found with %s (instead of %s)',
+                         artist.name, mbids[0], artist.mbid)
+        else:
+            return mbids[0]
+
     @bl_artist
     def search_artist(self, artist):
         """
@@ -438,7 +441,6 @@ class MPD(MPDClient):
             return artist
         return None
 
-    @blocklist(track=True)
     def search_track(self, artist, title):
         """Fuzzy search of title by an artist
         """
@@ -468,7 +470,6 @@ class MPD(MPDClient):
                                mtitle, title, leven)
         return tracks
 
-    @blocklist(album=True)
     def search_albums(self, artist):
         """Find potential albums for "artist"
 
@@ -476,7 +477,7 @@ class MPD(MPDClient):
           → falls back to "Artist" == artist when no "AlbumArtist" tag is set
         * Tries to filter some mutli-artists album
           For instance an album by Artist_A may have a track by Artist_B. Then
-          looking for albums for Artist_B returns wrongly this album.
+          looking for albums for Artist_B wrongly returns this album.
         """
         # First, look for all potential albums
         self.log.debug('Searching album for "%r"', artist)
@@ -486,7 +487,17 @@ class MPD(MPDClient):
         for name_sz in artist.names_sz:
             mpd_filter = f"((albumartist == '{name_sz}') AND ( album != ''))"
             raw_albums = self.list('album', mpd_filter)
-            albums = [Album(a, albumartist=artist.name, artist=artist) for a in raw_albums]
+            albums = list()
+            for alb in raw_albums:
+                mbid = None
+                if self.use_mbid:
+                    _ = Album(alb)
+                    mpd_filter = f"((albumartist == '{artist.name_sz}') AND ( album == '{_.name_sz}'))"
+                    mbids = self.list('MUSICBRAINZ_ALBUMID', mpd_filter)
+                    if mbids:
+                        mbid = mbids[0]
+                albums.append(Album(alb, albumartist=artist.name,
+                                    artist=artist.name, mbid=mbid))
         candidates = []
         for album in albums:
             album_trks = self.find_tracks(album)
@@ -513,6 +524,9 @@ class MPD(MPDClient):
                 self.log.debug('"%s" probably not an album of "%s" (ratio=%.2f)',
                                album, artist, ratio)
             continue
+        for alb in albums:
+            if self.database.get_bl_album(album, add=False):
+                candidates.remove(album)
         return candidates
 # #### / Search Methods ###
 
