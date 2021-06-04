@@ -291,7 +291,7 @@ class MPD(MPDClient):
     def find_tracks(self, what):
         """Find tracks for a specific artist or album
             >>> player.find_tracks(Artist('Nirvana'))
-            >>> player.find_tracks(Album('In Utero', artist=(Artist('Nirvana'))
+            >>> player.find_tracks(Album('In Utero', artist=Artist('Nirvana'))
 
         :param Artist,Album what: Artist or Album to fetch track from
 
@@ -343,11 +343,11 @@ class MPD(MPDClient):
             filt = f"(MUSICBRAINZ_ALBUMID == '{album.mbid}')"
             albums = self.find(filt)
         # Now look for album with no MusicBrainzIdentifier
-        if not albums and album.artist.mbid:  # Use album artist MBID if possible
-            filt = f"((MUSICBRAINZ_ALBUMARTISTID == '{album.artist.mbid}') AND (album == '{album.name_sz}'))"
+        if not albums and album.Artist.mbid:  # Use album artist MBID if possible
+            filt = f"((MUSICBRAINZ_ALBUMARTISTID == '{album.Artist.mbid}') AND (album == '{album.name_sz}'))"
             albums = self.find(filt)
         if not albums:  # Falls back to (album)?artist/album name
-            for artist in album.artist.names_sz:
+            for artist in album.Artist.names_sz:
                 filt = f"((albumartist == '{artist}') AND (album == '{album.name_sz}'))"
                 albums.extend(self.find(filt))
         return albums
@@ -394,6 +394,10 @@ class MPD(MPDClient):
                 # library could fetch several artist name for a single MUSICBRAINZ_ARTISTID
                 if len(library) > 1:
                     self.log.debug('I got "%s" searching for %r', library, artist)
+                    for name in library:
+                        if SimaStr(artist.name) == name and name != artist.name:
+                            self.log.debug('add alias for %s: %s', artist, name)
+                            artist.add_alias(name)
                 elif len(library) == 1 and library[0] != artist.name:
                     new_alias = artist.name
                     self.log.info('Update artist name %s->%s', artist, library[0])
@@ -484,11 +488,23 @@ class MPD(MPDClient):
         if artist.aliases:
             self.log.debug('Searching album for %s aliases: "%s"',
                            artist, artist.aliases)
+        albums = set()
+        if self.use_mbid and artist.mbid:
+            mpd_filter = f"((musicbrainz_albumartistid == '{artist.mbid}') AND ( album != ''))"
+            raw_album_id = self.list('musicbrainz_albumid', mpd_filter)
+            for albumid in raw_album_id:
+                mpd_filter = f"((musicbrainz_albumid == '{albumid}') AND ( album != ''))"
+                album_name = self.list('album', mpd_filter)
+                if not album_name:  # something odd here
+                    continue
+                albums.add(Album(album_name[0], artist=artist.name,
+                                 Artist=artist, mbid=albumid))
         for name_sz in artist.names_sz:
             mpd_filter = f"((albumartist == '{name_sz}') AND ( album != ''))"
             raw_albums = self.list('album', mpd_filter)
-            albums = list()
             for alb in raw_albums:
+                if alb in [a.name for a in albums]:
+                    continue
                 mbid = None
                 if self.use_mbid:
                     _ = Album(alb)
@@ -496,28 +512,36 @@ class MPD(MPDClient):
                     mbids = self.list('MUSICBRAINZ_ALBUMID', mpd_filter)
                     if mbids:
                         mbid = mbids[0]
-                albums.append(Album(alb, albumartist=artist.name,
-                                    artist=artist.name, mbid=mbid))
+                albums.add(Album(alb, artist=artist.name,
+                                 Artist=artist, mbid=mbid))
         candidates = []
         for album in albums:
             album_trks = self.find_tracks(album)
             album_artists = {tr.albumartist for tr in album_trks if tr.albumartist}
-            if album.artist.names & album_artists:
+            if album.Artist.names & album_artists:
                 candidates.append(album)
                 continue
+            if self.use_mbid and artist.mbid:
+                if artist.mbid == album_trks[0].musicbrainz_albumartistid:
+                    candidates.append(album)
+                    continue
+                else:
+                    self.log.debug('Discarding "%s", "%r" not set as musicbrainz_albumartistid', album, album.Artist)
+                    continue
             if 'Various Artists' in album_artists:
                 self.log.debug('Discarding %s ("Various Artists" set)', album)
                 continue
-            if album_artists and album.artist.name not in album_artists:
-                self.log.debug('Discarding "%s", "%s" not set as albumartist', album, album.artist)
+            if album_artists and album.Artist.name not in album_artists:
+                self.log.debug('Discarding "%s", "%s" not set as albumartist', album, album.Artist)
                 continue
-            # Attempt to detect false positive
+            # Attempt to detect false positive (especially when no
+            # AlbumArtist/MBIDs tag ar set)
             # Avoid selecting albums where artist is credited for a single
             # track of the album
             album_trks = self.find(f"(album == '{album.name_sz}')")
             arts = [trk.artist for trk in album_trks]  # Artists in the album
             # count artist occurences
-            ratio = arts.count(album.artist.name)/len(arts)
+            ratio = arts.count(album.Artist.name)/len(arts)
             if ratio >= 0.8:
                 candidates.append(album)
             else:
