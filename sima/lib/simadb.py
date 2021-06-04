@@ -476,22 +476,31 @@ class SimaDB:
                 SELECT albums.name AS name,
                        albums.mbid as mbid,
                        artists.name as artist,
-                       artists.mbid as artist_mbib
+                       artists.mbid as artist_mbib,
+                       albumartists.name as albumartist,
+                       albumartists.mbid as albumartist_mbib
                 FROM history
                 JOIN tracks ON history.track = tracks.id
                 LEFT OUTER JOIN albums ON tracks.album = albums.id
                 LEFT OUTER JOIN artists ON tracks.artist = artists.id
+                LEFT OUTER JOIN albumartists ON tracks.albumartist = albumartists.id
                 WHERE history.last_play > ? AND albums.name NOT NULL AND artists.name NOT NULL
                 ORDER BY history.last_play DESC""", (date.isoformat(' '),))
         hist = list()
         for row in rows:
             vals = dict(row)
-            artist = Artist(name=vals.pop('artist'),
-                            mbid=vals.pop('artist_mbib'))
-            if needle:
-                if needle != artist:
+            if needle:  # Here use artist instead of albumartist
+                if needle != Artist(name=vals.get('artist'),
+                                    mbid=vals.get('artist_mbib')):
                     continue
-            album = Album(**vals, artist=artist)
+            # Use albumartist / MBIDs if possible to build album artist
+            if not vals.get('albumartist'):
+                vals['albumartist'] = vals.get('artist')
+            if not vals.get('albumartist_mbib'):
+                vals['albumartist_mbib'] = vals.get('artist_mbib')
+            artist = Artist(name=vals.get('albumartist'),
+                            mbid=vals.pop('albumartist_mbib'))
+            album = Album(**vals, Artist=artist)
             if hist and hist[-1] == album:
                 # remove consecutive dupes
                 continue

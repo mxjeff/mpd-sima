@@ -75,7 +75,7 @@ class Test_00DB(Main):
 
     def test_02_history(self):
         # set records in the past to ease purging then
-        last = CURRENT - datetime.timedelta(hours=1)
+        last = CURRENT - datetime.timedelta(seconds=5)
         trk = Track(**DEVOLT)
         self.db.add_history(trk, date=last)
         self.db.add_history(trk, date=last)
@@ -168,6 +168,40 @@ class Test_00DB(Main):
                          trk04.artist, trk03.artist],
                          art_history)
 
+    def test_albums_history(self):
+        # set records in the past to ease purging then
+        last = CURRENT - datetime.timedelta(seconds=5)
+        track = {
+            'album': 'album', 'title': 'title',
+            'albumartist': 'albumartist',
+            'artist': 'artist',
+            'file': 'foo/bar.flac',
+            'musicbrainz_albumartistid': 'd8e7e3e2-49ab-4f7c-b148-fc946d521f99',
+            'musicbrainz_albumid': 'ea2ef2cf-59e1-443a-817e-9066e3e0be4b',
+            'musicbrainz_artistid': 'd8e7e3e2-49ab-4f7c-b148-fc946d521f99',}
+        self.db.purge_history(duration=0)
+        self.db.add_history(Track(**track), last)
+        alb_history = self.db.fetch_albums_history()
+        alb = alb_history[0]
+        self.assertEqual(alb.Artist.name, track.get('albumartist'))
+        # Fetching Album history for "artist" should return "album"
+        artist = Artist(track.get('artist'), mbid=track.get('musicbrainz_artistid'))
+        alb_history = self.db.fetch_albums_history(artist)
+        self.assertTrue(alb_history)
+        # Falls back to album and MBID when albumartist and
+        # musicbrainz_albumartistid are not set
+        self.db.purge_history(duration=0)
+        track = {
+            'album': 'no albumartist set', 'title': 'title',
+            'artist': 'no album artist set',
+            'file': 'bar/foo.flac',
+            'musicbrainz_artistid': 'dddddddd-49ab-4f7c-b148-dddddddddddd',}
+        self.db.add_history(Track(**track), last)
+        alb_history = self.db.fetch_albums_history()
+        album = alb_history[0]
+        self.assertEqual(album.albumartist, track['artist'])
+        self.assertEqual(album.Artist.mbid, track['musicbrainz_artistid'])
+
     def test_04_filtering_history(self):
         # Controls artist history filtering
         for i in range(0, 5):
@@ -244,6 +278,8 @@ class Test_00DB(Main):
         self.assertIn(('fooart',), artists)
         conn.close()
 
+    def test_06_add_album(self):
+        pass
 
 class Test_01BlockList(Main):
 
