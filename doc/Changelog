@@ -1,5 +1,8 @@
-MPD_sima v0.18.0.dev0
+MPD_sima v0.18.0.dev1
 
+ * New database, no migration done from old database !
+   A backup is done in "${XDG_DATA_HOME}/mpd_sima/"
+   Play history and blocklist are forgotten then.
  * Removed obsolete --create-db and --generate-config options
  * Fixed crash when setting XDG_CONFIG_HOME (closes #50)
  * Add abstract unix socket support for MPD connection
