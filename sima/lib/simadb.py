@@ -26,6 +26,8 @@ import sqlite3
 
 from collections import deque
 from datetime import (datetime, timedelta)
+from datetime import timezone
+
 
 from sima.lib.meta import Artist, Album
 from sima.lib.track import Track
@@ -435,10 +437,11 @@ class SimaDB:
                     VALUES (?, ?)""", (trk_id, gen_id))
 
     def add_history(self, track, date=None):
-        """Record last play date of track (ie. not a real exhautive play history).
-        :param track sima.lib.track.Track: track to add to history"""
+        """Record last play date of track (ie. not a real play history).
+        :param track sima.lib.track.Track: track to add to history
+        :param date datetime.datetime: UTC datetime object (use "datetime.now(timezone.utc)" is not set)"""
         if not date:
-            date = datetime.now()
+            date = datetime.now(timezone.utc)
         connection = self.get_database_connection()
         track_id = self.get_track(track, with_connection=connection)
         rows = connection.execute("SELECT * FROM history WHERE track = ? ",
@@ -466,7 +469,7 @@ class SimaDB:
         """
         :param sima.lib.meta.Artist needle: When specified, returns albums history for this artist.
         """
-        date = datetime.utcnow() - timedelta(hours=duration)
+        date = datetime.now(timezone.utc) - timedelta(hours=duration)
         connection = self.get_database_connection()
         connection.row_factory = sqlite3.Row
         rows = connection.execute("""
@@ -501,7 +504,7 @@ class SimaDB:
         :param sima.lib.meta.Artist|sima.lib.meta.MetaContainer needle: When specified, returns history for this artist, it's actually testing the artist presence in history.
         :param sima.lib.meta.MetaContainer needle: When specified, returns history for these artists only
         """
-        date = datetime.utcnow() - timedelta(hours=duration)
+        date = datetime.now(timezone.utc) - timedelta(hours=duration)
         connection = self.get_database_connection()
         connection.row_factory = sqlite3.Row
         rows = connection.execute("""
@@ -533,7 +536,7 @@ class SimaDB:
         return hist
 
     def fetch_genres_history(self, duration=__HIST_DURATION__, limit=20):
-        date = datetime.utcnow() - timedelta(hours=duration)
+        date = datetime.now(timezone.utc) - timedelta(hours=duration)
         connection = self.get_database_connection()
         rows = connection.execute("""
                 SELECT genres.name, artists.name
@@ -558,7 +561,7 @@ class SimaDB:
         :param sima.lib.meta.Artist artist: limit history to this artist
         :param int duration: How long ago to fetch history from
         """
-        date = datetime.utcnow() - timedelta(hours=duration)
+        date = datetime.now(timezone.utc) - timedelta(hours=duration)
         connection = self.get_database_connection()
         connection.row_factory = sqlite3.Row
         sql = """
