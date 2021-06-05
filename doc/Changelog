@@ -3,9 +3,12 @@ MPD_sima v0.18.0.dev1
  * New database, no migration done from old database !
    A backup is done in "${XDG_DATA_HOME}/mpd_sima/"
    Play history and blocklist are forgotten then.
+ * Blocklist is now handled with mpd-sima command arguments,
+ simadb_cli executable is removed.
  * Removed obsolete --create-db and --generate-config options
  * Fixed crash when setting XDG_CONFIG_HOME (closes #50)
- * Add abstract unix socket support for MPD connection
+ * Add abstract unix socket support for MPD connection (need at least
+ python-musicpd 0.6.0)
 
  -- kaliko <kaliko@azylum.org>  Wed, 28 Apr 2021 17:21:39 +0200
 
