@@ -19,8 +19,10 @@
 """SQlite database library
 """
 
+#: DB Version
 __DB_VERSION__ = 4
-__HIST_DURATION__ = int(30 * 24)  # in hours
+#: Default history duration for both request and purge in hours
+__HIST_DURATION__ = int(30 * 24)
 
 import sqlite3
 
@@ -198,7 +200,7 @@ class SimaDB:
         connection.close()
 
     def _remove_blocklist_id(self, blid, with_connection=None):
-        """Remove id"""
+        """Remove a blocklist id"""
         if with_connection:
             connection = with_connection
         else:
@@ -369,6 +371,7 @@ class SimaDB:
 
     def get_track(self, track, with_connection=None, add=True):
         """Get a track id from Tracks table, add if not existing,
+
         :param sima.lib.track.Track track: track to use
         :param bool add: add non existing track to database"""
         if not track.file:
@@ -438,8 +441,9 @@ class SimaDB:
 
     def add_history(self, track, date=None):
         """Record last play date of track (ie. not a real play history).
-        :param track sima.lib.track.Track: track to add to history
-        :param date datetime.datetime: UTC datetime object (use "datetime.now(timezone.utc)" is not set)"""
+
+        :param sima.lib.track.Track track: track to add to history
+        :param datetime.datetime date: UTC datetime object (use "datetime.now(timezone.utc)" is not set)"""
         if not date:
             date = datetime.now(timezone.utc)
         connection = self.get_database_connection()
@@ -456,8 +460,8 @@ class SimaDB:
 
     def purge_history(self, duration=__HIST_DURATION__):
         """Remove old entries in history
-        :param duration int: Purge history record older than duration in hours
-                            (defaults to __HIST_DURATION__)"""
+
+        :param int duration: Purge history record older than duration in hours"""
         connection = self.get_database_connection()
         connection.execute("DELETE FROM history WHERE last_play"
                            " < datetime('now', '-%i hours')" % duration)
@@ -468,6 +472,7 @@ class SimaDB:
     def fetch_albums_history(self, needle=None, duration=__HIST_DURATION__):
         """
         :param sima.lib.meta.Artist needle: When specified, returns albums history for this artist.
+        :param int duration: How long ago to fetch history from (in hours)
         """
         date = datetime.now(timezone.utc) - timedelta(hours=duration)
         connection = self.get_database_connection()
@@ -510,8 +515,10 @@ class SimaDB:
 
     def fetch_artists_history(self, needle=None, duration=__HIST_DURATION__):
         """Returns a list of Artist objects
-        :param sima.lib.meta.Artist|sima.lib.meta.MetaContainer needle: When specified, returns history for this artist, it's actually testing the artist presence in history.
+
         :param sima.lib.meta.MetaContainer needle: When specified, returns history for these artists only
+        :param int duration: How long ago to fetch history from (in hours)
+        :type needle: sima.lib.meta.Artist or sima.lib.meta.MetaContainer
         """
         date = datetime.now(timezone.utc) - timedelta(hours=duration)
         connection = self.get_database_connection()
@@ -545,6 +552,11 @@ class SimaDB:
         return hist
 
     def fetch_genres_history(self, duration=__HIST_DURATION__, limit=20):
+        """Returns genre history
+
+        :param int duration: How long ago to fetch history from (in hours)
+        :param int limit: number of genre to fetch
+        """
         date = datetime.now(timezone.utc) - timedelta(hours=duration)
         connection = self.get_database_connection()
         rows = connection.execute("""
@@ -567,8 +579,9 @@ class SimaDB:
 
     def fetch_history(self, artist=None, duration=__HIST_DURATION__):
         """Fetches tracks history, more recent first
+
         :param sima.lib.meta.Artist artist: limit history to this artist
-        :param int duration: How long ago to fetch history from
+        :param int duration: How long ago to fetch history from (in hours)
         """
         date = datetime.now(timezone.utc) - timedelta(hours=duration)
         connection = self.get_database_connection()
@@ -609,6 +622,7 @@ class SimaDB:
 
     def get_bl_track(self, track, with_connection=None, add=True):
         """Add a track to blocklist
+
         :param sima.lib.track.Track track: Track object to add to blocklist
         :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, else create a new one
         :param bool add: Default is to add a new record, set to False to fetch associated record"""
@@ -636,6 +650,7 @@ class SimaDB:
 
     def get_bl_album(self, album, with_connection=None, add=True):
         """Add an album to blocklist
+
         :param sima.lib.meta.Album: Album object to add to blocklist
         :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, else create a new one
         :param bool add: Default is to add a new record, set to False to fetch associated record"""
@@ -663,6 +678,7 @@ class SimaDB:
 
     def get_bl_artist(self, artist, with_connection=None, add=True):
         """Add an artist to blocklist
+
         :param sima.lib.meta.Artist: Artist object to add to blocklist
         :param sqlite3.Connection with_connection: sqlite3.Connection to reuse, else create a new one
         :param bool add: Default is to add a new record, set to False to fetch associated record"""

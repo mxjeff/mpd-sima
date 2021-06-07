@@ -25,6 +25,7 @@ import time
 
 from .meta import Artist, Album, SEPARATOR
 
+
 class Track:
     """
     Track object.
@@ -52,7 +53,7 @@ class Track:
                                  'genre', 'albumartist',
                                  'musicbrainz_artistid',
                                  'musicbrainz_albumartistid']
-        #  have tags been collapsed?
+        # Which tags have been collapsed?
         self.collapsed_tags = list()
         # Needed for multiple tags which returns a list instead of a string
         self._collapse_tags()
@@ -80,9 +81,9 @@ class Track:
 
     def __str__(self):
         return '{artist} - {album} - {title} ({length})'.format(
-                length=self.length,
-                **self.__dict__
-                )
+            length=self.length,
+            **self.__dict__
+        )
 
     def __int__(self):
         return int(self.duration)
@@ -128,8 +129,9 @@ class Track:
     def genres(self):
         """Fetches Genres for the track
         Multivalue genre are dealt with:
-          * when genre tag is multivalued
-          * when single tag uses coma or semi-colon separator
+
+        * when genre tag is multivalued
+        * when single tag uses coma or semi-colon separator
         """
         if 'genre' not in self.__dict__:
             return []
