@@ -1,6 +1,8 @@
 Track object Documentation
 ==========================
 
+.. autodata:: SEPARATOR
+
 .. automodule:: sima.lib.track
     :members:
 
@@ -10,7 +12,7 @@ Meta object Documentation
 Generic class and helper function
 ---------------------------------
 
-.. autoclass:: sima.lib.meta.Meta(name, mbid=None, **kwargs)
+.. autoclass:: sima.lib.meta.Meta
     :members:
     :undoc-members:
 
@@ -19,7 +21,10 @@ Generic class and helper function
 Derived objects
 ---------------
 
-.. autoclass:: sima.lib.meta.Artist(name, mbid=None, albumartist=None, musicbrainz_artistid=None, musicbrainz_albumartistid=None)
+.. autoclass:: sima.lib.meta.Artist(name, mbid=None, musicbrainz_artistid=None, albumartist=None)
+    :show-inheritance:
+
+.. autoclass:: sima.lib.meta.Album
     :show-inheritance:
 
 
