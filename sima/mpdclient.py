@@ -517,6 +517,8 @@ class MPD(MPDClient):
         candidates = []
         for album in albums:
             album_trks = self.find_tracks(album)
+            if not album_trks:  # find_track result can be empty, blocklist applied
+                continue
             album_artists = {tr.albumartist for tr in album_trks if tr.albumartist}
             if album.Artist.names & album_artists:
                 candidates.append(album)
@@ -548,9 +550,6 @@ class MPD(MPDClient):
                 self.log.debug('"%s" probably not an album of "%s" (ratio=%.2f)',
                                album, artist, ratio)
             continue
-        for alb in albums:
-            if self.database.get_bl_album(album, add=False):
-                candidates.remove(album)
         return candidates
 # #### / Search Methods ###
 
