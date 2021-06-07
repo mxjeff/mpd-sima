@@ -121,22 +121,24 @@ class TestMetaObject(unittest.TestCase):
 class TestArtistObject(unittest.TestCase):
 
     def test_init(self):
-        artist = {'artist': SEPARATOR.join(['Original Name', 'Featuring Nane', 'Feature…']),
+        artist = {'artist':
+                SEPARATOR.join(['Original Name', 'Featuring Nane', 'Feature…']),
                   'albumartist': 'Name',
-                  'musicbrainz_artistid': VALID,
+                  'musicbrainz_artistid':
+                  SEPARATOR.join([VALID, VALID.replace('0000', '1312')]),
                   }
         art = Artist(**artist)
         self.assertEqual(art.name, 'Original Name')
-        self.assertTrue(art.mbid == VALID)
+        self.assertEqual(art.mbid, VALID)
         self.assertEqual(art.albumartist, artist['albumartist'])
         artist.pop('albumartist')
         art = Artist(**artist)
-        self.assertTrue(art.name, 'Original Name')
-        self.assertTrue(art.albumartist, 'Original Name')
+        self.assertEqual(art.name, 'Original Name')
+        self.assertEqual(art.albumartist, 'Original Name')
 
     def test_empty_name(self):
         for args in [
-                {'mbid':VALID},
+                {'mbid': VALID},
                 {'name': None},
                 {},
                 ]:

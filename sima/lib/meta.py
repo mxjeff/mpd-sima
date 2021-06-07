@@ -93,13 +93,13 @@ class Meta:
         if not isinstance(kwargs.get('name'), str):
             raise MetaException('"name" argument not a string')
         else:
-            self.__name = kwargs.pop('name')
+            self.__name = kwargs.pop('name').split(SEPARATOR)[0]
         if 'mbid' in kwargs and kwargs.get('mbid'):
-            if is_uuid4(kwargs.get('mbid')):
-                self.__mbid = kwargs.pop('mbid').lower()
+            mbid = kwargs.get('mbid').lower().split(SEPARATOR)[0]
+            if is_uuid4(mbid):
+                self.__mbid = mbid
             else:
-                self.log.warning('Wrong mbid %s:%s', self.__name,
-                                 kwargs.get('mbid'))
+                self.log.warning('Wrong mbid %s:%s', self.__name, mbid)
             # mbid immutable as hash rests on
         self.__dict__.update(**kwargs)
 
@@ -184,7 +184,7 @@ class Album(Meta):
     @mbidfilter
     def __init__(self, name=None, mbid=None, **kwargs):
         if kwargs.get('musicbrainz_albumid', False):
-            mbid = kwargs.get('musicbrainz_albumid').split(SEPARATOR)[0]
+            mbid = kwargs.get('musicbrainz_albumid')
         super().__init__(name=name, mbid=mbid, **kwargs)
 
     @property
@@ -214,11 +214,11 @@ class Artist(Meta):
     @mbidfilter
     def __init__(self, name=None, mbid=None, **kwargs):
         if kwargs.get('artist', False):
-            name = kwargs.get('artist').split(SEPARATOR)[0]
+            name = kwargs.get('artist')
         if kwargs.get('musicbrainz_artistid', False):
-            mbid = kwargs.get('musicbrainz_artistid').split(SEPARATOR)[0]
-        if not kwargs.get('albumartist', False):
-            kwargs['albumartist'] = name
+            mbid = kwargs.get('musicbrainz_artistid')
+        if name and not kwargs.get('albumartist', False):
+            kwargs['albumartist'] = name.split(SEPARATOR)[0]
         super().__init__(name=name, mbid=mbid,
                          albumartist=kwargs.get('albumartist'))
 
