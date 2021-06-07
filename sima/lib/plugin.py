@@ -185,12 +185,12 @@ class AdvancedPlugin(Plugin):
         album_to_queue = []
         for album in albums_not_in_hist:
             # Controls the album found is not already queued
-            if album in {t.album for t in self.player.queue}:
+            if album in {t.Album.name for t in self.player.queue}:
                 self.log.debug('"%s" already queued, skipping!', album)
                 continue
             # In random play mode use complete playlist to filter
             if self.player.playmode.get('random'):
-                if album in {t.album for t in self.player.playlist}:
+                if album in {t.Album.name for t in self.player.playlist}:
                     self.log.debug('"%s" already in playlist, skipping!',
                                    album)
                     continue
@@ -225,10 +225,10 @@ class AdvancedPlugin(Plugin):
         for trk in [_ for _ in not_in_hist if _ not in deny_list]:
             # Should use albumartist heuristic as well
             if self.plugin_conf.getboolean('single_album', False):  # pylint: disable=no-member
-                albums = [tr.album for tr in deny_list]
-                albums += [tr.album for tr in self.to_add]
-                if (trk.album == self.player.current.album or
-                        trk.album in albums):
+                albums = [tr.Album for tr in deny_list]
+                albums += [tr.Album for tr in self.to_add]
+                if (trk.Album == self.player.current.Album or
+                        trk.Album in albums):
                     self.log.debug('Found unplayed track ' +
                                    'but from an album already queued: %s', trk)
                     continue

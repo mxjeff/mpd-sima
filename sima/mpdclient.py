@@ -316,7 +316,7 @@ class MPD(MPDClient):
         for name in artist.names:
             tracks |= set(self.find('artist', name))
         # album blocklist
-        albums = {Album(trk.album, mbid=trk.musicbrainz_albumid)
+        albums = {Album(trk.Album.name, mbid=trk.musicbrainz_albumid)
                   for trk in tracks}
         bl_albums = {Album(a.get('album'), mbid=a.get('musicbrainz_album'))
                      for a in self.database.view_bl() if a.get('album')}
