@@ -410,7 +410,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                             cache.<sbr />When set to "true", sima will use a
                             persistent cache for its http client. The cache is
                             written along with the dbfile in:<sbr />
-                            <filename>$XDG_CONFIG_HOME/mpd_sima/http/WEB_SERVICE</filename>.<sbr/>
+                            <filename>$XDG_DATA_HOME/mpd_sima/http/WEB_SERVICE</filename>.<sbr/>
                             If set to "false", caching is still done but in memory.
                         </para>
                     </listitem>
