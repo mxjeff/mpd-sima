@@ -21,7 +21,7 @@ import atexit
 import sys
 
 # local import
-from ..mpdclient import MPD, PlayerError, Artist, Album
+from ..mpdclient import MPD, MPDError, Artist, Album
 from ..lib.simadb import SimaDB
 
 
@@ -37,7 +37,7 @@ class BLCli(MPD):
             return
         try:
             getattr(self, cmd.replace('-', '_'))()
-        except PlayerError as err:
+        except MPDError as err:
             self.log.error(err)
             sys.exit(1)
 
@@ -46,14 +46,14 @@ class BLCli(MPD):
         for entry in ['artist', 'album', 'title']:
             header = False
             for bl in blocklist:
-                art = bl.get(entry, '')
+                val = bl.get(entry, '')
                 mbid = bl.get(f'musicbrainz_{entry}', '')
-                if art or mbid:
+                if val or mbid:
                     if not header:
                         header = True
                         self.log.info(f'{entry.capitalize()}'
                                       '(id name musicbranzID):')
-                    self.log.info(f'{bl["id"]} "{art}"\t\t{mbid}')
+                    self.log.info(f'{bl["id"]} "{val}"\t\t{mbid}')
 
     def bl_add_artist(self):
         artist = self.options.get('artist', None)

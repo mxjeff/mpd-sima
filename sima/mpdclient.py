@@ -32,7 +32,7 @@ from .lib.simastr import SimaStr
 from .utils.leven import levenshtein_ratio
 
 
-class PlayerError(Exception):
+class PlayerError(MPDError):
     """Fatal error in the player."""
 
 
