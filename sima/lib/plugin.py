@@ -170,7 +170,7 @@ class AdvancedPlugin(Plugin):
         albums = self.player.search_albums(artist)
         if not albums:
             return None
-        self.log.debug('Albums candidates: %s', albums)
+        self.log.debug('Albums to choose from: %s', albums)
         albums_hist = self.get_album_history(artist)
         self.log.trace('Albums history: %s', [a.name for a in albums_hist])
         albums_not_in_hist = [a for a in albums if a.name not in albums_hist]
@@ -181,7 +181,7 @@ class AdvancedPlugin(Plugin):
                 return None
         random.shuffle(albums_not_in_hist)
         albums_not_in_hist.extend(albums_hist)
-        self.log.debug('Albums candidate: %s', albums_not_in_hist)
+        self.log.trace('Album candidates: %s', albums_not_in_hist)
         album_to_queue = []
         for album in albums_not_in_hist:
             # Controls the album found is not already queued
@@ -189,6 +189,7 @@ class AdvancedPlugin(Plugin):
                 self.log.debug('"%s" already queued, skipping!', album)
                 continue
             # In random play mode use complete playlist to filter
+            # Yes indeed, some users play in random with album mode :|
             if self.player.playmode.get('random'):
                 if album in {t.Album.name for t in self.player.playlist}:
                     self.log.debug('"%s" already in playlist, skipping!',
