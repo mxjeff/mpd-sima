@@ -64,7 +64,7 @@ def set_artist_mbid(func):
     return wrapper
 
 def tracks_wrapper(func):
-    """Convert plain track mapping as returned by MPDClient into :py:obj:Track
+    """Convert plain track mapping as returned by MPDClient into :py:obj:`sima.lib.track.Track`
     objects. This decorator accepts single track or list of tracks as input.
     """
     @wraps(func)
@@ -81,7 +81,7 @@ class MPD(MPDClient):
     """
     Player instance inheriting from MPDClient (python-musicpd).
 
-    Some methods are overridden to format objects as sima.lib.Track for
+    Some methods are overridden to format objects as :py:obj:`sima.lib.track.Track` for
     instance, other are calling parent class directly through super().
     cf. MPD.__getattr__
 
@@ -248,7 +248,7 @@ class MPD(MPDClient):
     def add(self, payload):
         """Overriding MPD's add method to accept Track objects
 
-        :param Track,list payload: Either a single :py:obj:`Track` or a list of it
+        :param Track,list payload: Either a single track or a list of it
         """
         if isinstance(payload, Track):
             super().__getattr__('add')(payload.file)
@@ -300,8 +300,8 @@ class MPD(MPDClient):
             >>> player.find_tracks(Album('In Utero', artist=Artist('Nirvana'))
 
         :param Artist,Album what: Artist or Album to fetch track from
-
-        Returns a list of :py:obj:Track objects
+        :return: A list of track objects
+        :rtype: list(Track)
         """
         if isinstance(what, Artist):
             return self._find_art(what)
@@ -393,8 +393,8 @@ class MPD(MPDClient):
             >>> ['The Beatles', 'Beatles', 'the beatles']
 
         :param Artist artist: Artist to look for in MPD music library
-
-        Returns an Artist object
+        :return: Artist object
+        :rtype: Artist
         """
         found = False
         if artist.mbid:
