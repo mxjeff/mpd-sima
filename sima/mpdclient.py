@@ -42,20 +42,26 @@ def bl_artist(func):
         cls = args[0]
         if not cls.database:
             return func(*args, **kwargs)
-        results = func(*args, **kwargs)
-        if not results:
+        result = func(*args, **kwargs)
+        if not result:
             return None
-        for art in results.names:
-            mbid = results.mbid
-            if not mbid:
-                mbid = cls._find_musicbrainz_artistid(results)
-            artist = Artist(name=art, mbid=mbid)
+        for art in result.names:
+            artist = Artist(name=art, mbid=result.mbid)
             if cls.database.get_bl_artist(artist, add=False):
                 cls.log.debug('Artist in blocklist: %s', artist)
                 return None
-        return results
+        return result
     return wrapper
 
+def set_artist_mbid(func):
+    def wrapper(*args, **kwargs):
+        cls = args[0]
+        result = func(*args, **kwargs)
+        if Meta.use_mbid:
+            if result and not result.mbid:
+                result.mbid = cls._find_musicbrainz_artistid(result)
+        return result
+    return wrapper
 
 def tracks_wrapper(func):
     """Convert plain track mapping as returned by MPDClient into :py:obj:Track
@@ -355,6 +361,11 @@ class MPD(MPDClient):
 
 # #### Search Methods #####
     def _find_musicbrainz_artistid(self, artist):
+        """Find MusicBrainzArtistID when possible.
+        For artist with aliases having a mbid but not the main name, no mbid is
+        fetched…
+        Searching for Artist('Russian Circls') do not reslove the MBID
+        """
         if not self.use_mbid:
             return None
         mbids = self.list('MUSICBRAINZ_ARTISTID',
@@ -372,6 +383,7 @@ class MPD(MPDClient):
             return mbids[0]
 
     @bl_artist
+    @set_artist_mbid
     def search_artist(self, artist):
         """
         Search artists based on a fuzzy search in the media library

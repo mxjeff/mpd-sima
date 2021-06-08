@@ -158,6 +158,13 @@ class Meta:
     def mbid(self):
         return self.__mbid
 
+    @mbid.setter
+    def mbid(self, mbid):
+        if mbid and not is_uuid4(mbid):
+            self.log.warning('Wrong mbid %s:%s', self.__name, mbid)
+            return
+        self.__mbid = mbid
+
     @property
     def aliases(self):
         return self.__aliases
