@@ -136,12 +136,12 @@ class Meta:
 
         :param str other: Alias to add, could be any object with ``__str__`` method.
         """
+        if isinstance(other, Meta):
+            self.__aliases |= other.__aliases
+            self.__aliases -= {self.name}
         if getattr(other, '__str__', None):
             if callable(other.__str__) and other.__str__() != self.name:
                 self.__aliases |= {other.__str__()}
-        elif isinstance(other, Meta):
-            if other.name != self.name:
-                self.__aliases |= other.__aliases
         else:
             raise MetaException('No __str__ method found in {!r}'.format(other))
 
@@ -157,13 +157,6 @@ class Meta:
     @property
     def mbid(self):
         return self.__mbid
-
-    @mbid.setter
-    def mbid(self, mbid):
-        if mbid and not is_uuid4(mbid):
-            self.log.warning('Wrong mbid %s:%s', self.__name, mbid)
-            return
-        self.__mbid = mbid
 
     @property
     def aliases(self):

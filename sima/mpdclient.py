@@ -59,7 +59,10 @@ def set_artist_mbid(func):
         result = func(*args, **kwargs)
         if Meta.use_mbid:
             if result and not result.mbid:
-                result.mbid = cls._find_musicbrainz_artistid(result)
+                mbid = cls._find_musicbrainz_artistid(result)
+                artist = Artist(name=result.name, mbid=mbid)
+                artist.add_alias(result)
+                return artist
         return result
     return wrapper
 
@@ -368,8 +371,13 @@ class MPD(MPDClient):
         """
         if not self.use_mbid:
             return None
-        mbids = self.list('MUSICBRAINZ_ARTISTID',
-                          f'(artist == "{artist.name_sz}")')
+        mbids = None
+        for name in artist.names_sz:
+            self.log.debug(name)
+            filt = f'((artist == "{name}") AND (MUSICBRAINZ_ARTISTID != ""))'
+            mbids = self.list('MUSICBRAINZ_ARTISTID', filt)
+            if mbids:
+                break
         if not mbids:
             return None
         if len(mbids) > 1:

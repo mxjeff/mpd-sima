@@ -56,6 +56,15 @@ class TestMetaObject(unittest.TestCase):
         # test equality Obj.__name with OgjBis.__aliases
         self.assertTrue(art0 == Meta(name='A Silver Mt. Zion'))
 
+        art1 = Meta(name='Silver Mt. Zion')
+        art1.add_alias(art0)
+        self.assertIn('A Silver Mt. Zion', art1.aliases)
+
+        art3 = Meta(name='foo')
+        art3.add_alias('Silver Mt. Zion')
+        art1.add_alias(art3)
+        self.assertNotIn('Silver Mt. Zion', art1.aliases)
+
     def test_union(self):
         art00 = Meta(name='Aphex Twin',
                            mbid='f22942a1-6f70-4f48-866e-238cb2308fbd')
