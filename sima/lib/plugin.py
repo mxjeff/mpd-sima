@@ -204,11 +204,17 @@ class AdvancedPlugin(Plugin):
                       self.__class__.__name__, artist, album_to_queue)
         return album_to_queue
 
-    def filter_track(self, tracks, unplayed=False):
+    def filter_track(self, tracks, chosen=None, unplayed=False):
         """
         Extract one unplayed track from a Track object list.
             * not in history
             * not already in the queue
+
+        :param list(Track) tracks: List of tracks to chose from
+        :param list(Track) chosen: List of tracks previously chosen
+        :param bool unplayed: chose only unplayed (honoring history duration setting)
+        :return: A Track
+        :rtype: Track
         """
         artist = tracks[0].Artist
         # In random play mode use complete playlist to filter
@@ -227,7 +233,7 @@ class AdvancedPlugin(Plugin):
             # Should use albumartist heuristic as well
             if self.plugin_conf.getboolean('single_album', False):  # pylint: disable=no-member
                 albums = [tr.Album for tr in deny_list]
-                albums += [tr.Album for tr in self.to_add]
+                albums += [tr.Album for tr in chosen]
                 if (trk.Album == self.player.current.Album or
                         trk.Album in albums):
                     self.log.debug('Found unplayed track ' +

@@ -63,7 +63,6 @@ class WebService(AdvancedPlugin):
         super().__init__(daemon)
         self.history = daemon.short_history
         ##
-        self.to_add = list()
         self._cache = None
         self._flush_cache()
         wrapper = {'track': self._track,
@@ -251,7 +250,7 @@ class WebService(AdvancedPlugin):
     def find_album(self, artists):
         """Find albums to queue.
         """
-        self.to_add = list()
+        to_add = list()
         nb_album_add = 0
         target_album_to_add = self.plugin_conf.getint('album_to_add')
         for artist in artists:
@@ -267,19 +266,19 @@ class WebService(AdvancedPlugin):
             nbtracks = self.plugin_conf.getint('track_to_add_from_album')
             if nbtracks > 0:
                 candidates = candidates[0:nbtracks]
-            self.to_add.extend(candidates)
+            to_add.extend(candidates)
             if nb_album_add == target_album_to_add:
-                return
+                return to_add
 
     def find_top(self, artists):
         """
         find top tracks for artists in artists list.
         """
-        self.to_add = list()
+        to_add = list()
         nbtracks_target = self.plugin_conf.getint('track_to_add')
         for artist in artists:
-            if len(self.to_add) == nbtracks_target:
-                return
+            if len(to_add) == nbtracks_target:
+                return to_add
             self.log.info('Looking for a top track for %s', artist)
             titles = deque()
             try:
@@ -291,14 +290,17 @@ class WebService(AdvancedPlugin):
                 found = self.player.search_track(artist, trk.title)
                 if found:
                     random.shuffle(found)
-                    top_trk = self.filter_track(found)
+                    top_trk = self.filter_track(found, to_add)
                     if top_trk:
-                        self.to_add.append(top_trk)
+                        to_add.append(top_trk)
                         break
 
     def _track(self):
         """Get some tracks for track queue mode
+
+        :return: list of Tracks
         """
+        to_add = []
         artists = self.get_local_similar_artists()
         nbtracks_target = self.plugin_conf.getint('track_to_add')
         for artist in artists:
@@ -309,30 +311,33 @@ class WebService(AdvancedPlugin):
                 continue
             random.shuffle(found)
             # find tracks not in history for artist
-            track_candidate = self.filter_track(found)
+            track_candidate = self.filter_track(found, to_add)
             if track_candidate:
-                self.to_add.append(track_candidate)
-            if len(self.to_add) == nbtracks_target:
+                to_add.append(track_candidate)
+                self.log.info('%s plugin chose: %s',
+                              self.ws.name, track_candidate)
+            if len(to_add) == nbtracks_target:
                 break
-        if not self.to_add:
-            self.log.debug('Found no tracks to queue!')
-            return
-        for track in self.to_add:
-            self.log.info('%s plugin chose: %s', self.ws.name, track)
+        return to_add
 
     def _album(self):
         """Get albums for album queue mode
+
+        :return: list of Tracks
         """
         artists = self.get_local_similar_artists()
-        self.find_album(artists)
+        return self.find_album(artists)
 
     def _top(self):
         """Get some tracks for top track queue mode
+
+        :return: list of Tracks
         """
         artists = self.get_local_similar_artists()
-        self.find_top(artists)
-        for track in self.to_add:
+        chosen = self.find_top(artists)
+        for track in chosen:
             self.log.info('%s candidates: %s', self.ws.name, track)
+        return chosen
 
     def callback_need_track(self):
         self._cleanup_cache()
@@ -343,14 +348,12 @@ class WebService(AdvancedPlugin):
             self.log.warning('No artist set for the last track in queue')
             self.log.debug(repr(self.player.current))
             return None
-        self.queue_mode()
+        candidates = self.queue_mode()
         msg = ' '.join(['{0}: {1:>3d}'.format(k, v) for
                         k, v in sorted(self.ws.stats.items())])
         self.log.debug('http stats: ' + msg)
-        if not self.to_add:
+        if not candidates:
             self.log.info('%s plugin found nothing to queue', self.ws.name)
-        candidates = self.to_add
-        self.to_add = list()
         if self.plugin_conf.get('queue_mode') != 'album':
             random.shuffle(candidates)
         return candidates
