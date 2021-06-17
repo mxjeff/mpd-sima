@@ -100,7 +100,9 @@ class Genre(AdvancedPlugin):
         for artist in artists:
             self.log.debug('looking for %s', artist)
             tracks = self.player.find_tracks(artist)
-            trk = self.filter_track(tracks)
+            if not tracks:
+                continue
+            trk = self.filter_track(tracks, candidates)
             if not trk:
                 continue
             if queue_mode == 'track':

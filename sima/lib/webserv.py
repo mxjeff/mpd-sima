@@ -259,6 +259,8 @@ class WebService(AdvancedPlugin):
                 continue
             nb_album_add += 1
             candidates = self.player.find_tracks(album)
+            if not candidates:
+                continue
             if self.plugin_conf.getboolean('shuffle_album'):
                 random.shuffle(candidates)
             # this allows to select a maximum number of track from the album
