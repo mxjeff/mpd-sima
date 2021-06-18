@@ -61,8 +61,8 @@ def serialize(func):
     def wrapper(*args, **kwargs):
         ans = func(*args, **kwargs)
         if isinstance(ans, set):
-            return {s.replace("'", r"\'") for s in ans}
-        return ans.replace("'", r"\'")
+            return {s.replace("'", r"\'").replace('"', r'\"') for s in ans}
+        return ans.replace("'", r"\'").replace('"', r'\"')
     return wrapper
 
 

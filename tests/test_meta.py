@@ -125,6 +125,13 @@ class TestMetaObject(unittest.TestCase):
         self.assertEqual(heavens_door.name_sz, target)
         heavens_door = Artist(name=name)
         self.assertEqual(heavens_door.name_sz, target)
+        # Same with double quote
+        name = 'Bonnie "Prince" Billy'
+        bonnie = Meta(name=name)
+        target = r"Bonnie \"Prince\" Billy"
+        self.assertEqual(bonnie.name_sz, target)
+        self.assertEqual(bonnie.name, name)
+
 
 
 class TestArtistObject(unittest.TestCase):

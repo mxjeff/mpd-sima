@@ -365,15 +365,11 @@ class MPD(MPDClient):
 # #### Search Methods #####
     def _find_musicbrainz_artistid(self, artist):
         """Find MusicBrainzArtistID when possible.
-        For artist with aliases having a mbid but not the main name, no mbid is
-        fetched…
-        Searching for Artist('Russian Circls') do not reslove the MBID
         """
         if not self.use_mbid:
             return None
         mbids = None
         for name in artist.names_sz:
-            self.log.debug(name)
             filt = f'((artist == "{name}") AND (MUSICBRAINZ_ARTISTID != ""))'
             mbids = self.list('MUSICBRAINZ_ARTISTID', filt)
             if mbids:
