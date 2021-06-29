@@ -280,7 +280,7 @@ class WebService(AdvancedPlugin):
         nbtracks_target = self.plugin_conf.getint('track_to_add')
         for artist in artists:
             if len(to_add) == nbtracks_target:
-                return to_add
+                break
             self.log.info('Looking for a top track for %s', artist)
             titles = deque()
             try:
@@ -296,6 +296,7 @@ class WebService(AdvancedPlugin):
                     if top_trk:
                         to_add.append(top_trk)
                         break
+        return to_add
 
     def _track(self):
         """Get some tracks for track queue mode
