@@ -5,7 +5,7 @@ import sys
 from logging import getLogger
 
 from ..mpdclient import MPD
-from ..mpdclient import MPDError, PlayerError
+from ..mpdclient import PlayerError
 
 from ..plugins.internal.tags import forge_filter, control_config
 
@@ -22,7 +22,7 @@ def tags_config_test(cli, config):
     try:
         # Use window to limit reponse size
         res = cli.find(filt, 'window', (0, 300))
-    except MPDError as err:
+    except PlayerError as err:
         cli.disconnect()
         print('filter error: %s' % err, file=sys.stderr)
         sys.exit(1)

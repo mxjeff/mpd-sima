@@ -21,7 +21,7 @@ import atexit
 import sys
 
 # local import
-from ..mpdclient import MPD, MPDError, Artist, Album
+from ..mpdclient import MPD, PlayerError, Artist, Album
 from ..lib.simadb import SimaDB
 
 
@@ -37,7 +37,7 @@ class BLCli(MPD):
             return
         try:
             getattr(self, cmd.replace('-', '_'))()
-        except MPDError as err:
+        except PlayerError as err:
             self.log.error(err)
             sys.exit(1)
 

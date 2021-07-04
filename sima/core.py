@@ -26,7 +26,7 @@ from collections import deque
 from logging import getLogger
 
 from .mpdclient import MPD as PlayerClient
-from .mpdclient import PlayerError, MPDError
+from .mpdclient import PlayerError
 from .lib.simadb import SimaDB
 from .lib.daemon import Daemon
 from .utils.utils import SigHup
@@ -125,7 +125,7 @@ class Sima(Daemon):
             except PlayerError as err:
                 self.log.debug(err)
                 continue
-            except MPDError as err:
+            except PlayerError as err:
                 #TODO: unhandled Player exceptions
                 self.log.warning('Unhandled player exception: %s', err)
             self.log.info('Got reconnected')
@@ -160,13 +160,13 @@ class Sima(Daemon):
             self.log.info('Connecting MPD: %(host)s:%(port)s', self.config['MPD'])
             self.player.connect()
             self.foreach_plugin('start')
-        except (PlayerError, MPDError) as err:
+        except PlayerError as err:
             self.log.warning('Player: %s', err)
             self.reconnect_player()
         while 42:
             try:
                 self.loop()
-            except (PlayerError, MPDError) as err:
+            except PlayerError as err:
                 self.log.warning('Player error: %s', err)
                 self.reconnect_player()
                 del self.changed

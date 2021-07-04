@@ -22,7 +22,7 @@ from functools import wraps
 from logging import getLogger
 
 # external module
-from musicpd import MPDClient, MPDError
+from musicpd import MPDClient, MPDError as PlayerError
 
 
 # local import
@@ -30,10 +30,6 @@ from .lib.meta import Meta, Artist, Album
 from .lib.track import Track
 from .lib.simastr import SimaStr
 from .utils.leven import levenshtein_ratio
-
-
-class PlayerError(MPDError):
-    """Fatal error in the player."""
 
 
 # Some decorators
@@ -139,20 +135,20 @@ class MPD(MPDClient):
         try:
             super().connect(host, port)
         # Catch socket errors
-        except IOError as err:
+        except OSError as err:
             raise PlayerError('Could not connect to "%s:%s": %s' %
                               (host, port, err.strerror))
         # Catch all other possible errors
         # ConnectionError and ProtocolError are always fatal.  Others may not
         # be, but we don't know how to handle them here, so treat them as if
         # they are instead of ignoring them.
-        except MPDError as err:
+        except PlayerError as err:
             raise PlayerError('Could not connect to "%s:%s": %s' %
                               (host, port, err))
         if password:
             try:
                 self.password(password)
-            except (MPDError, IOError) as err:
+            except (PlayerError, OSError) as err:
                 raise PlayerError("Could not connect to '%s': %s" % (host, err))
         # Controls we have sufficient rights
         available_cmd = self.commands()
@@ -232,7 +228,7 @@ class MPD(MPDClient):
         curr = self.current
         try:
             ret = self.idle('database', 'playlist', 'player', 'options')
-        except (MPDError, IOError) as err:
+        except (PlayerError, OSError) as err:
             raise PlayerError("Couldn't init idle: %s" % err)
         if self._skipped_track(curr):
             ret.append('skipped')
