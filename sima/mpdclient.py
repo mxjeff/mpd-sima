@@ -115,9 +115,12 @@ class MPD(MPDClient):
     def __getattr__(self, cmd):
         """Wrapper around MPDClient calls for abstract overriding"""
         track_wrapped = {'currentsong', 'find', 'playlistinfo', }
-        if cmd in track_wrapped:
-            return tracks_wrapper(super().__getattr__(cmd))
-        return super().__getattr__(cmd)
+        try:
+            if cmd in track_wrapped:
+                return tracks_wrapper(super().__getattr__(cmd))
+            return super().__getattr__(cmd)
+        except OSError as err:
+            raise PlayerError(err)
 
     def disconnect(self):
         """Overriding explicitly MPDClient.disconnect()"""
@@ -226,10 +229,7 @@ class MPD(MPDClient):
             * skipped   current track skipped
         """
         curr = self.current
-        try:
-            ret = self.idle('database', 'playlist', 'player', 'options')
-        except (PlayerError, OSError) as err:
-            raise PlayerError("Couldn't init idle: %s" % err)
+        ret = self.idle('database', 'playlist', 'player', 'options')
         if self._skipped_track(curr):
             ret.append('skipped')
         if 'database' in ret:
