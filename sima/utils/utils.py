@@ -34,6 +34,9 @@ from os import getenv, access, getcwd, W_OK, R_OK
 from os.path import dirname, isabs, join, normpath, exists, isdir, isfile
 from time import sleep
 
+from musicpd import VERSION as mversion
+from sima.info import __version__ as sversion
+
 
 def getws(dic):
     """
@@ -44,6 +47,7 @@ def getws(dic):
     aka = push(bytes(dic.get('apikey') + '=', 'utf-8'))
     aka = getencoder('rot-13')(str((aka), 'utf-8'))[0]
     dic.update({'apikey': aka})
+
 
 def parse_mpd_host(value):
     passwd = host = None
@@ -87,6 +91,8 @@ def exception_log():
     log = logging.getLogger(__name__)
     log.error('Unhandled Exception!!!')
     log.error(''.join(traceback.format_exc()))
+    log.info('musicpd python module version: %s', mversion)
+    log.info('MPD_sima version: %s', sversion)
     log.info('Please report the previous message'
              ' along with some log entries right before the crash.')
     log.info('thanks for your help :)')
