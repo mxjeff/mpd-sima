@@ -22,7 +22,7 @@ stages:
 smoketest:
   stage: test
   script:
-  - pip install requests
+  - pip install requests musicpd
   - python setup.py test
   # build wheel and source
   - python setup.py bdist_wheel sdist
