@@ -232,7 +232,7 @@ class CacheController(object):
                     self.cache.set(cache_url, resp)
             # Force one month max age if no Cache-Control header is found
             # Overriding header disappearance on LastFM web service...
-            # https://getsatisfaction.com/lastfm/topics/-web-api-http-cache-control-header
+            # https://gitlab.com/kaliko/sima/-/issues/7
             elif CacheController.CACHE_ANYWAY:
                 resp.headers['Cache-Control'] = 'max-age=2419200'
                 self.cache.set(cache_url, resp)
