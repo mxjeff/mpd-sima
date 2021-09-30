@@ -145,10 +145,12 @@ class Sima(Daemon):
         """
         self.log.warning('Starting shutdown.')
         # Cleaning pending command
-        self.player.clean()
-        self.foreach_plugin('shutdown')
-        self.player.disconnect()
-
+        try:
+            self.player.clean()
+            self.foreach_plugin('shutdown')
+            self.player.disconnect()
+        except PlayerError as err:
+            self.log.error('Player error during shutdown: %s', err)
         self.log.info('The way is shut, it was made by those who are dead. '
                       'And the dead keep it…')
         self.log.info('bye...')

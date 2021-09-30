@@ -20,6 +20,7 @@
 from difflib import get_close_matches
 from functools import wraps
 from logging import getLogger
+from select import select
 
 # external module
 from musicpd import MPDClient, MPDError as PlayerError
@@ -106,6 +107,7 @@ class MPD(MPDClient):
 
     def __init__(self, config):
         super().__init__()
+        self.socket_timeout = 10
         self.use_mbid = True
         self.log = getLogger('sima')
         self.config = config
@@ -229,12 +231,22 @@ class MPD(MPDClient):
             * skipped   current track skipped
         """
         curr = self.current
-        ret = self.idle('database', 'playlist', 'player', 'options')
-        if self._skipped_track(curr):
-            ret.append('skipped')
-        if 'database' in ret:
-            self._reset_cache()
-        return ret
+        select_timeout = 5
+        while True:
+            self.send_idle('database', 'playlist', 'player', 'options')
+            _read, _, _ = select([self], [], [], select_timeout)
+            if _read:  # tries to read response
+                ret = self.fetch_idle()
+                if self._skipped_track(curr):
+                    ret.append('skipped')
+                if 'database' in ret:
+                    self._reset_cache()
+                return ret
+            else:
+                try:  # noidle cmd does not go through __getattr__, need to catch OSError then
+                    self.noidle()
+                except OSError as err:
+                    raise PlayerError(err)
 
     def clean(self):
         """Clean blocking event (idle) and pending commands
