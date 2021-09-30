@@ -22,7 +22,7 @@ stages:
 smoketest:
   stage: test
   script:
-  - pip install requests musicpd
+  - pip install requests python-musicpd
   - python setup.py test
   # build wheel and source
   - python setup.py bdist_wheel sdist
@@ -40,7 +40,7 @@ smoketest:
 unittests:
   stage: test
   script:
-  - pip install pytest-cov requests
+  - pip install pytest-cov requests python-musicpd
   - py.test -q --cov=sima --junitxml=report.xml tests
   artifacts:
     when: always
