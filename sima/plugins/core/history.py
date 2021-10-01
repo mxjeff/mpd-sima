@@ -28,6 +28,7 @@ from time import time
 # local import
 from ...lib.plugin import Plugin
 
+
 class History(Plugin):
     """
     History management

@@ -118,7 +118,7 @@ class Track:
     @property
     def length(self):
         """Get a fancy duration as ``%H:%M:%S`` (use :attr:`duration` to get duration in second only)"""
-        temps = time.gmtime(self.duration)  #TODO: returns a date not a duration
+        temps = time.gmtime(self.duration)  # TODO: returns a date not a duration
         if temps.tm_hour:
             fmt = '%H:%M:%S'
         else:

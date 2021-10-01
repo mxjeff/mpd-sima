@@ -42,13 +42,13 @@ def control_config(tags_config):
     if not tags_config.get('filter', None) and \
             config_tags.isdisjoint(sup_tags):
         log.warning('Found no config for Tags plugin! '
-                  'Need at least "filter" or a supported tag')
+                    'Need at least "filter" or a supported tag')
         log.info('Supported Tags are : %s', ', '.join(sup_tags))
         # raise PluginException('plugin misconfiguration')
         return False
     if config_tags.difference(sup_tags):
         log.error('Found unsupported tag in config: %s',
-                   config_tags.difference(sup_tags))
+                  config_tags.difference(sup_tags))
         # raise PluginException('plugin misconfiguration')
         return False
     return True

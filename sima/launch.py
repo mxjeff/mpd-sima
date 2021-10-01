@@ -148,7 +148,8 @@ def start(sopt, restart=False):
     for cplgn in core_plugins:
         logger.debug('Register core %(name)s (%(doc)s)', cplgn.info())
         sima.register_core_plugin(cplgn)
-    logger.debug('core loaded, prioriy: %s', ' > '.join(map(str, sima.core_plugins)))
+    logger.debug('core loaded, prioriy: %s',
+                 ' > '.join(map(str, sima.core_plugins)))
 
     #  Loading internal plugins
     load_plugins(sima, 'internal')
@@ -187,6 +188,7 @@ def run(sopt, restart=False):
         sys.exit(2)
     except Exception:  # Unhandled exception
         exception_log()
+
 
 # Script starts here
 def main():

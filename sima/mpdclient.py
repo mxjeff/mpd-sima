@@ -50,6 +50,7 @@ def bl_artist(func):
         return result
     return wrapper
 
+
 def set_artist_mbid(func):
     def wrapper(*args, **kwargs):
         cls = args[0]
@@ -62,6 +63,7 @@ def set_artist_mbid(func):
                 return artist
         return result
     return wrapper
+
 
 def tracks_wrapper(func):
     """Convert plain track mapping as returned by MPDClient into :py:obj:`sima.lib.track.Track`

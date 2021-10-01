@@ -59,7 +59,7 @@ class FileLock:
         while True:
             try:
                 self.filedsc = os.open(self.lockfile,
-                                       os.O_CREAT|os.O_EXCL|os.O_RDWR)
+                                       os.O_CREAT | os.O_EXCL | os.O_RDWR)
                 break
             except OSError as err:
                 if err.errno != errno.EEXIST:

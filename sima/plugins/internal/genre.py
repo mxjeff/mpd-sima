@@ -65,8 +65,8 @@ class Genre(AdvancedPlugin):
     def fetch_genres(self):
         """Fetches ,at most, nb-depth genre from history,
         and returns the nbgenres most present"""
-        depth = 10 # nb of genre to fetch from history for analysis
-        nbgenres = 2 # nb of genre to return
+        depth = 10  # nb of genre to fetch from history for analysis
+        nbgenres = 2  # nb of genre to return
         genres = [g[0] for g in self.sdb.fetch_genres_history(limit=depth)]
         if not genres:
             self.log.debug('No genre found in current track history')

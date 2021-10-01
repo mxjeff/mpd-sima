@@ -2,7 +2,6 @@
 # Copyright (C) 2013 Vinay Sajip. New BSD License.
 # Copyright (C) 2014, 2020 kaliko <kaliko@azylum.org>
 #
-from __future__ import print_function
 
 REQ_VER = (3,4)
 import sys

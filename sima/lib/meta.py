@@ -31,6 +31,7 @@ UUID_RE = r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89AB][a-f0-9]{3}-[a-f0-9]{12}$
 # separator. It is used then to split back the string to tags list.
 SEPARATOR = chr(0x1F)  # ASCII Unit Separator
 
+
 def is_uuid4(uuid):
     """Controls MusicBrainz UUID4 format
 
@@ -41,6 +42,7 @@ def is_uuid4(uuid):
     if regexp.match(uuid):
         return True
     return False
+
 
 class MetaException(Exception):
     """Generic Meta Exception"""
@@ -170,7 +172,7 @@ class Meta:
     @property
     def names(self):
         """aliases + name"""
-        return self.__aliases | {self.__name,}
+        return self.__aliases | {self.__name, }
 
     @property
     @serialize

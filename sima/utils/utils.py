@@ -137,7 +137,6 @@ class Wfile(FileAction):
         if isdir(self._file):
             self.parser.error('need a file not a directory: {}'.format(self._file))
         if not exists(self._dir):
-            #raise ArgumentError(self, '"{0}" does not exist'.format(self._dir))
             self.parser.error('directory does not exist: {0}'.format(self._dir))
         if not exists(self._file):
             # Is parent directory writable then

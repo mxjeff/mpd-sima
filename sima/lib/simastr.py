@@ -118,18 +118,15 @@ class SimaStr(str):
         """
         sea = SimaStr.reg_lead.search(self.stripped)
         if sea:
-            #print sea.groupdict()
             self.stripped = sea.group('root0')
 
         sea = SimaStr.reg_midl.search(self.stripped)
         if sea:
-            #print sea.groupdict()
             self.stripped = str().join([sea.group('root0'), ' ',
                                         sea.group('root1')])
 
         sea = SimaStr.reg_trail.search(self.stripped)
         if sea:
-            #print sea.groupdict()
             self.stripped = sea.group('root0')
 
     def remove_diacritics(self):

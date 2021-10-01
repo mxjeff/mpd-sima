@@ -27,6 +27,7 @@
 # local import
 from sima.lib.plugin import Plugin
 
+
 class PlaceHolder(Plugin):
     """
     Placeholder contrib plugin
@@ -36,7 +37,6 @@ class PlaceHolder(Plugin):
         #self.log.info(self.plugin_conf)
         #self.log.debug('%s contrib plugin!!!', self)
         pass
-
 
 
 # VIM MODLINE

@@ -18,6 +18,7 @@
 #
 """Computes levenshtein distance/ratio"""
 
+
 def levenshtein(a_st, b_st):
     """Computes the Levenshtein distance between two strings."""
     n_a, m_b = len(a_st), len(b_st)
@@ -37,6 +38,7 @@ def levenshtein(a_st, b_st):
             current[j] = min(add, delete, change)
 
     return current[n_a]
+
 
 def levenshtein_ratio(string, strong):
     """

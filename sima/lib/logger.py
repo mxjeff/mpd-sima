@@ -34,8 +34,6 @@ ERROR = logging.ERROR
 LOG_FORMATS = {
         DEBUG: '[{process}]{filename: >11}:{lineno: <3} {levelname: <7}: {message}',
         INFO:  '{levelname: <7}: {message}',
-        #logging.DEBUG: '{asctime} {filename}:{lineno}({funcName}) '
-                                 #'{levelname}: {message}',
         }
 DATE_FMT = "%Y-%m-%d %H:%M:%S"
 

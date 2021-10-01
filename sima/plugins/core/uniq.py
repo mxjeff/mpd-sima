@@ -24,7 +24,7 @@
 """
 
 # standard library import
-from os import  getpid
+from os import getpid
 from socket import getfqdn
 
 # third parties components

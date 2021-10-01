@@ -19,7 +19,7 @@
 #
 #
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter, SUPPRESS
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 from .utils import Wfile, Rfile, Wdir
 

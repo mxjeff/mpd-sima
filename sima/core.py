@@ -37,7 +37,7 @@ class Sima(Daemon):
     """
 
     def __init__(self, conf):
-        ## Set daemon
+        # Set daemon
         Daemon.__init__(self, conf.get('daemon', 'pidfile'))
         self.enabled = True
         self.config = conf
@@ -80,7 +80,8 @@ class Sima(Daemon):
 
     @property
     def plugins(self):
-        return [plugin[1] for plugin in sorted(self._plugins, key=lambda pl: pl[0], reverse=True)]
+        return [plugin[1] for plugin in
+                sorted(self._plugins, key=lambda pl: pl[0], reverse=True)]
 
     def need_tracks(self):
         """Is the player in need for tracks"""
@@ -126,7 +127,7 @@ class Sima(Daemon):
                 self.log.debug(err)
                 continue
             except PlayerError as err:
-                #TODO: unhandled Player exceptions
+                # TODO: unhandled Player exceptions
                 self.log.warning('Unhandled player exception: %s', err)
             self.log.info('Got reconnected')
             break
@@ -177,7 +178,7 @@ class Sima(Daemon):
         """Dispatching callbacks to plugins
         """
         # hanging here until a monitored event is raised in the player
-        if getattr(self, 'changed', False): # first iteration exception
+        if getattr(self, 'changed', False):  # first iteration exception
             self.changed = self.player.monitor()
         else:  # first iteration goes through else
             self.changed = ['playlist', 'player', 'skipped']
