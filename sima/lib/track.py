@@ -54,7 +54,7 @@ class Track:
                                  'musicbrainz_artistid',
                                  'musicbrainz_albumartistid']
         # Which tags have been collapsed?
-        self.collapsed_tags = list()
+        self.collapsed_tags = []
         # Needed for multiple tags which returns a list instead of a string
         self._collapse_tags()
 

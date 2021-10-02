@@ -58,12 +58,12 @@ def load_plugins(sima, source):
     # TODO: Sanity check for "sima.config.get('sima', source)" ?
     for plugin in sima.config.get('sima', source).split(','):
         plugin = plugin.strip(' \n')
-        module = 'sima.plugins.{0}.{1}'.format(source, plugin.lower())
+        module = f'sima.plugins.{source}.{plugin.lower()}'
         try:
             mod_obj = sima_import(module, fromlist=[plugin])
         except ImportError as err:
-            logger.error('Failed to load "{}" plugin\'s module: '.format(plugin) +
-                         '{0} ({1})'.format(module, err))
+            logger.error(f'Failed to load "{plugin}" plugin\'s module: ' +
+                         f'{module} ({err})')
             sima.shutdown()
             sys.exit(1)
         try:

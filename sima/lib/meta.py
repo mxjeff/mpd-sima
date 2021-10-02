@@ -147,7 +147,7 @@ class Meta:
             if callable(other.__str__) and other.__str__() != self.name:
                 self.__aliases |= {other.__str__()}
         else:
-            raise MetaException('No __str__ method found in {!r}'.format(other))
+            raise MetaException(f'No __str__ method found in {other!r}')
 
     @property
     def name(self):

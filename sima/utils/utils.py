@@ -131,16 +131,16 @@ class Wfile(FileAction):
     """
     def checks(self):
         if isdir(self._file):
-            self.parser.error('need a file not a directory: {}'.format(self._file))
+            self.parser.error(f'need a file not a directory: {self._file}')
         if not exists(self._dir):
-            self.parser.error('directory does not exist: {0}'.format(self._dir))
+            self.parser.error(f'directory does not exist: {self._dir}')
         if not exists(self._file):
             # Is parent directory writable then
             if not access(self._dir, W_OK):
-                self.parser.error('no write access to "{0}"'.format(self._dir))
+                self.parser.error(f'no write access to "{self._dir}"')
         else:
             if not access(self._file, W_OK):
-                self.parser.error('no write access to "{0}"'.format(self._file))
+                self.parser.error(f'no write access to "{self._file}"')
 
 
 class Rfile(FileAction):
@@ -149,11 +149,11 @@ class Rfile(FileAction):
     """
     def checks(self):
         if not exists(self._file):
-            self.parser.error('file does not exist: {0}'.format(self._file))
+            self.parser.error(f'file does not exist: {self._file}')
         if not isfile(self._file):
-            self.parser.error('not a file: {0}'.format(self._file))
+            self.parser.error(f'not a file: {self._file}')
         if not access(self._file, R_OK):
-            self.parser.error('no read access to "{0}"'.format(self._file))
+            self.parser.error(f'no read access to "{self._file}"')
 
 
 class Wdir(FileAction):
@@ -162,11 +162,11 @@ class Wdir(FileAction):
     """
     def checks(self):
         if not exists(self._file):
-            self.parser.error('directory does not exist: {0}'.format(self._file))
+            self.parser.error(f'directory does not exist: {self._file}')
         if not isdir(self._file):
-            self.parser.error('not a directory: {0}'.format(self._file))
+            self.parser.error(f'not a directory: {self._file}')
         if not access(self._file, W_OK):
-            self.parser.error('no write access to "{0}"'.format(self._file))
+            self.parser.error(f'no write access to "{self._file}"')
 
 
 class Throttle:

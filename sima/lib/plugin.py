@@ -41,7 +41,7 @@ class Plugin:
     def info(cls):
         """self documenting class method
         """
-        doc = 'Undocumented plugin! Fill "{}" docstring'.format(cls.__name__)
+        doc = f'Undocumented plugin! Fill "{cls.__name__}" docstring'
         if cls.__doc__:
             doc = cls.__doc__.strip(' \n').splitlines()[0]
         return {'name': cls.__name__,
@@ -166,7 +166,7 @@ class AdvancedPlugin(Plugin):
         :param Artist artist: Artist to fetch an album for
         :param bool unplayed: Fetch only unplayed album
         """
-        self.log.info('Searching an album for "%s"...' % artist)
+        self.log.info('Searching an album for "%s"...', artist)
         albums = self.player.search_albums(artist)
         if not albums:
             return None
@@ -176,7 +176,7 @@ class AdvancedPlugin(Plugin):
         albums_not_in_hist = [a for a in albums if a.name not in albums_hist]
         # Get to next artist if there are no unplayed albums
         if not albums_not_in_hist:
-            self.log.info('No unplayed album found for "%s"' % artist)
+            self.log.info('No unplayed album found for "%s"', artist)
             if unplayed:
                 return None
         random.shuffle(albums_not_in_hist)

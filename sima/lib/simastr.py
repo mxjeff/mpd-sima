@@ -81,7 +81,7 @@ class SimaStr(str):
     """
     diafilter = True
     leven_ratio = 0.82
-    regexp_dict = dict()
+    regexp_dict = {}
 
     # Leading patterns: The Le Les
     # case-insensitive matching for this RE

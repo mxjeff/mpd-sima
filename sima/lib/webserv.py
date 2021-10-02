@@ -81,8 +81,8 @@ class WebService(AdvancedPlugin):
             self.log.info('%s: Flushing cache!', name)
         else:
             self.log.info('%s: Initialising cache!', name)
-        self._cache = {'asearch': dict(),
-                       'tsearch': dict()}
+        self._cache = {'asearch': {},
+                       'tsearch': {}}
 
     def _cleanup_cache(self):
         """Avoid bloated cache
@@ -101,7 +101,7 @@ class WebService(AdvancedPlugin):
         dynamic = self.plugin_conf.getint('max_art')
         if dynamic <= 0:
             dynamic = 100
-        results = list()
+        results = []
         similarities.reverse()
         while (len(results) < dynamic and similarities):
             art_pop = similarities.pop()
@@ -156,8 +156,8 @@ class WebService(AdvancedPlugin):
             history = self.player.queue + history
         history = deque(history)
         last_trk = history.popleft()  # remove
-        extra_arts = list()
-        ret_extra = list()
+        extra_arts = []
+        ret_extra = []
         depth = 0
         while depth < self.plugin_conf.getint('depth'):
             if not history:
@@ -250,7 +250,7 @@ class WebService(AdvancedPlugin):
     def find_album(self, artists):
         """Find albums to queue.
         """
-        to_add = list()
+        to_add = []
         nb_album_add = 0
         target_album_to_add = self.plugin_conf.getint('album_to_add')
         for artist in artists:
@@ -277,7 +277,7 @@ class WebService(AdvancedPlugin):
         """
         find top tracks for artists in artists list.
         """
-        to_add = list()
+        to_add = []
         nbtracks_target = self.plugin_conf.getint('track_to_add')
         for artist in artists:
             if len(to_add) == nbtracks_target:
@@ -285,7 +285,7 @@ class WebService(AdvancedPlugin):
             self.log.info('Looking for a top track for %s', artist)
             titles = deque()
             try:
-                titles = [t for t in self.ws.get_toptrack(artist)]
+                titles = list(self.ws.get_toptrack(artist))
             except WSError as err:
                 self.log.warning('%s: %s', self.ws.name, err)
                 continue
@@ -353,7 +353,7 @@ class WebService(AdvancedPlugin):
             self.log.debug(repr(self.player.current))
             return None
         candidates = self.queue_mode()
-        msg = ' '.join(['{0}: {1:>3d}'.format(k, v) for
+        msg = ' '.join([f'{k}: {v:>3d}' for
                         k, v in sorted(self.ws.stats.items())])
         self.log.debug('http stats: ' + msg)
         if not candidates:

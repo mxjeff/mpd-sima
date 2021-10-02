@@ -143,7 +143,7 @@ class Tags(AdvancedPlugin):
             if not trk:
                 continue
             if queue_mode == 'track':
-                self.log.info('Tags plugin chose: {}'.format(trk))
+                self.log.info('Tags plugin chose: %s', trk)
                 candidates.append(trk)
                 if len(candidates) == target:
                     break

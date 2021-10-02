@@ -106,7 +106,7 @@ class Genre(AdvancedPlugin):
             if not trk:
                 continue
             if queue_mode == 'track':
-                self.log.info('Genre plugin chose: {}'.format(trk))
+                self.log.info('Genre plugin chose: %s', trk)
                 candidates.append(trk)
                 if len(candidates) == target:
                     break

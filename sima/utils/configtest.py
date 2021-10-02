@@ -24,7 +24,7 @@ def tags_config_test(cli, config):
         res = cli.find(filt, 'window', (0, 300))
     except PlayerError as err:
         cli.disconnect()
-        print('filter error: %s' % err, file=sys.stderr)
+        print(f'filter error: {err}', file=sys.stderr)
         sys.exit(1)
     artists = list({trk.albumartist for trk in res if trk.albumartist})
     if not artists:

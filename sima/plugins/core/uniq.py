@@ -70,7 +70,7 @@ class Uniq(Plugin):
             self.log.warning(' '.join(channels))
 
     def sub_chan(self):
-        self.chan = 'mpd_sima:{0}.{1}'.format(getfqdn(), getpid())
+        self.chan = f'mpd_sima:{getfqdn()}.{getpid()}'
         self.log.debug('Registering as %s', self.chan)
         try:
             self.player.subscribe(self.chan)

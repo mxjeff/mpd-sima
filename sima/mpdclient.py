@@ -148,28 +148,25 @@ class MPD(MPDClient):
             super().connect(host, port)
         # Catch socket errors
         except OSError as err:
-            raise PlayerError('Could not connect to "%s:%s": %s' %
-                              (host, port, err.strerror)) from err
+            raise PlayerError(f'Could not connect to "{host}:{port}": {err.strerror}'
+                             ) from err
         # Catch all other possible errors
         # ConnectionError and ProtocolError are always fatal.  Others may not
         # be, but we don't know how to handle them here, so treat them as if
         # they are instead of ignoring them.
         except MPDError as err:
-            raise PlayerError('Could not connect to "%s:%s": %s' %
-                              (host, port, err)) from err
+            raise PlayerError(f'Could not connect to "{host}:{port}": {err}') from err
         if password:
             try:
                 self.password(password)
             except (MPDError, OSError) as err:
-                raise PlayerError("Could not connect to '%s': %s" % (host, err)) from err
+                raise PlayerError(f"Could not connect to '{host}': {err}") from err
         # Controls we have sufficient rights
         available_cmd = self.commands()
         for cmd in MPD.needed_cmds:
             if cmd not in available_cmd:
                 self.disconnect()
-                raise PlayerError('Could connect to "%s", '
-                                  'but command "%s" not available' %
-                                  (host, cmd))
+                raise PlayerError(f'Could connect to "{host}", but command "{cmd}" not available')
         self.tagtypes('clear')
         for tag in MPD.needed_tags:
             self.tagtypes('enable', tag)
@@ -294,7 +291,7 @@ class MPD(MPDClient):
         plm = {'repeat': None, 'single': None,
                'random': None, 'consume': None, }
         for key, val in self.status().items():
-            if key in plm.keys():
+            if key in plm:
                 plm.update({key: bool(int(val))})
         return plm
 

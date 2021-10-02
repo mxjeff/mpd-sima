@@ -78,7 +78,7 @@ def set_logger(level='info', logfile=None):
         if filehdl:
             logger.handlers = []
         # Add timestamp for file handler
-        log_format = '{0} {1}'.format('{asctime}', log_format)
+        log_format = f'{{asctime}} {log_format}'
         formatter = logging.Formatter(log_format, DATE_FMT, '{')
         # create file handler
         fileh = logging.FileHandler(logfile)

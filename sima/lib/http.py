@@ -58,7 +58,7 @@ class CacheController:
         """Normalize the URL to create a safe key for the cache"""
         (scheme, authority, path, query, _) = parse_uri(uri)
         if not scheme or not authority:
-            raise Exception("Only absolute URIs are allowed. uri = %s" % uri)
+            raise Exception(f'Only absolute URIs are allowed. uri = {uri}')
         authority = authority.lower()
         scheme = scheme.lower()
         if not path:
@@ -294,8 +294,7 @@ class HttpClient:
         try:
             return self.fetch_ws(req)
         except Timeout as err:
-            raise WSTimeout('Failed to reach server within {0}s'.format(
-                SOCKET_TIMEOUT)) from err
+            raise WSTimeout(f'Failed to reach server within {SOCKET_TIMEOUT}s') from err
         except HTTPConnectionError as err:
             raise WSError(err) from err
 
@@ -308,7 +307,7 @@ class HttpClient:
             self.stats.update(etag=self.stats.get('etag')+1)
             resp = self.controller.update_cached_response(prepreq, resp)
         elif resp.status_code != 200:
-            raise WSHTTPError('{0.status_code}: {0.reason}'.format(resp))
+            raise WSHTTPError(f'{resp.status_code}: {resp.reason}')
         self.controller.cache_response(resp.request, resp)
         return resp
 

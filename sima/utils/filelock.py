@@ -47,7 +47,7 @@ class FileLock:
         self.filedsc = None
         self.is_locked = False
         dirname = os.path.dirname(file_name)
-        self.lockfile = os.path.join(dirname, '{0}.lock'.format(file_name))
+        self.lockfile = os.path.join(dirname, 'f{file_name}.lock')
         self.file_name = file_name
         self.timeout = timeout
         self.delay = delay

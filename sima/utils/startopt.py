@@ -124,7 +124,7 @@ class StartOpt:
     def __init__(self, script_info,):
         self.parser = None
         self.info = dict(script_info)
-        self.options = dict()
+        self.options = {}
         self.main()
 
     def declare_opts(self):
@@ -143,14 +143,14 @@ class StartOpt:
             opt_names = opt.pop('sw')
             self.parser.add_argument(*opt_names, **opt)
         # Add sub commands
-        sp = self.parser.add_subparsers(
+        spa = self.parser.add_subparsers(
                 title=f'{self.info["prog"]} commands as positional arguments',
                 description=f"""Use them after optionnal arguments.\n"{self.info["prog"]} command -h" for more info.""",
                 metavar='', dest='command')
         for cmd in CMDS:
             helpmsg = cmd.pop('help')
             cmd, args = cmd.popitem()
-            _ = sp.add_parser(cmd, description=helpmsg, help=helpmsg)
+            _ = spa.add_parser(cmd, description=helpmsg, help=helpmsg)
             for arg in args:
                 name = arg.pop('name', None)
                 if name:

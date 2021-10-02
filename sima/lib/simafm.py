@@ -61,7 +61,7 @@ class SimaFM:
             code = ans.get('error')
             mess = ans.get('message')
             if code == 6:
-                raise WSNotFound('{0}: "{1}"'.format(mess, self.artist))
+                raise WSNotFound(f'{mess}: "{self.artist}"')
             raise WSError(mess)
         return True
 
@@ -76,10 +76,10 @@ class SimaFM:
         payload = payloads.get(method)
         payload.update(api_key=LFM.get('apikey'), format='json')
         if not isinstance(artist, Artist):
-            raise TypeError('"{0!r}" not an Artist object'.format(artist))
+            raise TypeError(f'"{artist!r}" not an Artist object')
         self.artist = artist
         if artist.mbid:
-            payload.update(mbid='{0}'.format(artist.mbid))
+            payload.update(mbid=f'{artist.mbid}')
         else:
             payload.update(artist=artist.name,
                            autocorrect=1)

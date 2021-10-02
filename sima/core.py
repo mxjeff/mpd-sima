@@ -44,8 +44,8 @@ class Sima(Daemon):
         self.sdb = SimaDB(db_path=conf.get('sima', 'db_file'))
         PlayerClient.database = self.sdb
         self.log = getLogger('sima')
-        self._plugins = list()
-        self._core_plugins = list()
+        self._plugins = []
+        self._core_plugins = []
         self.player = PlayerClient(conf)  # MPD client
         self.short_history = deque(maxlen=60)
         self.changed = None
@@ -102,7 +102,7 @@ class Sima(Daemon):
         return False
 
     def queue(self):
-        to_add = list()
+        to_add = []
         for plugin in self.plugins:
             self.log.debug('callback_need_track: %s', plugin)
             pl_candidates = getattr(plugin, 'callback_need_track')()

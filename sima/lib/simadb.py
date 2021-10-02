@@ -373,7 +373,7 @@ class SimaDB:
         :param sima.lib.track.Track track: track to use
         :param bool add: add non existing track to database"""
         if not track.file:
-            raise SimaDBError('Got a track with no file attribute: %r' % track)
+            raise SimaDBError(f'Got a track with no file attribute: {track}')
         if with_connection:
             connection = with_connection
         else:
@@ -489,7 +489,7 @@ class SimaDB:
                 LEFT OUTER JOIN albumartists ON tracks.albumartist = albumartists.id
                 WHERE history.last_play > ? AND albums.name NOT NULL AND artists.name NOT NULL
                 ORDER BY history.last_play DESC""", (date.isoformat(' '),))
-        hist = list()
+        hist = []
         for row in rows:
             vals = dict(row)
             if needle:  # Here use artist instead of albumartist
@@ -530,7 +530,7 @@ class SimaDB:
                 WHERE history.last_play > ? AND artists.name NOT NULL
                 ORDER BY history.last_play DESC""", (date.isoformat(' '),))
         last = deque(maxlen=1)
-        hist = list()
+        hist = []
         for row in rows:
             artist = Artist(**row)
             if last and last[0] == artist:  # remove consecutive dupes
@@ -567,7 +567,7 @@ class SimaDB:
                 WHERE history.last_play > ? AND genres.name NOT NULL
                 ORDER BY history.last_play DESC
                 """, (date.isoformat(' '),))
-        genres = list()
+        genres = []
         for row in rows:
             genres.append(row)
             if len({g[0] for g in genres}) >= limit:
@@ -612,7 +612,7 @@ class SimaDB:
         else:
             rows = connection.execute(sql+'ORDER BY history.last_play DESC',
                                       (date.isoformat(' '),))
-        hist = list()
+        hist = []
         for row in rows:
             hist.append(Track(**row))
         connection.close()
