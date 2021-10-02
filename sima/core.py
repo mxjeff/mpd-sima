@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009-2015, 2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2015, 2020, 2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -48,6 +48,7 @@ class Sima(Daemon):
         self._core_plugins = list()
         self.player = PlayerClient(conf)  # MPD client
         self.short_history = deque(maxlen=60)
+        self.changed = None
 
     def add_history(self):
         """Handle local, in memory, short history"""
@@ -116,6 +117,8 @@ class Sima(Daemon):
         cycle : 5s 10s 1m 5m 20m 1h
         """
         sleepfor = [5, 10, 60, 300, 1200, 3600]
+        # reset change
+        self.changed = None
         while True:
             tmp = sleepfor.pop(0)
             sleepfor.append(tmp)
@@ -172,17 +175,16 @@ class Sima(Daemon):
             except PlayerError as err:
                 self.log.warning('Player error: %s', err)
                 self.reconnect_player()
-                del self.changed
 
     def loop(self):
         """Dispatching callbacks to plugins
         """
         # hanging here until a monitored event is raised in the player
-        if getattr(self, 'changed', False):  # first iteration exception
-            self.changed = self.player.monitor()
-        else:  # first iteration goes through else
+        if self.changed is None:  # first iteration goes through else
             self.changed = ['playlist', 'player', 'skipped']
-        self.log.debug('changed: %s', ', '.join(self.changed))
+        else:  # Wait for a change
+            self.changed = self.player.monitor()
+            self.log.debug('changed: %s', ', '.join(self.changed))
         if 'playlist' in self.changed:
             self.foreach_plugin('callback_playlist')
         if 'player' in self.changed or 'options' in self.changed:
