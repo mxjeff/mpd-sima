@@ -117,9 +117,9 @@ class Tags(AdvancedPlugin):
             if self.plugin_conf['filter']:
                 # Use window to limit response size
                 self.player.find(self.plugin_conf['filter'], "window", (0, 1))
-        except CommandError:
+        except CommandError as err:
             raise PluginException('Badly formated filter in tags plugin configuration: "%s"'
-                                  % self.plugin_conf['filter'])
+                                  % self.plugin_conf['filter']) from err
 
     def callback_need_track(self):
         candidates = []

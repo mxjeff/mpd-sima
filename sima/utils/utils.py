@@ -100,10 +100,6 @@ def exception_log():
     sys.exit(1)
 
 
-class SigHup(Exception):
-    """SIGHUP raises this Exception"""
-
-
 # ArgParse Callbacks
 class Obsolete(Action):
     # pylint: disable=R0903
@@ -191,6 +187,10 @@ class Throttle:
 
 class MPDSimaException(Exception):
     """Generic MPD_sima Exception"""
+
+
+class SigHup(MPDSimaException):
+    """SIGHUP raises this Exception"""
 
 
 # http client exceptions (for webservices)

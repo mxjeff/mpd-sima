@@ -26,6 +26,9 @@ from collections.abc import Set
 import logging
 import re
 
+from ..utils.utils import MPDSimaException
+
+
 UUID_RE = r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[89AB][a-f0-9]{3}-[a-f0-9]{12}$'
 #: The Track Object is collapsing multiple tags into a single string using this
 # separator. It is used then to split back the string to tags list.
@@ -44,7 +47,7 @@ def is_uuid4(uuid):
     return False
 
 
-class MetaException(Exception):
+class MetaException(MPDSimaException):
     """Generic Meta Exception"""
 
 

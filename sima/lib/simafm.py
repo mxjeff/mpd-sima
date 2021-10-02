@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009-2014 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2014, 2021 kaliko <kaliko@azylum.org>
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -101,9 +101,9 @@ class SimaFM:
         ans = self.http(self.root_url, payload)
         try:
             ans.json()
-        except ValueError:
+        except ValueError as err:
             # Corrupted/malformed cache? cf. gitlab issue #35
-            raise WSError('Malformed json, try purging the cache: %s')
+            raise WSError('Malformed json, try purging the cache: %s') from err
         self._controls_answer(ans.json())  # pylint: disable=no-member
         # Artist might be found but return no 'artist' list…
         # cf. "Mulatu Astatqe" vs. "Mulatu Astatqé" with autocorrect=0

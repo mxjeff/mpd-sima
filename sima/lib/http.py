@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014-2015, 2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2014-2015, 2020, 2021 kaliko <kaliko@azylum.org>
 # Copyright (c) 2012, 2013 Eric Larson <eric@ionrock.org>
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import time
 
 import email.utils
 
-from requests import Session, Request, Timeout, ConnectionError
+from requests import Session, Request, Timeout, ConnectionError as HTTPConnectionError
 
 from sima import SOCKET_TIMEOUT, WAIT_BETWEEN_REQUESTS
 from sima.utils.utils import WSError, WSTimeout, WSHTTPError, Throttle
@@ -293,11 +293,11 @@ class HttpClient:
             return cached_response
         try:
             return self.fetch_ws(req)
-        except Timeout:
+        except Timeout as err:
             raise WSTimeout('Failed to reach server within {0}s'.format(
-                SOCKET_TIMEOUT))
-        except ConnectionError as err:
-            raise WSError(err)
+                SOCKET_TIMEOUT)) from err
+        except HTTPConnectionError as err:
+            raise WSError(err) from err
 
     @Throttle(WAIT_BETWEEN_REQUESTS)
     def fetch_ws(self, prepreq):

@@ -23,7 +23,7 @@ from logging import getLogger
 from select import select
 
 # external module
-from musicpd import MPDClient, MPDError as PlayerError
+from musicpd import MPDClient, MPDError
 
 
 # local import
@@ -31,6 +31,11 @@ from .lib.meta import Meta, Artist, Album
 from .lib.track import Track
 from .lib.simastr import SimaStr
 from .utils.leven import levenshtein_ratio
+from .utils.utils import MPDSimaException
+
+
+class PlayerError(MPDSimaException):
+    """Fatal error in the player."""
 
 
 # Some decorators
@@ -124,7 +129,7 @@ class MPD(MPDClient):
                 return tracks_wrapper(super().__getattr__(cmd))
             return super().__getattr__(cmd)
         except OSError as err:
-            raise PlayerError(err)
+            raise PlayerError(err) from err
 
     def disconnect(self):
         """Overriding explicitly MPDClient.disconnect()"""
@@ -144,19 +149,19 @@ class MPD(MPDClient):
         # Catch socket errors
         except OSError as err:
             raise PlayerError('Could not connect to "%s:%s": %s' %
-                              (host, port, err.strerror))
+                              (host, port, err.strerror)) from err
         # Catch all other possible errors
         # ConnectionError and ProtocolError are always fatal.  Others may not
         # be, but we don't know how to handle them here, so treat them as if
         # they are instead of ignoring them.
-        except PlayerError as err:
+        except MPDError as err:
             raise PlayerError('Could not connect to "%s:%s": %s' %
-                              (host, port, err))
+                              (host, port, err)) from err
         if password:
             try:
                 self.password(password)
-            except (PlayerError, OSError) as err:
-                raise PlayerError("Could not connect to '%s': %s" % (host, err))
+            except (MPDError, OSError) as err:
+                raise PlayerError("Could not connect to '%s': %s" % (host, err)) from err
         # Controls we have sufficient rights
         available_cmd = self.commands()
         for cmd in MPD.needed_cmds:
@@ -244,11 +249,11 @@ class MPD(MPDClient):
                 if 'database' in ret:
                     self._reset_cache()
                 return ret
-            else:
-                try:  # noidle cmd does not go through __getattr__, need to catch OSError then
-                    self.noidle()
-                except OSError as err:
-                    raise PlayerError(err)
+            #  Nothing to read, canceling idle
+            try:  # noidle cmd does not go through __getattr__, need to catch OSError then
+                self.noidle()
+            except OSError as err:
+                raise PlayerError(err) from err
 
     def clean(self):
         """Clean blocking event (idle) and pending commands

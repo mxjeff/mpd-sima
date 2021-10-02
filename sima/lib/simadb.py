@@ -33,9 +33,10 @@ from datetime import timezone
 
 from sima.lib.meta import Artist, Album
 from sima.lib.track import Track
+from sima.utils.utils import MPDSimaException
 
 
-class SimaDBError(Exception):
+class SimaDBError(MPDSimaException):
     """
     Exceptions.
     """

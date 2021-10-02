@@ -129,9 +129,6 @@ class Sima(Daemon):
             except PlayerError as err:
                 self.log.debug(err)
                 continue
-            except PlayerError as err:
-                # TODO: unhandled Player exceptions
-                self.log.warning('Unhandled player exception: %s', err)
             self.log.info('Got reconnected')
             break
         self.foreach_plugin('start')
