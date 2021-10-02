@@ -39,7 +39,7 @@ class Track:
     """
 
     def __init__(self, file=None, duration=0, pos=-1, **kwargs):
-        self.title = self.artist = self.album = self.albumartist = ''
+        self.title = self.artist = self.album = self.albumartist = self.genre = ''
         self.musicbrainz_artistid = self.musicbrainz_albumartistid = None
         self.musicbrainz_albumid = self.musicbrainz_trackid = None
         self.pos = int(pos)
@@ -133,7 +133,7 @@ class Track:
         * when genre tag is multivalued
         * when single tag uses coma or semi-colon separator
         """
-        if 'genre' not in self.__dict__:
+        if not self.genre:
             return []
         genres = self.genre.split(SEPARATOR)
         for sep in [',', ';']:
