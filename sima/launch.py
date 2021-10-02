@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014, 2015, 2020,2021 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015, 2020, 2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -51,7 +51,7 @@ def load_plugins(sima, source):
     """Handles internal/external plugins
         sima:   sima.core.Sima instance
         source: ['internal', 'contrib']
-    """
+    """# pylint: disable=logging-not-lazy,logging-format-interpolation
     if not sima.config.get('sima', source):
         return
     logger = logging.getLogger('sima')
@@ -114,7 +114,7 @@ def start(sopt, restart=False):
         if cmd == "generate-config":
             config.write(sys.stdout, space_around_delimiters=True)
             sys.exit(0)
-        logger.info('Running "%s" and exit' % cmd)
+        logger.info('Running "%s" and exit', cmd)
         if cmd == "config-test":
             logger.info('Config location: "%s"', cfg_mgmt.conf_file)
             from .utils.configtest import config_test

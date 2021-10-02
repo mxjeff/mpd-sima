@@ -45,15 +45,15 @@ class BLCli(MPD):
         blocklist = self.sdb.view_bl()
         for entry in ['artist', 'album', 'title']:
             header = False
-            for bl in blocklist:
-                val = bl.get(entry, '')
-                mbid = bl.get(f'musicbrainz_{entry}', '')
+            for blitem in blocklist:
+                val = blitem.get(entry, '')
+                mbid = blitem.get(f'musicbrainz_{entry}', '')
                 if val or mbid:
                     if not header:
                         header = True
                         self.log.info(f'{entry.capitalize()}'
                                       '(id name musicbranzID):')
-                    self.log.info(f'{bl["id"]} "{val}"\t\t{mbid}')
+                    self.log.info(f'{blitem["id"]} "{val}"\t\t{mbid}')
 
     def bl_add_artist(self):
         artist = self.options.get('artist', None)

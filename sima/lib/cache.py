@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014 kaliko <kaliko@azylum.org>
+# Copyright (c) 2014, 2021 kaliko <kaliko@azylum.org>
 # Copyright (c) 2012, 2013 Eric Larson <eric@ionrock.org>
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -85,6 +85,7 @@ class FileCache:
         name = self._fn(key)
         if os.path.exists(name):
             return load(codecs.open(name, 'rb'))
+        return None
 
     def set(self, key, value):
         name = self._fn(key)

@@ -173,25 +173,25 @@ class MPD(MPDClient):
         self.tagtypes('clear')
         for tag in MPD.needed_tags:
             self.tagtypes('enable', tag)
-        tt = set(map(str.lower, self.tagtypes()))
+        ltt = set(map(str.lower, self.tagtypes()))
         needed_tags = set(map(str.lower, MPD.needed_tags))
-        if len(needed_tags & tt) != len(MPD.needed_tags):
-            self.log.warning('MPD exposes: %s', tt)
+        if len(needed_tags & ltt) != len(MPD.needed_tags):
+            self.log.warning('MPD exposes: %s', ltt)
             self.log.warning('Tags needed: %s', needed_tags)
             raise PlayerError('Missing mandatory metadata!')
         for tag in MPD.needed_mbid_tags:
             self.tagtypes('enable', tag)
         # Controls use of MusicBrainzIdentifier
         if self.config.getboolean('sima', 'musicbrainzid'):
-            tt = set(self.tagtypes())
-            if len(MPD.needed_mbid_tags & tt) != len(MPD.needed_mbid_tags):
+            ltt = set(self.tagtypes())
+            if len(MPD.needed_mbid_tags & ltt) != len(MPD.needed_mbid_tags):
                 self.log.warning('Use of MusicBrainzIdentifier is set but MPD '
                                  'is not providing related metadata')
-                self.log.info(tt)
+                self.log.info(ltt)
                 self.log.warning('Disabling MusicBrainzIdentifier')
                 self.use_mbid = Meta.use_mbid = False
             else:
-                self.log.debug('Available metadata: %s', tt)
+                self.log.debug('Available metadata: %s', ltt)
                 self.use_mbid = Meta.use_mbid = True
         else:
             self.log.warning('Use of MusicBrainzIdentifier disabled!')
@@ -400,6 +400,7 @@ class MPD(MPDClient):
                          artist.name, mbids[0], artist.mbid)
         else:
             return mbids[0]
+        return None
 
     @bl_artist
     @set_artist_mbid
@@ -558,9 +559,9 @@ class MPD(MPDClient):
                 if artist.mbid == album_trks[0].musicbrainz_albumartistid:
                     candidates.append(album)
                     continue
-                else:
-                    self.log.debug('Discarding "%s", "%r" not set as musicbrainz_albumartistid', album, album.Artist)
-                    continue
+                self.log.debug('Discarding "%s", "%r" not set as musicbrainz_albumartistid',
+                               album, album.Artist)
+                continue
             if 'Various Artists' in album_artists:
                 self.log.debug('Discarding %s ("Various Artists" set)', album)
                 continue

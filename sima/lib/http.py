@@ -45,7 +45,7 @@ def parse_uri(uri):
     return (groups[1], groups[3], groups[4], groups[6], groups[8])
 
 
-class CacheController(object):
+class CacheController:
     """An interface to see if request should cached or not.
     """
     CACHE_ANYWAY = False
@@ -66,7 +66,7 @@ class CacheController(object):
 
         # Could do syntax based normalization of the URI before
         # computing the digest. See Section 6.2.2 of Std 66.
-        request_uri = query and "?".join([path, query]) or path
+        request_uri = "?".join([path, query]) if query else path
         scheme = scheme.lower()
         defrag_uri = scheme + "://" + authority + request_uri
 
@@ -101,7 +101,7 @@ class CacheController(object):
         cc = self.parse_cache_control(request.headers)
 
         # non-caching states
-        no_cache = True if 'no-cache' in cc else False
+        no_cache = bool('no-cache' in cc)
         if 'max-age' in cc and cc['max-age'] == 0:
             no_cache = True
         # see if it is in the cache anyways

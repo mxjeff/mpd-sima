@@ -17,7 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with sima.  If not, see <http://www.gnu.org/licenses/>.
 #
-# pylint: disable=bad-continuation
 
 """
 Deal with configuration and data files.
@@ -190,10 +189,8 @@ class ConfMan:  # CONFIG MANAGER CLASS
         self.log.debug('file permission is: %o', mode)
         if mode & S_IRWXO or mode & S_IRWXG:
             self.log.warning('File is readable by "other" and/or' +
-                             ' "group" (actual permission %o octal).' %
-                             mode)
-            self.log.warning('Consider setting permissions' +
-                             ' to 600 octal.')
+                             ' "group" (actual permission %o octal).', mode)
+            self.log.warning('Consider setting permissions to 600 octal.')
 
     def supersedes_config_with_cmd_line_options(self):
         """Updates defaults settings with command line options"""

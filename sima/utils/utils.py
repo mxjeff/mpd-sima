@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, 2011, 2013, 2014, 2015, 2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2010, 2011, 2013, 2014, 2015, 2020, 2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -112,7 +112,7 @@ class Obsolete(Action):
 class FileAction(Action):
     """Generic class to inherit from for ArgParse action on file/dir
     """
-    # pylint: disable=R0903
+    # pylint: disable=R0903,W0201
     def __call__(self, parser, namespace, values, option_string=None):
         self._file = normalize_path(values)
         self._dir = dirname(self._file)
@@ -171,6 +171,7 @@ class Wdir(FileAction):
 
 class Throttle:
     """throttle decorator"""
+    # pylint: disable=R0903
     def __init__(self, wait):
         self.wait = wait
         self.last_called = datetime.now()

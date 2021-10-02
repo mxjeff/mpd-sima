@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009, 2010, 2013, 2014, 2015 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009, 2010, 2013, 2014, 2015, 2021 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -54,7 +54,7 @@ def set_logger(level='info', logfile=None):
         logfile: file to log to
     """
     name = 'sima'
-    if getenv('TRACE', False):
+    if getenv('TRACE', None):
         user_log_level = TRACE_LEVEL_NUM
     else:
         user_log_level = getattr(logging, level.upper())

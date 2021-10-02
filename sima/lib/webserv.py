@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009-2020 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2021 kaliko <kaliko@azylum.org>
 # Copyright (c) 2019 sacha <sachahony@gmail.com>
 #
 #  This file is part of sima
@@ -271,6 +271,7 @@ class WebService(AdvancedPlugin):
             to_add.extend(candidates)
             if nb_album_add == target_album_to_add:
                 return to_add
+        return to_add
 
     def find_top(self, artists):
         """

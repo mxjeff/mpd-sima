@@ -92,7 +92,8 @@ class Sima(Daemon):
         queue_trigger = self.config.getint('sima', 'queue_length')
         if self.player.playmode.get('random'):
             queue = self.player.playlist
-            self.log.debug('Currently %s track(s) in the playlist. (target %s)', len(queue), queue_trigger)
+            self.log.debug('Currently %s track(s) in the playlist. (target %s)',
+                           len(queue), queue_trigger)
         else:
             queue = self.player.queue
             self.log.debug('Currently %s track(s) ahead. (target %s)', len(queue), queue_trigger)
@@ -157,8 +158,6 @@ class Sima(Daemon):
         self.log.info('bye...')
 
     def run(self):
-        """
-        """
         try:
             self.log.info('Connecting MPD: %(host)s:%(port)s', self.config['MPD'])
             self.player.connect()

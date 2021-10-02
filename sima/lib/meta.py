@@ -97,8 +97,7 @@ class Meta:
             raise MetaException('Need a "name" argument (str type)')
         if not isinstance(kwargs.get('name'), str):
             raise MetaException('"name" argument not a string')
-        else:
-            self.__name = kwargs.pop('name').split(SEPARATOR)[0]
+        self.__name = kwargs.pop('name').split(SEPARATOR)[0]
         if 'mbid' in kwargs and kwargs.get('mbid'):
             mbid = kwargs.get('mbid').lower().split(SEPARATOR)[0]
             if is_uuid4(mbid):

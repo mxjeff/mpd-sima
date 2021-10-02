@@ -196,8 +196,8 @@ class SimaDB:
         connection = self.get_database_connection()
         rows = connection.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'")
-        for r in rows.fetchall():
-            connection.execute(f'DROP TABLE IF EXISTS {r[0]}')
+        for row in rows.fetchall():
+            connection.execute(f'DROP TABLE IF EXISTS {row[0]}')
         connection.close()
 
     def _remove_blocklist_id(self, blid, with_connection=None):
@@ -218,10 +218,9 @@ class SimaDB:
             return connection.execute(
                 "SELECT id FROM albums WHERE mbid = ?",
                 (album.mbid,))
-        else:
-            return connection.execute(
-                "SELECT id FROM albums WHERE name = ? AND mbid IS NULL",
-                (album.name,))
+        return connection.execute(
+            "SELECT id FROM albums WHERE name = ? AND mbid IS NULL",
+            (album.name,))
 
     def get_album(self, album, with_connection=None, add=True):
         """get album information from the database.
@@ -261,10 +260,9 @@ class SimaDB:
             return connection.execute(
                 "SELECT id FROM albumartists WHERE mbid = ?",
                 (artist.mbid,))
-        else:
-            return connection.execute(
-                "SELECT id FROM albumartists WHERE name = ? AND mbid IS NULL",
-                (artist.name,))
+        return connection.execute(
+            "SELECT id FROM albumartists WHERE name = ? AND mbid IS NULL",
+            (artist.name,))
 
     def get_albumartist(self, artist, with_connection=None, add=True):
         """get albumartist information from the database.
@@ -303,9 +301,8 @@ class SimaDB:
             return connection.execute(
                 "SELECT id FROM artists WHERE mbid = ?",
                 (artist.mbid,))
-        else:
-            return connection.execute(
-                "SELECT id FROM artists WHERE name = ? AND mbid IS NULL", (artist.name,))
+        return connection.execute(
+            "SELECT id FROM artists WHERE name = ? AND mbid IS NULL", (artist.name,))
 
     def get_artist(self, artist, with_connection=None, add=True):
         """get artist information from the database.
@@ -430,7 +427,7 @@ class SimaDB:
 
     def _add_tracks_genres(self, track, connection):
         if not track.genres:
-            return None
+            return
         rows = connection.execute(
             "SELECT id FROM tracks WHERE file = ?", (track.file,))
         trk_id = rows.fetchone()[0]
@@ -544,7 +541,7 @@ class SimaDB:
                     hist.append(artist)  # No need to go further
                     break
                 continue
-            elif needle and getattr(needle, '__contains__'):
+            if needle and getattr(needle, '__contains__'):
                 if artist in needle:
                     hist.append(artist)  # No need to go further
                 continue
@@ -644,10 +641,10 @@ class SimaDB:
             connection.commit()
         rows = connection.execute(
             "SELECT id FROM blocklist WHERE track = ?", (track_id,))
-        bl = rows.fetchone()[0]
+        blt = rows.fetchone()[0]
         if not with_connection:
             connection.close()
-        return bl
+        return blt
 
     def get_bl_album(self, album, with_connection=None, add=True):
         """Add an album to blocklist
@@ -672,10 +669,10 @@ class SimaDB:
             connection.commit()
         rows = connection.execute(
             "SELECT id FROM blocklist WHERE album = ?", (album_id,))
-        bl = rows.fetchone()[0]
+        blitem = rows.fetchone()[0]
         if not with_connection:
             connection.close()
-        return bl
+        return blitem
 
     def get_bl_artist(self, artist, with_connection=None, add=True):
         """Add an artist to blocklist
@@ -698,10 +695,10 @@ class SimaDB:
             connection.commit()
         rows = connection.execute(
             "SELECT id FROM blocklist WHERE artist = ?", (artist_id,))
-        bl = rows.fetchone()[0]
+        blitem = rows.fetchone()[0]
         if not with_connection:
             connection.close()
-        return bl
+        return blitem
 
     def view_bl(self):
         connection = self.get_database_connection()

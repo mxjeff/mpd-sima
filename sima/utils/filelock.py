@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2009 Evan Fosmark
-# Copyright (c) 2014 kaliko <kaliko@azylum.org>
+# Copyright (c) 2014, 2021 kaliko <kaliko@azylum.org>
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ class FileLock:
             self.acquire()
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, ex_type, ex_value, ex_traceback):
         """end of the with statement
         """
         if self.is_locked:
