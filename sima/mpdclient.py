@@ -128,7 +128,9 @@ class MPD(MPDClient):
             if cmd in track_wrapped:
                 return tracks_wrapper(super().__getattr__(cmd))
             return super().__getattr__(cmd)
-        except OSError as err:
+        except OSError as err:  # socket errors
+            raise PlayerError(err) from err
+        except MPDError as err:  # hight level MPD client errors
             raise PlayerError(err) from err
 
     def disconnect(self):
