@@ -238,21 +238,23 @@ class MPD(MPDClient):
         """
         curr = self.current
         select_timeout = 5
-        while True:
-            self.send_idle('database', 'playlist', 'player', 'options')
-            _read, _, _ = select([self], [], [], select_timeout)
-            if _read:  # tries to read response
-                ret = self.fetch_idle()
-                if self._skipped_track(curr):
-                    ret.append('skipped')
-                if 'database' in ret:
-                    self._reset_cache()
-                return ret
-            #  Nothing to read, canceling idle
-            try:  # noidle cmd does not go through __getattr__, need to catch OSError then
+        try:  # noidle cmd does not go through __getattr__, need to catch OSError then
+            while True:
+                self.send_idle('database', 'playlist', 'player', 'options')
+                _read, _, _ = select([self], [], [], select_timeout)
+                if _read:  # tries to read response
+                    ret = self.fetch_idle()
+                    if self._skipped_track(curr):
+                        ret.append('skipped')
+                    if 'database' in ret:
+                        self._reset_cache()
+                    return ret
+                #  Nothing to read, canceling idle
                 self.noidle()
-            except OSError as err:
-                raise PlayerError(err) from err
+        except OSError as err:
+            raise PlayerError(err) from err
+        except MPDError as err:  # hight level MPD client errors
+            raise PlayerError(err) from err
 
     def clean(self):
         """Clean blocking event (idle) and pending commands
