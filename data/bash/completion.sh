@@ -38,7 +38,12 @@ _sima() {
           config-test \
           create-db \
           generate-config \
-          purge-history"
+          purge-history \
+          bl-view \
+          bl-add-artist \
+          bl-add-album \
+          bl-add-track \
+          bl-delete"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -52,52 +57,16 @@ _sima() {
         -v|--log-level)
             COMPREPLY=( $(compgen -W "debug info warning error" -- ${cur} ))
             ;;
-        -p|--pid|-l|--log)
-            _filedir
-            ;;
-        -c|--config)
+        -p|--pid|-l|--log|-c|--config)
             _filedir
             ;;
         --host|-S)
-            COMPREPLY=( $(compgen -A hostname ${cur}) )
+            _known_hosts_real -a "${cur}"
             ;;
         *)
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             ;;
     esac
 }
-complete -F _sima mpd_sima
-complete -F _sima mpd-sima
-
-_simadb_cli() {
-    local cur prev opts
-    local IFS=$'\n'
-    COMPREPLY=()
-    _get_comp_words_by_ref cur prev
-    opts="--bl_curr_trk --bl_curr_art --bl_curr_al \
-      --bl_art --remove_bl --view_bl --purge_hist \
-        --dbfile -d \
-        --host -S --port -P \
-        --check_names -c \
-        --version -h --help"
-    opts=$(echo $opts | sed 's/ /\n/g')
-
-    if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-        return 0
-    fi
-
-    case "${prev}" in
-        --bl_curr*|--view_bl|--view_all|--purge_hist|--version|--help|-h)
-            return 0
-            ;;
-        -d|--dbfile)
-            _filedir
-            ;;
-        --host|-S)
-            COMPREPLY=( $(compgen -A hostname ${cur}) )
-            ;;
-        *)
-            ;;
-    esac
-}
-complete -F _simadb_cli simadb_cli
+complete -o nosort -F _sima mpd_sima
+complete -o nosort -F _sima mpd-sima
