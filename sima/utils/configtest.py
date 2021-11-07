@@ -44,7 +44,8 @@ def config_test(config):
     except PlayerError as err:
         print(err, file=sys.stderr)
         sys.exit(1)
-    tags_config_test(cli, config)
+    if 'Tags' in config.get('sima', 'internal'):
+        tags_config_test(cli, config)
 
 
 # VIM MODLINE
