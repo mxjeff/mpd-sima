@@ -1,7 +1,7 @@
 Track object Documentation
 ==========================
 
-.. autodata:: SEPARATOR
+.. autodata:: sima.lib.track.SEPARATOR
 
 .. automodule:: sima.lib.track
     :members:
