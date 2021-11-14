@@ -6,3 +6,4 @@
 .. _MusicBrainz: https://musicbrainz.org
 .. _`ID3 tags`: https://en.wikipedia.org/wiki/ID3
 .. _last.fm: https://www.last.fm/
+.. _`MPD filter`: https://mpd.readthedocs.io/en/latest/protocol.html#filter-syntax
