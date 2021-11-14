@@ -289,6 +289,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         </refsect2>
         <refsect2 id="random">
             <title>Random section</title>
+            <para>When no similar tracks are found, falling back to random queuing.</para>
             <para>Random plugin's configuration:</para>
                 <varlistentry> <!-- random -->
                     <term><option>[random]</option></term>
@@ -302,12 +303,10 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                 <varlistentry> <!-- random.flavour -->
                     <term><option>flavour=</option><replaceable>sensible</replaceable></term>
                     <listitem>
-                        <para>When no similar tracks are found, falling back to
-                            random queuing. Different mode, aka random flavour,
+                        <para>Different mode, aka random flavour,
                             are available:
                             <replaceable>pure</replaceable>,
                             <replaceable>sensible</replaceable>,
-                            <replaceable>genre</replaceable>.
                             <itemizedlist mark='bullet'>
                                 <listitem>
                                     <para><replaceable>pure</replaceable>, pure random choice, even among recently played track.
@@ -315,10 +314,6 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
                                 </listitem>
                                 <listitem >
                                     <para><replaceable>sensible</replaceable>, use play history to filter chosen tracks.
-                                    </para>
-                                </listitem>
-                                <listitem>
-                                    <para><replaceable>genre</replaceable>, Not implemented yet.
                                     </para>
                                 </listitem>
                             </itemizedlist>

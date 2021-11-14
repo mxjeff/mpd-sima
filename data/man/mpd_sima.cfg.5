@@ -2,12 +2,12 @@
 .\"     Title: mpd_sima.cfg
 .\"    Author: kaliko <kaliko@azylum.org>
 .\" Generator: DocBook XSL Stylesheets v1.79.2 <http://docbook.sf.net/>
-.\"      Date: 04/22/2021
-.\"    Manual: mpd-sima 0.17.0 User Manual
+.\"      Date: 11/14/2021
+.\"    Manual: mpd-sima 0.18.0.dev0 User Manual
 .\"    Source: mpd-sima
 .\"  Language: English
 .\"
-.TH "MPD_SIMA\&.CFG" "5" "04/22/2021" "mpd-sima" "mpd-sima 0.17.0 User Manual"
+.TH "MPD_SIMA\&.CFG" "5" "11/14/2021" "mpd-sima" "mpd-sima 0.18.0.dev0 User Manu"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -270,6 +270,8 @@ Plugin priority
 .RE
 .SS "Random section"
 .PP
+When no similar tracks are found, falling back to random queuing\&.
+.PP
 Random plugin\*(Aqs configuration:
 .PP
 \fB[random]\fR
@@ -283,10 +285,9 @@ How many track(s) to add\&.
 .PP
 \fBflavour=\fR\fIsensible\fR
 .RS 4
-When no similar tracks are found, falling back to random queuing\&. Different mode, aka random flavour, are available:
+Different mode, aka random flavour, are available:
 \fIpure\fR,
 \fIsensible\fR,
-\fIgenre\fR\&.
 .sp
 .RS 4
 .ie n \{\
@@ -308,17 +309,6 @@ When no similar tracks are found, falling back to random queuing\&. Different mo
 .IP \(bu 2.3
 .\}
 \fIsensible\fR, use play history to filter chosen tracks\&.
-.RE
-.sp
-.RS 4
-.ie n \{\
-\h'-04'\(bu\h'+03'\c
-.\}
-.el \{\
-.sp -1
-.IP \(bu 2.3
-.\}
-\fIgenre\fR, Not implemented yet\&.
 .RE
 .sp
 .RE
@@ -401,7 +391,7 @@ Whether or not to use on\-disk persistent http cache\&.
 When set to "true", sima will use a persistent cache for its http client\&. The cache is written along with the dbfile in:
 .br
 
-$XDG_CONFIG_HOME/mpd_sima/http/WEB_SERVICE\&.
+$XDG_DATA_HOME/mpd_sima/http/WEB_SERVICE\&.
 .br
 
 If set to "false", caching is still done but in memory\&.
