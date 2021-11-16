@@ -112,7 +112,7 @@ CMDS = [
          ], 'help': 'Add track to the blocklist'},
         {'bl-delete': [
             {'name': 'id', 'type': int, 'nargs': '?',
-             'help': 'blocklist ID to suppress (use bl-view list IDs)'}
+             'help': 'blocklist ID to suppress (use bl-view to list IDs)'}
          ], 'help': 'Remove entries from the blocklist'},
 ]
 
