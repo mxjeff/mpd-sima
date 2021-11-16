@@ -23,7 +23,7 @@ from logging import getLogger
 from select import select
 
 # external module
-from musicpd import MPDClient, MPDError
+from musicpd import MPDClient, MPDError as PlayerError
 
 
 # local import
@@ -31,11 +31,6 @@ from .lib.meta import Meta, Artist, Album
 from .lib.track import Track
 from .lib.simastr import SimaStr
 from .utils.leven import levenshtein_ratio
-from .utils.utils import MPDSimaException
-
-
-class PlayerError(MPDSimaException):
-    """Fatal error in the player."""
 
 
 # Some decorators
@@ -130,8 +125,6 @@ class MPD(MPDClient):
             return super().__getattr__(cmd)
         except OSError as err:  # socket errors
             raise PlayerError(err) from err
-        except MPDError as err:  # hight level MPD client errors
-            raise PlayerError(err) from err
 
     def disconnect(self):
         """Overriding explicitly MPDClient.disconnect()"""
@@ -161,7 +154,7 @@ class MPD(MPDClient):
         if password:
             try:
                 self.password(password)
-            except (MPDError, OSError) as err:
+            except OSError as err:
                 raise PlayerError(f"Could not connect to '{host}': {err}") from err
         # Controls we have sufficient rights
         available_cmd = self.commands()
@@ -252,8 +245,6 @@ class MPD(MPDClient):
                 #  Nothing to read, canceling idle
                 self.noidle()
         except OSError as err:
-            raise PlayerError(err) from err
-        except MPDError as err:  # hight level MPD client errors
             raise PlayerError(err) from err
 
     def clean(self):

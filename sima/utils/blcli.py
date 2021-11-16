@@ -21,7 +21,7 @@ import atexit
 import sys
 
 # local import
-from ..mpdclient import MPD, PlayerError, Artist, Album
+from ..mpdclient import MPD, Artist, Album
 from ..lib.simadb import SimaDB
 
 
@@ -35,11 +35,7 @@ class BLCli(MPD):
         cmd = options.get('command', None)
         if not cmd or not cmd.startswith('bl-'):
             return
-        try:
-            getattr(self, cmd.replace('-', '_'))()
-        except PlayerError as err:
-            self.log.error(err)
-            sys.exit(1)
+        getattr(self, cmd.replace('-', '_'))()
 
     def bl_view(self):
         blocklist = self.sdb.view_bl()

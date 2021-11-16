@@ -36,6 +36,7 @@ from os import rename
 from . import core, info
 from .lib.logger import set_logger
 from .lib.simadb import SimaDB
+from .mpdclient import PlayerError
 from .utils.config import ConfMan
 from .utils.startopt import StartOpt
 from .utils.utils import exception_log, SigHup, MPDSimaException
@@ -183,7 +184,7 @@ def run(sopt, restart=False):
         start(sopt, restart)
     except SigHup:  # SigHup inherit from Exception
         run(sopt, True)
-    except MPDSimaException as err:
+    except (MPDSimaException, PlayerError) as err:
         logger.error(err)
         sys.exit(2)
     except Exception:  # Unhandled exception
