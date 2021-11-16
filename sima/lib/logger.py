@@ -32,7 +32,7 @@ DEBUG = logging.DEBUG
 INFO = logging.INFO
 ERROR = logging.ERROR
 LOG_FORMATS = {
-        DEBUG: '[{process}]{filename: >11}:{lineno: <3} {levelname: <7}: {message}',
+        DEBUG: '[{process}]{filename: >12}:{lineno: <3} {levelname: <7}: {message}',
         INFO:  '{levelname: <7}: {message}',
         }
 DATE_FMT = "%Y-%m-%d %H:%M:%S"
