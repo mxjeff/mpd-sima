@@ -52,9 +52,22 @@ def control_config(tags_config):
     return True
 
 
-def forge_filter(cfg):
+def forge_filter(cfg, logger):
+    """forge_filter merges tags config and user defined MPD filter into a single
+    MPD filter"""
     tags = set(cfg.keys()) & Tags.supported_tags
     cfg_filter = cfg.get('filter', None)
+    # Remove external enclosing parentheses in user defined MPD filter, for
+    # instance  when there is more than one expression:
+    #     ((genre == 'rock' ) AND (date =~ '198.'))
+    # Even though it's a valid MPD filter, forge_filter will enclose it
+    # properly. We do not want to through a syntax error at users since it's a
+    # valid MPD filter, hence trying to transparently reformat the filter
+    if cfg_filter.startswith('((') and cfg_filter.endswith('))'):
+        logger.debug('Drop external enclosing parentheses in user filter: %s',
+                     cfg_filter[1:-1])
+        cfg['filter'] = cfg_filter[1:-1]
+        cfg_filter = cfg['filter']
     mpd_filter = []
     if cfg_filter:
         mpd_filter.append(cfg_filter)
@@ -82,7 +95,7 @@ class Tags(AdvancedPlugin):
     def __init__(self, daemon):
         super().__init__(daemon)
         self._control_conf()
-        self.mpd_filter = forge_filter(self.plugin_conf)
+        self.mpd_filter = forge_filter(self.plugin_conf, self.log)
         self._setup_tagsneeded()
         self.log.debug('mpd filter: %s', self.mpd_filter)
 
@@ -110,12 +123,14 @@ class Tags(AdvancedPlugin):
                 'Need at least MPD 0.21 to use Tags plugin (filters required)')
             self.player.disconnect()
             raise PluginException('MPD >= 0.21 required')
+        if not self.plugin_conf['filter']:
+            return
         # Check filter is valid
         try:
-            if self.plugin_conf['filter']:
-                # Use window to limit response size
-                self.player.find(self.plugin_conf['filter'], "window", (0, 1))
+            # Use window to limit response size
+            self.player.find(self.mpd_filter, "window", (0, 1))
         except CommandError as err:
+            self.log.warning(err)
             raise PluginException('Badly formated filter in tags plugin configuration: "%s"'
                                   % self.plugin_conf['filter']) from err
 

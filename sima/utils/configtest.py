@@ -31,7 +31,7 @@ def tags_config_test(cli, config):
     tags_cfg = config['tags']
     if not control_config(tags_cfg):
         return
-    filt = forge_filter(tags_cfg)
+    filt = forge_filter(tags_cfg, log)
     log.info('Trying tags and filter config')
     log.debug('Complete filter (tag+filter): %s', filt)
     try:
