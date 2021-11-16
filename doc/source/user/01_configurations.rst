@@ -145,8 +145,8 @@ current filter "`(date =~ '198[2-9]+')`":
     genre = rock
     filter = (date =~ '198[2-9]+')
 
-And even go further and merge genre in the filter using "`((genre == 'rock') AND
-(date =~ '198[2-9]+'))`".
+And even go further and merge genre in the filter using "`(genre == 'rock') AND
+(date =~ '198[2-9]+')`".
 
 .. code:: ini
 
@@ -154,8 +154,7 @@ And even go further and merge genre in the filter using "`((genre == 'rock') AND
     internal = Crop, Tags
 
     [tags]
-    filter = (genre == 'rock' ) AND (date =~ '198[2-9]+'))
-
+    filter = (genre == 'rock' ) AND (date =~ '198[2-9]+')
 
 Since the setup for the filter can be tricky and it can be useful to validate
 the syntax and have a look at what kind of artists the filter would return.
