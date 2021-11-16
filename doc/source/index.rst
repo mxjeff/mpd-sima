@@ -53,8 +53,9 @@ Development documentation
    dev/simadb
 
 
+###################
 Indices and tables
-==================
+###################
 
 * :ref:`genindex`
 * :ref:`modindex`

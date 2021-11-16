@@ -41,7 +41,7 @@ Album mode
 
 One of the first request added to MPD_sima was album mode. It allows to queue whole album instead of single tracks.
 
-Here the configuration keeps the queue plugin *Lastfm* but configure it to queue albums (``queue_mode = album``) and ask for 2 albums to be add.
+Here the configuration keeps the queue plugin *Lastfm* but configures it to queue albums (``queue_mode = album``) and ask for 2 albums to be add.
 
 The configuration of MPD_sima in ``sima`` section is also modified for ``queue_length``. The value of 10 is to trigger album queueing when there are 10 tracks or less in the queue.
 
