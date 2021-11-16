@@ -162,9 +162,9 @@ class MPD(MPDClient):
             if cmd not in available_cmd:
                 self.disconnect()
                 raise PlayerError(f'Could connect to "{host}", but command "{cmd}" not available')
-        self.tagtypes('clear')
+        self.tagtypes_clear()
         for tag in MPD.needed_tags:
-            self.tagtypes('enable', tag)
+            self.tagtypes_enable(tag)
         ltt = set(map(str.lower, self.tagtypes()))
         needed_tags = set(map(str.lower, MPD.needed_tags))
         if len(needed_tags & ltt) != len(MPD.needed_tags):
@@ -172,7 +172,7 @@ class MPD(MPDClient):
             self.log.warning('Tags needed: %s', needed_tags)
             raise PlayerError('Missing mandatory metadata!')
         for tag in MPD.needed_mbid_tags:
-            self.tagtypes('enable', tag)
+            self.tagtypes_enable(tag)
         # Controls use of MusicBrainzIdentifier
         if self.config.getboolean('sima', 'musicbrainzid'):
             ltt = set(self.tagtypes())
