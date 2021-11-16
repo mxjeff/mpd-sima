@@ -5,7 +5,7 @@
   <!ENTITY dhemail     "kaliko@azylum.org">
   <!ENTITY dhusername  "&dhsurname;">
   <!ENTITY dhpackage "mpd-sima">
-  <!ENTITY release   "0.18.0.dev0">
+  <!ENTITY release   "0.18.0">
   <!-- TITLE should be something like "User commands" or similar (see
        http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
   <!ENTITY dhtitle     "&dhpackage; &release; User Manual">
