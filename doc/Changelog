@@ -1,5 +1,6 @@
 MPD_sima v0.18.1.dev0
 
+ * Remove bad heuristic to infer artist aliases
 
  -- kaliko <kaliko@azylum.org>  Thu, 18 Nov 2021 13:55:12 +0100
 
