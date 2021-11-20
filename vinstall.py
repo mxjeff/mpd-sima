@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (C) 2013 Vinay Sajip. New BSD License.
-# Copyright (C) 2014, 2020 kaliko <kaliko@azylum.org>
+# Copyright (C) 2014, 2021 kaliko <kaliko@azylum.org>
 #
 
-REQ_VER = (3,4)
+REQ_VER = (3,6)
 import sys
 if sys.version_info < REQ_VER:
     print('Need at least python {0}.{1} to run this script'.format(*REQ_VER), file=sys.stderr)
@@ -91,7 +91,7 @@ class ExtendedEnvBuilder(venv.EnvBuilder):
             os.unlink(distpath)
 
 
-def main(args=None):
+def main():
     root = os.path.dirname(os.path.abspath(__file__))
     vdir = os.path.join(root, 'venv')
     builder = ExtendedEnvBuilder(clear=True, verbose=False, with_pip=True)
@@ -103,8 +103,8 @@ def main(args=None):
     # Write wrapper
     with open(os.path.join(root, 'vmpd-sima'),'w') as fd:
         fd.write('#!/bin/sh\n')
-        fd.write('. "{}/venv/bin/activate"\n'.format(root))
-        fd.write('"{}/venv/bin/mpd-sima" "$@"'.format(root))
+        fd.write(f'. "{root}/venv/bin/activate"\n')
+        fd.write(f'"{root}/venv/bin/mpd-sima" "$@"')
     os.chmod(os.path.join(root, 'vmpd-sima'), 0o744)
 
 
@@ -114,5 +114,5 @@ if __name__ == '__main__':
         main()
         rc = 0
     except ImportError as e:
-        print('Error: %s' % e)
+        print(f'Error: {e}')
     sys.exit(rc)
