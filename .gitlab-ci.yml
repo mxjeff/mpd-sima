@@ -22,10 +22,12 @@ stages:
 smoketest:
   stage: test
   script:
-  - pip install requests python-musicpd
+  - pip install requests python-musicpd sphinx
   - python setup.py test
   # build wheel and source
   - python setup.py bdist_wheel sdist
+  # manual and HTML documentation
+  - python setup.py build_sphinx
   # install
   - pip install dist/*.whl
   # smoke test

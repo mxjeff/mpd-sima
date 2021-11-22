@@ -1,6 +1,9 @@
 MPD_sima v0.18.1.dev0
 
  * Remove bad heuristic to infer artist aliases
+ * Add shpinx documentation
+ * Merge unix manuals in sphinx reStructuredText
+   Call "setup.py build_sphinx" to build troff manuals
 
  -- kaliko <kaliko@azylum.org>  Thu, 18 Nov 2021 13:55:12 +0100
 

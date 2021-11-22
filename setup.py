@@ -11,8 +11,6 @@ from sima.info import __version__ as VERSION, __author__ as AUTHOR
 from sima.info import __doc__ as DESCRIPTION, __email__ as EMAIL
 
 data_files = [
-    ('share/man/man1', ['data/man/mpd-sima.1']),
-    ('share/man/man5', ['data/man/mpd_sima.cfg.5']),
     ('share/doc/mpd-sima/examples/', glob.glob('doc/examples/*')),
     ('share/doc/mpd-sima/', [fi for fi in listdir('doc') if isfile(fi)]),
 ]
@@ -52,6 +50,13 @@ setup(name='MPD_sima',
               ]
           },
       test_suite="tests",
+      command_options={
+          'build_sphinx': {
+              'version': ('setup.py', VERSION),
+              'release': ('setup.py', VERSION),
+              'builder': ('setup.py', 'html,man'),
+              }
+          }
       )
 
 # VIM MODLINE

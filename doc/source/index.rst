@@ -17,7 +17,9 @@ your library is correctly tagged (see :ref:`metadata-convention`).
 The default setting for MPD_sima is to queue similar artists thanks to last.fm_
 suggestions but there are other possibilities.
 
-**To queue tracks from similar artists, start playing a track in MPD then launch MPD_sima:**
+**To queue tracks from similar artists:**
+  - start playing a track in MPD
+  - launch MPD_sima
 
 .. code-block:: sh
 
@@ -26,6 +28,7 @@ suggestions but there are other possibilities.
 
     # runs against a specific MPD server
     mpd-sima --host mpd.example.org
+
 
 #####################
 User's documentation
@@ -36,6 +39,20 @@ User's documentation
    :glob:
 
    user/*
+
+
+############
+Unix Manuals
+############
+
+These manual pages were written for the Debian system (and may be used by others).
+
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+
+   man/mpd-sima.1.rst
+   man/mpd_sima.cfg.5.rst
 
 
 ##########################
@@ -53,9 +70,9 @@ Development documentation
    dev/simadb
 
 
-###################
+##################
 Indices and tables
-###################
+##################
 
 * :ref:`genindex`
 * :ref:`modindex`
