@@ -221,6 +221,7 @@ LastFM plugin's configuration.
 
 
 **[lastfm]**
+
 **queue_mode=track**
 
     Queue mode to use among track, top and album (see `QUEUE MODE section
