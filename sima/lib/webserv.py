@@ -103,7 +103,7 @@ class WebService(AdvancedPlugin):
             dynamic = 100
         results = []
         similarities.reverse()
-        while (len(results) < dynamic and similarities):
+        while (len(results) < dynamic+1 and similarities):
             art_pop = similarities.pop()
             res = self.player.search_artist(art_pop)
             if res:

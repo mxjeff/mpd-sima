@@ -227,7 +227,7 @@ LastFM plugin's configuration.
     Queue mode to use among track, top and album (see `QUEUE MODE section
     <#queue_mode>`__ for info about queue modes).
 
-**max_art=0**
+**max_art=20**
 
     Maximum number of similar artist to retrieve from local media
     library. When set to something superior to zero, it tries to get as

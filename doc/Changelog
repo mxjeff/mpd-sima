@@ -1,6 +1,7 @@
 MPD_sima v0.18.1.dev0
 
  * Remove bad heuristic to infer artist aliases
+ * Set max_art default value to 20
  * Add shpinx documentation
  * Merge unix manuals in sphinx reStructuredText
    Call "setup.py build_sphinx" to build troff manuals

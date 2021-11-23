@@ -71,7 +71,7 @@ DEFAULT_CONF = {
             },
         'lastfm': {
             'queue_mode': "track",  # TODO control values
-            'max_art': 10,
+            'max_art': 20,
             'single_album': False,
             'track_to_add': 1,
             'album_to_add': 1,
