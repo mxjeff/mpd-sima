@@ -27,8 +27,8 @@ Here is an example of autoqueue using file tags only.
     [sima] # Setup internal plugins
     # Tags plugin falls back to Random if nothing is found then Crop the queue
     internal = Tags, Random, Crop
-    history_duration=48  # 48h / 24 = 2 days
-    queue_length=2       # triggers autoqueue when 2 tracks remains to play
+    history_duration = 48  # 48h / 24 = 2 days
+    queue_length = 2       # triggers autoqueue when 2 tracks remains to play
 
     [tags]
     # Look for files with tagged with genre "electronica" OR "IDM" OR "glitch"
@@ -36,7 +36,7 @@ Here is an example of autoqueue using file tags only.
 
     [crop]
     # keep 30 played tracks in playlist
-    consume=30
+    consume = 30
 
 
 Album queue mode using last.fm recommendations (online mode).
@@ -118,7 +118,7 @@ Configure process daemon.
 **[daemon]**
 
 **daemon=false**
-    whether to daemonize process or not.
+    Whether to daemonize process or not.
 
 **pidfile=**
     Where to store process ID.
