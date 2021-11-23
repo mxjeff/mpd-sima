@@ -21,7 +21,7 @@
 Consume Last.fm web service
 """
 
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 __author__ = 'Jack Kaliko'
 
 
@@ -83,7 +83,7 @@ class SimaFM:
         else:
             payload.update(artist=artist.name,
                            autocorrect=1)
-        payload.update(results=100)
+        payload.update(limit=100)
         if method == 'track':
             payload.update(track=track)
         # > hashing the URL into a cache key
