@@ -191,7 +191,10 @@ pseudoxml:
 	@echo
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
 
-publish: html
-	rsync -avh ./build/html/ kaliko.me:var/www/kaliko/media/sima
+setuptools:
+	(cd ..; python3 setup.py build_sphinx)
+
+publish: setuptools
+	rsync -avh --delete ../build/sphinx/html/ kaliko.me:var/www/kaliko/media/sima
 	@echo
 	@echo "Publishing to https://media.kaliko.me/sima finished."
