@@ -3,9 +3,9 @@
 
 import glob
 
-from setuptools import setup, find_packages  # >= 2.0.2
 from os import listdir
 from os.path import isfile
+from setuptools import setup, find_packages  # >= 2.0.2
 
 from sima.info import __version__ as VERSION, __author__ as AUTHOR
 from sima.info import __doc__ as DESCRIPTION, __email__ as EMAIL
