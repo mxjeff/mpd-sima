@@ -15,7 +15,7 @@ MPD_sima (or any advanced music players, MPD_ among them), you need to ensure
 your library is correctly tagged (see :ref:`metadata-convention`).
 
 The default setting for MPD_sima is to queue similar artists thanks to last.fm_
-suggestions but there are other possibilities.
+suggestions but there are other possibilities, see :ref:`configuration-examples`.
 
 **To queue tracks from similar artists:**
   - start playing a track in MPD
