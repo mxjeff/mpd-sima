@@ -149,7 +149,7 @@ class MPD(MPDClient):
         # ConnectionError and ProtocolError are always fatal.  Others may not
         # be, but we don't know how to handle them here, so treat them as if
         # they are instead of ignoring them.
-        except MPDError as err:
+        except PlayerError as err:
             raise PlayerError(f'Could not connect to "{host}:{port}": {err}') from err
         if password:
             try:
