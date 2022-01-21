@@ -109,12 +109,6 @@ class Plugin:
         Returns a list of Track objects to add
         """
 
-    def callback_need_track_fb(self):
-        """
-        Called when callback_need_track failled to find tracks to queue
-        Returns a list of Track objects to add
-        """
-
     def shutdown(self):
         """Called on application shutdown"""
 
