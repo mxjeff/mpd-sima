@@ -123,7 +123,7 @@ class WebService(AdvancedPlugin):
         except WSNotFound as err:
             self.log.warning('%s: %s', self.ws.name, err)
             if artist.mbid:
-                self.log.debug('Trying without MusicBrainzID')
+                self.log.info('Trying without MusicBrainzID')
                 try:
                     return self.ws_similar_artists(Artist(name=artist.name))
                 except WSNotFound as err:
