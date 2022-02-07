@@ -1,12 +1,14 @@
-MPD_sima v0.18.1.dev0
+MPD_sima v0.18.1
 
  * Remove bad heuristic to infer artist aliases
  * Set max_art default value to 20
  * Add sphinx documentation
  * Merge unix manuals in sphinx reStructuredText
-   Call "setup.py build_sphinx" to build troff manuals
+   Call "setup.py build_sphinx" to build documentation (troff and html).
+   Build only man pages:
+   sphinx-build -d ./build/sphinx/doctrees doc/source -b man ./build/sphinx/man
 
- -- kaliko <kaliko@azylum.org>  Thu, 18 Nov 2021 13:55:12 +0100
+ -- kaliko <kaliko@azylum.org>  Mon, 07 Feb 2022 18:11:48 +0100
 
 MPD_sima v0.18.0
 
