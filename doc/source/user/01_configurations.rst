@@ -104,7 +104,7 @@ Tag queuing
 
 This is the most complex and versatile offline mode. "Tags" plugin allows to queue track based on actual tags value.
 
-Here is an example to have MPD_sima to queue only electronic music tagged with genres **electonica** or **IDM** or **glitch**:
+Here is an example to have MPD_sima to queue only electronic music tagged with genres **electronica** or **IDM** or **glitch**:
 
 .. code:: ini
 
@@ -112,8 +112,8 @@ Here is an example to have MPD_sima to queue only electronic music tagged with g
     internal = Crop, Tags
 
     [tags]
-    # Look for files with tagged with genre "electonica" OR "IDM" OR "glitch"
-    genre = electonica, IDM, glitch
+    # Look for files with tagged with genre "electronica" OR "IDM" OR "glitch"
+    genre = electronica, IDM, glitch
 
 There are other supported tags, mainly **date**, **originaldate** or
 **comment** (cf manual for the exact list). You can use more than one, entries
