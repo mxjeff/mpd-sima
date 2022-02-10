@@ -189,7 +189,13 @@ class MPD(MPDClient):
             self.log.warning('Use of MusicBrainzIdentifier disabled!')
             self.log.info('Consider using MusicBrainzIdentifier for your music library')
             self.use_mbid = Meta.use_mbid = False
-        self._reset_cache()
+        # TODO: Why do I need to intercept OSError here?
+        # why is it not wrapped in PlayerError in __getattr__?
+        # (cf. commit message for more)
+        try:
+            self._reset_cache()
+        except OSError as err:
+            raise PlayerError(f'Error during cache init: {err}') from err
     # ######### / Overriding MPDClient #########
 
     def _reset_cache(self):
