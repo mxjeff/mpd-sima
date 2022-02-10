@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2009-2015, 2021 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2015, 2022 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -114,6 +114,10 @@ CMDS = [
             {'name': 'id', 'type': int, 'nargs': '?',
              'help': 'blocklist ID to suppress (use bl-view to list IDs)'}
          ], 'help': 'Remove entries from the blocklist'},
+        {'random': [
+            {'name': 'nbtracks', 'type': int, 'nargs': '?',
+             'help': 'Number of tracks to add'}
+         ], 'help': 'Start in random auto queuing'},
 ]
 
 

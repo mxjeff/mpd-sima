@@ -30,6 +30,13 @@ suggestions but there are other possibilities, see :ref:`configuration-examples`
     mpd-sima --host mpd.example.org
 
 
+**To start in random queuing mode:**
+
+.. code-block:: sh
+
+    # Adds 5 tracks at random when there is only 1 track in the queue
+    mpd-sima random 5
+
 #####################
 User's documentation
 #####################

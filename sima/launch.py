@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2013, 2014, 2015, 2020, 2021 kaliko <kaliko@azylum.org>
+# Copyright (c) 2013, 2014, 2015, 2020-2022 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -136,6 +136,10 @@ def start(sopt, restart=False):
                 sys.exit(1)
             SimaDB(db_path=db_file).purge_history(duration=0)
             sys.exit(0)
+        if cmd == 'random':
+            config['sima']['internal'] = 'Crop, Random'
+            if sopt.options.get('nbtracks'):
+                config['random']['track_to_add'] = str(sopt.options.get('nbtracks'))
 
     logger.info('Starting (%s)...', info.__version__)
     sima = core.Sima(config)

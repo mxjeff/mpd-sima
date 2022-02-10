@@ -27,6 +27,8 @@ SYNOPSYS
 
 ``mpd-sima bl-delete id``
 
+``mpd-sima random [nbtracks]``
+
 
 DESCRIPTION
 -----------
@@ -153,6 +155,10 @@ Command arguments
 ``bl-delete id``
    Remove blocklist entry referenced by its id. Use bloclist view
    command to get the id.
+
+``random [nbtracks]``
+   Starts in random mode overriding internal plugin configuration. If
+   `nbtracks` is provided, as many tracks will be queued (defaults to one).
 
 ENVIRONMENT
 -----------
