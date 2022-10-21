@@ -32,12 +32,17 @@ smoketest:
   - pip install dist/*.whl
   # smoke test
   - mpd-sima --help
+  - TRACE=y ./mpd-sima -d --pid ./mpd-sima.pid -l ./mpd-sima.log
+  - sleep 10
+  - test -f ./mpd-sima.pid && kill $(cat ./mpd-sima.pid)
   artifacts:
     expire_in: 1 hour
     paths:
     - dist/*.whl
     - dist/*.tar.gz
     - dist/*.zip
+    - ./mpd-sima.pid
+    - ./mpd-sima.log
 
 unittests:
   stage: test

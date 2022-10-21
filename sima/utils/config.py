@@ -143,15 +143,15 @@ class ConfMan:  # CONFIG MANAGER CLASS
         self.supersedes_config_with_cmd_line_options()
         # set dbfile
         self.config['sima']['db_file'] = join(self.config['sima']['var_dir'], 'sima.db')
-        # Controls files access
-        self.control_facc()
-
         # Create directories
         data_dir = self.config['sima']['var_dir']
         if not isdir(data_dir):
             self.log.trace('Creating "%s"', data_dir)
             makedirs(data_dir)
             chmod(data_dir, 0o700)
+
+        # Controls files access
+        self.control_facc()
 
     def control_facc(self):
         """Controls file access.
