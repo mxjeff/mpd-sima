@@ -1,9 +1,10 @@
 MPD_sima v0.18.2
 
   * Add positional argument:
-  "random", a short cut to start in random mode
+  "random", a shortcut to start in random mode (cf. manual for more)
+  * Fixed startup (regression preventing start when var dir is not present)
 
- -- kaliko <kaliko@azylum.org>  UNRELEASED
+ -- kaliko <kaliko@azylum.org> Fri, 28 Oct 2022 08:49:58 +0200
 
 MPD_sima v0.18.1
 
