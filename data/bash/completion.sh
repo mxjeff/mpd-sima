@@ -1,4 +1,4 @@
-# Copyright (c) 2010, 2011, 2013, 2014, 2015, 2021 kaliko <kaliko@azylum.org>
+# Copyright (c) 2010, 2011, 2013, 2014, 2015, 2021, 2022 kaliko <kaliko@azylum.org>
 #
 #  This file is part of MPD_sima
 #
@@ -43,7 +43,8 @@ _sima() {
           bl-add-artist \
           bl-add-album \
           bl-add-track \
-          bl-delete"
+          bl-delete \
+          random"
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
