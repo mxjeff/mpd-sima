@@ -49,6 +49,7 @@ unittests:
   script:
   - pip install pytest-cov requests python-musicpd
   - py.test -q --cov=sima --junitxml=report.xml tests
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     when: always
     reports:
