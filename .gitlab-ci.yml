@@ -5,11 +5,13 @@ image: python:3
 include:
   - local: .gitlab/gitlab-templates.yml
   - local: .gitlab/pylint.yml
-  - template: Security/SAST.gitlab-ci.yml
+  - template: Jobs/SAST.gitlab-ci.yml
 
 variables:
   #XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
+  SAST_EXCLUDED_ANALYZERS: brakeman, flawfinder, kubesec, mobsf, nodejs-scan,
+    phpcs-security-audit, pmd-apex, sobelow, spotbugs
 
 cache:
   paths:
@@ -64,12 +66,6 @@ vinstall:
   - ./vmpd-sima --help
   artifacts:
     expire_in: 1 hour
-
-sast:
-  variables:
-    SAST_EXCLUDED_ANALYZERS: brakeman, eslint, flawfinder, gosec, kubesec, nodejs-scan,
-      phpcs-security-audit, pmd-apex, security-code-scan, semgrep, sobelow, spotbugs
-  stage: test
 
 tag_release:
   stage: build
