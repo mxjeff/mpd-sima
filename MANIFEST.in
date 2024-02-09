@@ -2,4 +2,3 @@ recursive-include data *
 recursive-include doc *
 include README
 include INSTALL
-include vinstall.py

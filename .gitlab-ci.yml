@@ -58,16 +58,6 @@ unittests:
     reports:
       junit: report.xml
 
-vinstall:
-  stage: test
-  script:
-  # test virtualenv install
-  - python3 ./vinstall.py
-  # smoke test
-  - ./vmpd-sima --help
-  artifacts:
-    expire_in: 1 hour
-
 tag_release:
   stage: build
   dependencies:
