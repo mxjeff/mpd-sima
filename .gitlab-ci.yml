@@ -29,7 +29,8 @@ smoketest:
   # build wheel and source
   - python setup.py bdist_wheel sdist
   # manual and HTML documentation
-  - python setup.py build_sphinx
+  - sphinx-build -d ./build/doctrees doc/source -b man ./build/man/
+  - sphinx-build -d ./build/doctrees doc/source -b html ./build/html/
   # install
   - pip install dist/*.whl
   # smoke test
