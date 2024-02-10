@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2009-2021 kaliko <kaliko@azylum.org>
+# Copyright (c) 2009-2022, 2024 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -31,6 +31,7 @@ from .lib.meta import Meta, Artist, Album
 from .lib.track import Track
 from .lib.simastr import SimaStr
 from .utils.leven import levenshtein_ratio
+from .utils.utils import get_decorator
 
 
 # Some decorators
@@ -76,6 +77,9 @@ def tracks_wrapper(func):
             return Track(**ret)
         return [Track(**t) for t in ret]
     return wrapper
+
+# Decorator to wrap non MPDError exceptions from musicpd in PlayerError
+we = get_decorator(errors=(OSError, TimeoutError), wrap_into=PlayerError)
 # / decorators
 
 
@@ -116,15 +120,13 @@ class MPD(MPDClient):
         self._cache = None
 
     # ######### Overriding MPDClient ###########
+    @we
     def __getattr__(self, cmd):
         """Wrapper around MPDClient calls for abstract overriding"""
         track_wrapped = {'currentsong', 'find', 'playlistinfo', }
-        try:
-            if cmd in track_wrapped:
-                return tracks_wrapper(super().__getattr__(cmd))
-            return super().__getattr__(cmd)
-        except OSError as err:  # socket errors
-            raise PlayerError(err) from err
+        if cmd in track_wrapped:
+            return tracks_wrapper(super().__getattr__(cmd))
+        return super().__getattr__(cmd)
 
     def disconnect(self):
         """Overriding explicitly MPDClient.disconnect()"""
@@ -139,23 +141,9 @@ class MPD(MPDClient):
         port = mpd_config.get('port')
         password = mpd_config.get('password', fallback=None)
         self.disconnect()
-        try:
-            super().connect(host, port)
-        # Catch socket errors
-        except OSError as err:
-            raise PlayerError(f'Could not connect to "{host}:{port}": {err.strerror}'
-                             ) from err
-        # Catch all other possible errors
-        # ConnectionError and ProtocolError are always fatal.  Others may not
-        # be, but we don't know how to handle them here, so treat them as if
-        # they are instead of ignoring them.
-        except PlayerError as err:
-            raise PlayerError(f'Could not connect to "{host}:{port}": {err}') from err
+        super().connect(host, port)
         if password:
-            try:
-                self.password(password)
-            except OSError as err:
-                raise PlayerError(f"Could not connect to '{host}': {err}") from err
+            self.password(password)
         # Controls we have sufficient rights
         available_cmd = self.commands()
         for cmd in MPD.needed_cmds:
@@ -219,6 +207,7 @@ class MPD(MPDClient):
             return False
         return self.current.id != previous.id  # pylint: disable=no-member
 
+    @we
     def monitor(self):
         """Monitor player for change
         Returns a list a events among:
@@ -231,21 +220,18 @@ class MPD(MPDClient):
         """
         curr = self.current
         select_timeout = 5
-        try:  # noidle cmd does not go through __getattr__, need to catch OSError then
-            while True:
-                self.send_idle('database', 'playlist', 'player', 'options')
-                _read, _, _ = select([self], [], [], select_timeout)
-                if _read:  # tries to read response
-                    ret = self.fetch_idle()
-                    if self._skipped_track(curr):
-                        ret.append('skipped')
-                    if 'database' in ret:
-                        self._reset_cache()
-                    return ret
-                #  Nothing to read, canceling idle
-                self.noidle()
-        except OSError as err:
-            raise PlayerError(err) from err
+        while True:
+            self.send_idle('database', 'playlist', 'player', 'options')
+            _read, _, _ = select([self], [], [], select_timeout)
+            if _read:  # tries to read response
+                ret = self.fetch_idle()
+                if self._skipped_track(curr):
+                    ret.append('skipped')
+                if 'database' in ret:
+                    self._reset_cache()
+                return ret
+            #  Nothing to read, canceling idle
+            self.noidle()
 
     def clean(self):
         """Clean blocking event (idle) and pending commands
@@ -255,6 +241,7 @@ class MPD(MPDClient):
         elif self._pending:
             self.log.warning('pending commands: %s', self._pending)
 
+    @we
     def add(self, payload):
         """Overriding MPD's add method to accept Track objects
 

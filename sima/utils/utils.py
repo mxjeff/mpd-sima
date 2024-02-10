@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, 2011, 2013, 2014, 2015, 2020, 2021 kaliko <kaliko@azylum.org>
+# Copyright (c) 2010, 2011, 2013, 2014, 2015, 2020, 2021, 2024 kaliko <kaliko@azylum.org>
 #
 #  This file is part of sima
 #
@@ -213,6 +213,22 @@ class WSHTTPError(WSError):
 
 class PluginException(MPDSimaException):
     pass
+
+
+# Wrap Exception decorator
+def get_decorator(errors=(OSError, TimeoutError), wrap_into=Exception):
+    def decorator(func):
+        def w_func(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except errors as err:
+                strerr = str(err)
+                if hasattr(err, 'strerror'):
+                    if err.strerror:
+                        strerr = err.strerror
+                raise wrap_into(strerr) from err
+        return w_func
+    return decorator
 
 # VIM MODLINE
 # vim: ai ts=4 sw=4 sts=4 expandtab
